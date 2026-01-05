@@ -25,7 +25,7 @@ export function DashboardTabs({ stats, uploads, userEmail }: DashboardTabsProps)
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <div className="text-sm text-muted-foreground">
-          Signed in as <span className="font-medium text-foreground">{userEmail}</span>
+          Signed in <span className="font-medium text-foreground">{userEmail}</span>
         </div>
       </div>
       
