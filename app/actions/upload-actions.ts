@@ -4,6 +4,13 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { r2Client } from "@/lib/storage/r2";
 import { createClient } from "@/lib/supabase/server";
+import {
+  UploadInsertSchema,
+  UploadFullSchema,
+  UploadEventIdSchema,
+  EventOwnerSchema,
+  type UploadInsert,
+} from "@/lib/schemas/database";
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/quicktime"];
@@ -29,18 +36,13 @@ export async function getPresignedUrl(
 ): Promise<PresignedUrlResult> {
   // Validate file type
   if (!ALLOWED_TYPES.includes(fileType)) {
-    throw new Error(
-      `Invalid file type. Allowed types: ${ALLOWED_TYPES.join(", ")}`
-    );
+    throw new Error(`Invalid file type. Allowed types: ${ALLOWED_TYPES.join(", ")}`);
   }
 
   // Generate unique file key
   const uuid = crypto.randomUUID();
   const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
   const fileKey = `events/${eventId}/${uuid}-${sanitizedFileName}`;
-
-  // Determine media type
-  const mediaType = ALLOWED_IMAGE_TYPES.includes(fileType) ? "image" : "video";
 
   // Create PutObjectCommand
   const command = new PutObjectCommand({
@@ -72,39 +74,49 @@ export async function saveUploadToDb(
   }
 
   const fileUrl = `${r2Domain}/${uploadData.fileKey}`;
-  
+
   // For now, thumbnail_url is null (can be generated later)
   // For images, we could use the same URL, for videos we'd need to generate thumbnails
   const thumbnailUrl = uploadData.mediaType === "image" ? fileUrl : null;
 
-  // Insert into database
+  // Prepare insert data and validate with Zod
+  const insertData: UploadInsert = {
+    event_id: uploadData.eventId,
+    file_url: fileUrl,
+    thumbnail_url: thumbnailUrl,
+    media_type: uploadData.mediaType,
+    guest_name: uploadData.guestName || null,
+    caption: uploadData.caption || null,
+  };
+
+  // Validate with Zod before inserting
+  const validatedData = UploadInsertSchema.parse(insertData);
+
+  // Insert into database (type assertion needed for Supabase client type inference)
   const { data, error } = await supabase
     .from("uploads")
-    .insert({
-      event_id: uploadData.eventId,
-      file_url: fileUrl,
-      thumbnail_url: thumbnailUrl,
-      media_type: uploadData.mediaType,
-      guest_name: uploadData.guestName || null,
-      caption: uploadData.caption || null,
-    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .insert(validatedData as any)
     .select()
     .single();
 
-  if (error) {
-    throw new Error(`Failed to save upload to database: ${error.message}`);
+  if (error || !data) {
+    throw new Error(`Failed to save upload to database: ${error?.message || "Unknown error"}`);
   }
 
+  // Parse and validate response with Zod
+  const parsedUpload = UploadFullSchema.parse(data);
+
   return {
-    id: data.id,
-    file_url: data.file_url,
-    thumbnail_url: data.thumbnail_url,
+    id: parsedUpload.id,
+    file_url: parsedUpload.file_url,
+    thumbnail_url: parsedUpload.thumbnail_url,
   };
 }
 
 export async function deleteUpload(uploadId: string): Promise<{ success: boolean }> {
   const supabase = await createClient();
-  
+
   // Get current user to verify ownership
   const {
     data: { user },
@@ -125,26 +137,35 @@ export async function deleteUpload(uploadId: string): Promise<{ success: boolean
     throw new Error("Upload not found");
   }
 
+  // Parse and validate with Zod
+  const parsedUpload = UploadEventIdSchema.safeParse(upload);
+  if (!parsedUpload.success) {
+    throw new Error("Invalid upload data");
+  }
+
   // Verify the event belongs to the user
   const { data: event, error: eventError } = await supabase
     .from("events")
     .select("owner_id")
-    .eq("id", upload.event_id)
+    .eq("id", parsedUpload.data.event_id)
     .single();
 
   if (eventError || !event) {
     throw new Error("Event not found");
   }
 
-  if (event.owner_id !== user.id) {
+  // Parse and validate event with Zod
+  const parsedEvent = EventOwnerSchema.safeParse(event);
+  if (!parsedEvent.success) {
+    throw new Error("Invalid event data");
+  }
+
+  if (parsedEvent.data.owner_id !== user.id) {
     throw new Error("Unauthorized: You don't own this event");
   }
 
   // Delete the upload
-  const { error: deleteError } = await supabase
-    .from("uploads")
-    .delete()
-    .eq("id", uploadId);
+  const { error: deleteError } = await supabase.from("uploads").delete().eq("id", uploadId);
 
   if (deleteError) {
     throw new Error(`Failed to delete upload: ${deleteError.message}`);

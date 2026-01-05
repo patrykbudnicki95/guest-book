@@ -1,6 +1,8 @@
 "use server";
 
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { EventIdSchema, EventIdWithNamesSchema, UploadFileUrlSchema, UploadFullSchema } from "@/lib/schemas/database";
 
 export interface DashboardStats {
   totalPhotos: number;
@@ -25,13 +27,33 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
   const supabase = await createClient();
 
   // Get user's events
-  const { data: events } = await supabase
+  const { data: events, error: eventsError } = await supabase
     .from("events")
     .select("id")
     .eq("owner_id", userId)
     .eq("is_active", true);
 
-  const eventIds = events?.map((e) => e.id) || [];
+  if (eventsError || !events) {
+    return {
+      totalPhotos: 0,
+      totalStorage: "0 MB",
+      activeEvents: 0,
+      recentUploads: 0,
+    };
+  }
+
+  // Parse and validate with Zod
+  const parsedEvents = z.array(EventIdSchema).safeParse(events);
+  if (!parsedEvents.success) {
+    return {
+      totalPhotos: 0,
+      totalStorage: "0 MB",
+      activeEvents: 0,
+      recentUploads: 0,
+    };
+  }
+
+  const eventIds = parsedEvents.data.map((e) => e.id);
 
   if (eventIds.length === 0) {
     return {
@@ -43,25 +65,34 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
   }
 
   // Get all uploads for user's events
-  const { data: uploads } = await supabase
+  const { data: uploads, error: uploadsError } = await supabase
     .from("uploads")
     .select("file_url, created_at")
     .in("event_id", eventIds);
 
+  if (uploadsError || !uploads) {
+    return {
+      totalPhotos: 0,
+      totalStorage: "0 MB",
+      activeEvents: eventIds.length,
+      recentUploads: 0,
+    };
+  }
+
+  // Parse and validate with Zod
+  const parsedUploads = z.array(UploadFileUrlSchema).safeParse(uploads);
+  const validUploads = parsedUploads.success ? parsedUploads.data : [];
+
   // Get uploads from last 24 hours
   const oneDayAgo = new Date();
   oneDayAgo.setHours(oneDayAgo.getHours() - 24);
-  const recentUploads = uploads?.filter(
-    (upload) => new Date(upload.created_at) > oneDayAgo
-  ).length || 0;
+  const recentUploads = validUploads.filter((upload) => new Date(upload.created_at) > oneDayAgo).length;
 
   // Calculate total storage (rough estimate based on file count)
   // In a real app, you'd track actual file sizes
-  const totalPhotos = uploads?.length || 0;
+  const totalPhotos = validUploads.length;
   const estimatedMB = Math.round((totalPhotos * 3) / 10) / 100; // Rough estimate: ~3MB per photo average
-  const totalStorage = estimatedMB < 1 
-    ? `${Math.round(estimatedMB * 1000)} KB` 
-    : `${estimatedMB.toFixed(2)} MB`;
+  const totalStorage = estimatedMB < 1 ? `${Math.round(estimatedMB * 1000)} KB` : `${estimatedMB.toFixed(2)} MB`;
 
   return {
     totalPhotos,
@@ -75,14 +106,24 @@ export async function getUserUploads(userId: string): Promise<DashboardUpload[]>
   const supabase = await createClient();
 
   // Get user's events
-  const { data: events } = await supabase
+  const { data: events, error: eventsError } = await supabase
     .from("events")
     .select("id, names")
     .eq("owner_id", userId)
     .eq("is_active", true);
 
-  const eventIds = events?.map((e) => e.id) || [];
-  const eventMap = new Map(events?.map((e) => [e.id, e.names]) || []);
+  if (eventsError || !events) {
+    return [];
+  }
+
+  // Parse and validate with Zod
+  const parsedEvents = z.array(EventIdWithNamesSchema).safeParse(events);
+  if (!parsedEvents.success) {
+    return [];
+  }
+
+  const eventIds = parsedEvents.data.map((e) => e.id);
+  const eventMap = new Map(parsedEvents.data.map((e) => [e.id, e.names]));
 
   if (eventIds.length === 0) {
     return [];
@@ -99,11 +140,17 @@ export async function getUserUploads(userId: string): Promise<DashboardUpload[]>
     return [];
   }
 
-  return uploads.map((upload) => ({
+  // Parse and validate with Zod
+  const parsedUploads = z.array(UploadFullSchema).safeParse(uploads);
+  if (!parsedUploads.success) {
+    return [];
+  }
+
+  return parsedUploads.data.map((upload) => ({
     id: upload.id,
     file_url: upload.file_url,
     thumbnail_url: upload.thumbnail_url,
-    media_type: upload.media_type as "image" | "video",
+    media_type: upload.media_type,
     guest_name: upload.guest_name,
     caption: upload.caption,
     created_at: upload.created_at,
@@ -111,4 +158,3 @@ export async function getUserUploads(userId: string): Promise<DashboardUpload[]>
     event_names: eventMap.get(upload.event_id) || null,
   }));
 }
-

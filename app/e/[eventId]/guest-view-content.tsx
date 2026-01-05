@@ -1,5 +1,7 @@
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { GuestViewContentClient } from "./guest-view-content-client";
+import { EventBasicSchema, UploadFullSchema } from "@/lib/schemas/database";
 import type { Upload } from "./upload-drawer";
 
 async function getEvent(eventId: string) {
@@ -15,11 +17,13 @@ async function getEvent(eventId: string) {
     return null;
   }
 
-  return {
-    id: data.id,
-    names: data.names,
-    date: data.date,
-  };
+  // Parse and validate with Zod
+  const parsed = EventBasicSchema.safeParse(data);
+  if (!parsed.success) {
+    return null;
+  }
+
+  return parsed.data;
 }
 
 async function getEventUploads(eventId: string): Promise<Upload[]> {
@@ -34,11 +38,17 @@ async function getEventUploads(eventId: string): Promise<Upload[]> {
     return [];
   }
 
-  return data.map((upload) => ({
+  // Parse and validate with Zod
+  const parsed = z.array(UploadFullSchema).safeParse(data);
+  if (!parsed.success) {
+    return [];
+  }
+
+  return parsed.data.map((upload) => ({
     id: upload.id,
     file_url: upload.file_url,
     thumbnail_url: upload.thumbnail_url,
-    media_type: upload.media_type as "image" | "video",
+    media_type: upload.media_type,
     guest_name: upload.guest_name,
     caption: upload.caption,
     created_at: upload.created_at,
