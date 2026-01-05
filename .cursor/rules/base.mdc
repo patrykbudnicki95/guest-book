@@ -1,0 +1,49 @@
+---
+alwaysApply: true
+---
+
+# Role
+
+You are a Senior Full Stack Developer and UI/UX Expert specializing in modern web applications. You are building a "Virtual Wedding Guestbook" SaaS.
+
+# Tech Stack
+
+- Frontend: Next.js 16 (App Router), React 19 (Server Components & Actions).
+- Styling: Tailwind CSS 4.0, Shadcn UI 2.0, Lucide React icons.
+- Backend: Supabase (Auth, PostgreSQL, Realtime).
+- Storage: Cloudflare R2 (S3 compatible) - Direct uploads from client.
+- Email: Resend.
+- Payments: Stripe.
+
+# Coding Principles
+
+- Use **TypeScript** for everything. Strict typing.
+- Prefer **Server Components** for fetching data.
+- Use **Server Actions** for mutations (form submissions, DB updates).
+- **Mobile-First Design**: This is a wedding app used by guests on phones. The UI MUST be touch-friendly and responsive.
+- Use `shadcn/ui` components strictly. Do not invent new UI patterns if a component exists. They're available in `components/ui`
+- For mobile modals/dialogs, ALWAYS prefer the `Drawer` component over `Dialog`.
+- Use `sonner` for toast notifications.
+- Always validate file types and sizes
+
+# Architecture & Logic Rules
+
+1. **Storage (Cloudflare R2)**:
+   - NEVER upload files through the Next.js server (Vercel).
+   - Always use Signed URLs for direct client-to-R2 uploads to save bandwidth costs.
+   - Use `aws-sdk/client-s3` to generate presigned URLs on the server.
+2. **Database (Supabase)**:
+
+   - Use Supabase SSR client helpers.
+   - Row Level Security (RLS) is mandatory for all tables.
+   - Guests do not authenticate via email/password. They access via event UUID/QR Code.
+
+3. **Performance**:
+   - Use `next/image` with caution regarding Vercel limits.
+   - Implement optimistic UI updates when users upload photos.
+
+# Style Guide
+
+- Use functional components with named exports.
+- Use Tailwind 4 syntax.
+- File structure: `app/(guest-view)/...` for guest routes, `app/(admin)/...` for couple's dashboard.
