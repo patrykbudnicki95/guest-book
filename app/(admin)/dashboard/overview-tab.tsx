@@ -78,7 +78,7 @@ export function OverviewTab({ stats }: OverviewTabProps) {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            Use the tabs above to navigate between different sections of your dashboard.
+            Use the navigation above to access different sections of your dashboard.
           </p>
         </CardContent>
       </Card>

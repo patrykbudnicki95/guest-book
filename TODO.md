@@ -2,6 +2,7 @@ DONE:
 - login
 - file upload
 - base dashboard
+- split dashboard to routes
 
 TODO (sorted by priorites):
 - main page content
