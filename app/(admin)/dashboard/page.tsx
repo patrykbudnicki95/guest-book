@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getDashboardStats } from "@/app/actions/dashboard-actions";
+import { getDashboardStats, getUserEvents } from "@/app/actions/dashboard-actions";
 import { OverviewTab } from "./components/overview-tab";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -28,9 +28,12 @@ async function OverviewContent() {
     redirect("/login");
   }
 
-  const stats = await getDashboardStats(user.id);
+  const [stats, events] = await Promise.all([
+    getDashboardStats(user.id),
+    getUserEvents(user.id),
+  ]);
 
-  return <OverviewTab stats={stats} />;
+  return <OverviewTab stats={stats} events={events} />;
 }
 
 export default function DashboardPage() {

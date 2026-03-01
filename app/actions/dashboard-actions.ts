@@ -23,6 +23,11 @@ export interface DashboardUpload {
   event_names: string | null;
 }
 
+export interface UserEvent {
+  id: string;
+  names: string;
+}
+
 export async function getDashboardStats(userId: string): Promise<DashboardStats> {
   const supabase = await createClient();
 
@@ -156,5 +161,36 @@ export async function getUserUploads(userId: string): Promise<DashboardUpload[]>
     created_at: upload.created_at,
     event_id: upload.event_id,
     event_names: eventMap.get(upload.event_id) || null,
+  }));
+}
+
+export async function getUserEvents(userId: string): Promise<UserEvent[]> {
+  const supabase = await createClient();
+
+  // Get user's events
+  const { data: events, error: eventsError } = await supabase
+    .from("events")
+    .select("id, names")
+    .eq("owner_id", userId)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false });
+
+  if (eventsError || !events) {
+    console.error("[getUserEvents] Error fetching events:", eventsError);
+    return [];
+  }
+
+  // Parse and validate with Zod
+  const parsedEvents = z.array(EventIdWithNamesSchema).safeParse(events);
+  if (!parsedEvents.success) {
+    console.error("[getUserEvents] Zod validation failed:");
+    console.error("Validation errors:", JSON.stringify(parsedEvents.error.format(), null, 2));
+    console.error("Raw data:", JSON.stringify(events, null, 2));
+    return [];
+  }
+
+  return parsedEvents.data.map((event) => ({
+    id: event.id,
+    names: event.names,
   }));
 }
