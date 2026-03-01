@@ -25,8 +25,6 @@ Good to know: Caching can be applied at the component or function level, while f
 Diagram showing partially rendered page on the client, with loading UI for chunks that are being streamed.
 This rendering approach is called Partial Prerendering, and it's the default behavior with Cache Components. For the rest of this document, we simply refer to it as "prerendering" which can produce a partial or complete output.
 
-🎥 Watch: Why Partial Prerendering and how it works → YouTube (10 minutes).
-
 Automatically prerendered content
 Operations like synchronous I/O, module imports, and pure computations can complete during prerendering. Components using only these operations have their rendered output included in the static HTML shell.
 

@@ -12,6 +12,8 @@ export async function DashboardContent({ userId, userEmail }: DashboardContentPr
     getUserUploads(userId),
   ]);
 
+  console.log("uploads", uploads)
+
   return <DashboardTabs stats={stats} uploads={uploads} userEmail={userEmail} />;
 }
 

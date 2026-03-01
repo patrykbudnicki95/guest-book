@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { GuestViewContentClient } from "./guest-view-content-client";
-import { EventBasicSchema, UploadFullSchema } from "@/lib/schemas/database";
+import { EventBasicSchema, UploadGuestSchema } from "@/lib/schemas/database";
 import type { Upload } from "./upload-drawer";
 
 async function getEvent(eventId: string) {
@@ -14,12 +14,15 @@ async function getEvent(eventId: string) {
     .single();
 
   if (error || !data) {
+    console.error("[getEvent] Error fetching event:", error);
     return null;
   }
 
   // Parse and validate with Zod
   const parsed = EventBasicSchema.safeParse(data);
   if (!parsed.success) {
+    console.error("[getEvent] Zod validation failed:", z.prettifyError(parsed.error));
+    console.error("[getEvent] Raw data:", data);
     return null;
   }
 
@@ -34,13 +37,22 @@ async function getEventUploads(eventId: string): Promise<Upload[]> {
     .eq("event_id", eventId)
     .order("created_at", { ascending: false });
 
-  if (error || !data) {
+  if (error) {
+    console.error("[getEventUploads] Supabase error:", error);
+    return [];
+  }
+
+  if (!data) {
+    console.warn("[getEventUploads] No data returned from Supabase");
     return [];
   }
 
   // Parse and validate with Zod
-  const parsed = z.array(UploadFullSchema).safeParse(data);
+  const parsed = z.array(UploadGuestSchema).safeParse(data);
   if (!parsed.success) {
+    console.error("[getEventUploads] Zod validation failed:");
+    console.error("Validation errors:", JSON.stringify(parsed.error.format(), null, 2));
+    console.error("Raw data:", JSON.stringify(data, null, 2));
     return [];
   }
 
@@ -67,7 +79,7 @@ export async function GuestViewContent({ eventId }: { eventId: string }) {
         <div className="text-center">
           <h1 className="text-2xl font-semibold">Event not found</h1>
           <p className="mt-2 text-muted-foreground">
-            The event you're looking for doesn't exist.
+            The event you&apos;re looking for doesn&apos;t exist.
           </p>
         </div>
       </div>

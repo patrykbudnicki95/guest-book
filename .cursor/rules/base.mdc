@@ -26,6 +26,26 @@ You are a Senior Full Stack Developer and UI/UX Expert specializing in modern we
 - Use `sonner` for toast notifications.
 - Always validate file types and sizes
 
+# Data Validation & Error Handling
+
+- **ALWAYS validate all data from Supabase queries using Zod schemas** before using it in the application.
+- **ALWAYS log errors to console** when Zod validation fails:
+  - Use `console.error()` with descriptive prefixes like `[functionName]` for easy debugging
+  - Log both the validation errors (`z.prettifyError(error)`) and the raw data that failed validation
+  - Include context about what operation was being performed
+- Create Zod schemas in `lib/schemas/database.ts` that match the exact structure returned by Supabase queries
+- Use `safeParse()` instead of `parse()` to handle validation errors gracefully
+- Example pattern:
+  ```typescript
+  const parsed = Schema.safeParse(data);
+  if (!parsed.success) {
+    console.error("[functionName] Zod validation failed:", z.prettifyError(parsed.error));
+    console.error("[functionName] Raw data:", JSON.stringify(data, null, 2));
+    return defaultValue; // or throw error
+  }
+  return parsed.data;
+  ```
+
 # Architecture & Logic Rules
 
 1. **Storage (Cloudflare R2)**:
@@ -47,3 +67,5 @@ You are a Senior Full Stack Developer and UI/UX Expert specializing in modern we
 - Use functional components with named exports.
 - Use Tailwind 4 syntax.
 - File structure: `app/(guest-view)/...` for guest routes, `app/(admin)/...` for couple's dashboard.
+- Keep files near the page that are used. If the files are used more in one place, then keep it in global components/lib etc, but if component, schema, api call is used only in one route, keep file near that route, to keep clean architecture.
+
