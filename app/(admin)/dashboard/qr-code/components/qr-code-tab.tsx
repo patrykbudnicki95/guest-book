@@ -1,63 +1,142 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import QRCode from "qrcode";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockGenerateQRCode } from "@/app/actions/mock-actions";
 import { toast } from "sonner";
-import { QrCode, Download } from "lucide-react";
+import { Download } from "lucide-react";
+import type { UserEvent } from "@/app/actions/dashboard-actions";
 
-export function QRCodeTab() {
-  const [isPending, startTransition] = useTransition();
+interface QRCodeTabProps {
+  events: UserEvent[];
+}
 
-  const handleGenerateQRCode = () => {
-    startTransition(async () => {
-      try {
-        console.log("[MOCK] Generating QR Code PDF...");
-        const result = await mockGenerateQRCode("mock-event-123");
-        
-        if (result.success) {
-          toast.success("QR Code PDF generated successfully!");
-          // In a real app, this would trigger a download
-          console.log("[MOCK] PDF URL:", result.pdfUrl);
-        } else {
-          toast.error("Failed to generate QR Code");
+export function QRCodeTab({ events }: QRCodeTabProps) {
+  const [qrCodes, setQrCodes] = useState<Record<string, string>>({});
+  const [loadingQRCodes, setLoadingQRCodes] = useState<Set<string>>(new Set());
+  const [generatingPDF, setGeneratingPDF] = useState<string | null>(null);
+
+  useEffect(() => {
+    const generateQRCodes = async () => {
+      if (events.length === 0) return;
+
+      const newQRCodes: Record<string, string> = {};
+      const loadingSet = new Set<string>();
+
+      for (const event of events) {
+        loadingSet.add(event.id);
+        try {
+          const eventUrl = `${window.location.origin}/e/${event.id}`;
+          const dataUrl = await QRCode.toDataURL(eventUrl, {
+            width: 300,
+            margin: 2,
+            color: {
+              dark: "#000000",
+              light: "#FFFFFF",
+            },
+          });
+          newQRCodes[event.id] = dataUrl;
+        } catch (error) {
+          console.error(`[QRCodeTab] Failed to generate QR code for event ${event.id}:`, error);
+          toast.error(`Failed to generate QR code for ${event.names}`);
+        } finally {
+          loadingSet.delete(event.id);
         }
-      } catch (error) {
-        toast.error("An error occurred");
-        console.error(error);
       }
-    });
+
+      setQrCodes(newQRCodes);
+      setLoadingQRCodes(loadingSet);
+    };
+
+    generateQRCodes();
+  }, [events]);
+
+  const handleGeneratePDF = (eventId: string, eventName: string) => {
+    setGeneratingPDF(eventId);
+    // Placeholder for PDF generation
+    setTimeout(() => {
+      toast.info(`PDF generation for ${eventName} will be implemented soon`);
+      setGeneratingPDF(null);
+    }, 500);
   };
 
-  return (
-    <div className="space-y-6">
+  if (events.length === 0) {
+    return (
       <Card>
         <CardHeader>
           <CardTitle>QR Code Generator</CardTitle>
           <CardDescription>
-            Generate a downloadable QR code PDF for your event
+            Generate QR codes for your events
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-12">
-            <QrCode className="mb-4 size-16 text-muted-foreground" />
-            <p className="mb-2 text-sm font-medium">Event QR Code</p>
-            <p className="mb-4 text-center text-sm text-muted-foreground">
-              Click the button below to generate a QR code PDF that guests can scan
-              to access your event page.
-            </p>
-            <Button
-              onClick={handleGenerateQRCode}
-              disabled={isPending}
-              size="lg"
-            >
-              <Download className="mr-2 size-4" />
-              {isPending ? "Generating..." : "Generate QR Code PDF"}
-            </Button>
-          </div>
+        <CardContent>
+          <p className="text-center text-sm text-muted-foreground py-8">
+            No active events found. Create an event to generate QR codes.
+          </p>
         </CardContent>
       </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {events.map((event) => {
+        const qrCodeDataUrl = qrCodes[event.id];
+        const isLoading = loadingQRCodes.has(event.id);
+        const isGeneratingPDF = generatingPDF === event.id;
+
+        return (
+          <Card key={event.id}>
+            <CardHeader>
+              <CardTitle>{event.names}</CardTitle>
+              <CardDescription>
+                Share this QR code with your guests to access the event page
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8">
+                {isLoading ? (
+                  <div className="flex flex-col items-center justify-center space-y-4">
+                    <div className="size-64 animate-pulse rounded-lg bg-muted" />
+                    <p className="text-sm text-muted-foreground">Generating QR code...</p>
+                  </div>
+                ) : qrCodeDataUrl ? (
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="rounded-lg border bg-white p-4">
+                      <Image
+                        src={qrCodeDataUrl}
+                        alt={`QR Code for ${event.names}`}
+                        width={300}
+                        height={300}
+                        className="size-auto"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground text-center max-w-sm">
+                      {`${window.location.origin}/e/${event.id}`}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center space-y-4">
+                    <p className="text-sm text-muted-foreground">Failed to generate QR code</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-center">
+                <Button
+                  onClick={() => handleGeneratePDF(event.id, event.names)}
+                  disabled={isGeneratingPDF || isLoading || !qrCodeDataUrl}
+                  size="lg"
+                >
+                  <Download className="mr-2 size-4" />
+                  {isGeneratingPDF ? "Generating..." : "Generate QR Code PDF"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }
