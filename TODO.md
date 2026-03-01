@@ -5,9 +5,10 @@ DONE:
 - split dashboard to routes
 
 TODO (sorted by priorites):
+- render link to the event page on dashboard
+- qr code generation
 - main page content
 - event page  content
-- qr code generation
 - login from the homepage
 - limitations by selected plan
 - giving info about the plan

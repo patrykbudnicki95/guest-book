@@ -67,5 +67,13 @@ You are a Senior Full Stack Developer and UI/UX Expert specializing in modern we
 - Use functional components with named exports.
 - Use Tailwind 4 syntax.
 - File structure: `app/(guest-view)/...` for guest routes, `app/(admin)/...` for couple's dashboard.
-- Keep files near the page that are used. If the files are used more in one place, then keep it in global components/lib etc, but if component, schema, api call is used only in one route, keep file near that route, to keep clean architecture.
+
+# File Organization
+
+- **Route-specific components**: Components used only in a specific route MUST be placed in a `components` folder within that route directory.  schemas in 'schemas' directory, and API calls in 'api' directory
+  - Example: `app/(admin)/dashboard/gallery/components/gallery-tab.tsx` for a component only used in the gallery route
+  - Example: `app/(admin)/dashboard/components/overview-tab.tsx` for a component used in the root dashboard route
+- **Shared components**: Components used across multiple routes should be in `components/` at the app root or in `lib/` if they're utilities.
+- **Layout components**: Components used in layouts (like navigation) can stay at the layout level if they're only used by that layout.
+- **Rule of thumb**: If a component/schema/action is used in only ONE route, it belongs in that route's `components` folder. If used in multiple routes, it belongs in a shared location.
 

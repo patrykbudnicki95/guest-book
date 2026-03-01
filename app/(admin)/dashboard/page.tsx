@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getDashboardStats } from "@/app/actions/dashboard-actions";
-import { OverviewTab } from "./overview-tab";
+import { OverviewTab } from "./components/overview-tab";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function OverviewSkeleton() {

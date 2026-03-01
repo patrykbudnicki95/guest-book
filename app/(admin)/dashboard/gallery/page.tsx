@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUserUploads } from "@/app/actions/dashboard-actions";
-import { GalleryTab } from "../gallery-tab";
+import { GalleryTab } from "./components/gallery-tab";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function GallerySkeleton() {
