@@ -7,11 +7,11 @@ DONE:
 - render link to the event page on dashboard
 - qr code generation
 - pdf download generated qr code only
+- translations
 
 TODO (sorted by priorites):
 
 - pdf download with information about the event
-- translations
 - main page content
   - pricing options (maybe display some fast shopping options like in vesti, but I'm not sure about that)
 - event page content

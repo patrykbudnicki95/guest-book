@@ -1,0 +1,238 @@
+{
+  "common": {
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "loading": "Ładowanie...",
+    "anonymous": "Anonimowy",
+    "unknownEvent": "Nieznane wydarzenie",
+    "image": "Obraz",
+    "video": "Wideo",
+    "upload": "Prześlij",
+    "uploading": "Przesyłanie...",
+    "download": "Pobierz",
+    "delete": "Usuń",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano"
+  },
+  "landing": {
+    "hero": {
+      "badge": "Podziel się wyjątkowymi chwilami",
+      "title": "Wirtualna Księga Gości",
+      "subtitle": "Pozwól gościom przesyłać zdjęcia i składać życzenia bezpośrednio z telefonu. Bez pobierania aplikacji. Prosto, szybko i pięknie.",
+      "createAccount": "Utwórz darmowe konto",
+      "viewDemo": "Zobacz demo"
+    },
+    "features": {
+      "title": "Wszystko w jednym miejscu",
+      "uploads": {
+        "title": "Łatwe przesyłanie zdjęć",
+        "description": "Goście skanują kod QR i przesyłają zdjęcia bezpośrednio z telefonu. Bez instalacji aplikacji."
+      },
+      "gallery": {
+        "title": "Piękna galeria",
+        "description": "Wszystkie zdjęcia wyświetlane są w pięknej, zoptymalizowanej na mobile galerii, z której każdy może korzystać."
+      },
+      "management": {
+        "title": "Proste zarządzanie",
+        "description": "Moderuj treści, pobieraj zdjęcia i zarządzaj wydarzeniem z jednego panelu."
+      }
+    },
+    "pricing": {
+      "title": "Proste ceny",
+      "subtitle": "Wybierz plan dopasowany do Twoich potrzeb",
+      "free": {
+        "title": "Darmowy",
+        "description": "Idealny na początek",
+        "perMonth": "/mies.",
+        "event": "1 Wydarzenie",
+        "photos": "Do 50 zdjęć",
+        "features": "Podstawowe funkcje",
+        "cta": "Rozpocznij"
+      },
+      "pro": {
+        "title": "Pro",
+        "description": "Najpopularniejszy",
+        "perMonth": "/mies.",
+        "events": "Nieograniczone wydarzenia",
+        "photos": "Nieograniczone zdjęcia",
+        "support": "Priorytetowe wsparcie",
+        "download": "Pobierz wszystkie zdjęcia",
+        "cta": "Rozpocznij"
+      },
+      "enterprise": {
+        "title": "Enterprise",
+        "description": "Dla dużych wydarzeń",
+        "perMonth": "/mies.",
+        "everything": "Wszystko z Pro",
+        "branding": "Własna marka",
+        "support": "Dedykowane wsparcie",
+        "analytics": "Zaawansowana analityka",
+        "cta": "Skontaktuj się"
+      }
+    },
+    "cta": {
+      "title": "Gotowy do startu?",
+      "subtitle": "Utwórz darmowe konto i skonfiguruj pierwsze wydarzenie w kilka minut.",
+      "button": "Utwórz darmowe konto"
+    }
+  },
+  "auth": {
+    "login": {
+      "welcomeBack": "Witaj ponownie",
+      "signInToManage": "Zaloguj się, aby zarządzać wydarzeniami weselnymi",
+      "title": "Logowanie",
+      "description": "Wprowadź email i hasło, aby kontynuować",
+      "email": "Email",
+      "password": "Hasło",
+      "emailPlaceholder": "ty@example.com",
+      "submit": "Zaloguj się",
+      "submitting": "Logowanie...",
+      "noAccount": "Nie masz konta?",
+      "signUp": "Zarejestruj się"
+    },
+    "signup": {
+      "createAccount": "Utwórz konto",
+      "signUpToStart": "Zarejestruj się, aby tworzyć wydarzenia weselne",
+      "title": "Rejestracja",
+      "description": "Utwórz konto, aby rozpocząć",
+      "email": "Email",
+      "emailPlaceholder": "ty@example.com",
+      "password": "Hasło",
+      "confirmPassword": "Potwierdź hasło",
+      "submit": "Zarejestruj się",
+      "submitting": "Tworzenie konta...",
+      "hasAccount": "Masz już konto?",
+      "signIn": "Zaloguj się"
+    },
+    "errors": {
+      "fillAll": "Wypełnij wszystkie pola",
+      "invalidCredentials": "Nieprawidłowe dane logowania",
+      "loginError": "Wystąpił błąd podczas logowania",
+      "passwordsNoMatch": "Hasła nie są identyczne",
+      "passwordMinLength": "Hasło musi mieć co najmniej 6 znaków",
+      "signupError": "Wystąpił błąd podczas rejestracji",
+      "createAccountError": "Nie udało się utworzyć konta"
+    }
+  },
+  "dashboard": {
+    "title": "Panel",
+    "signedInAs": "Zalogowano jako",
+    "nav": {
+      "overview": "Przegląd",
+      "gallery": "Galeria",
+      "qrCode": "Kod QR",
+      "settings": "Ustawienia"
+    },
+    "overview": {
+      "totalPhotos": "Łącznie zdjęć",
+      "storageUsed": "Wykorzystane miejsce",
+      "activeEvents": "Aktywne wydarzenia",
+      "recentUploads": "Ostatnie przesyłki",
+      "acrossAllEvents": "We wszystkich wydarzeniach",
+      "totalStorage": "Łącznie miejsca",
+      "currentlyActive": "Obecnie aktywne",
+      "last24Hours": "Ostatnie 24 godziny",
+      "eventLinks": "Linki do wydarzeń",
+      "shareEventLinks": "Udostępnij linki do wydarzeń",
+      "copyShareDescription": "Kopiuj i udostępnij te linki gościom",
+      "copyLink": "Kopiuj link",
+      "linkCopied": "Link skopiowany",
+      "linkCopiedFor": "Link skopiowany dla {name}",
+      "copyFailed": "Nie udało się skopiować linku",
+      "noEvents": "Brak aktywnych wydarzeń. Utwórz wydarzenie, aby wygenerować linki.",
+      "welcomeBack": "Witaj ponownie!",
+      "manageDescription": "Zarządzaj wydarzeniami weselnymi i przeglądaj przesyłki gości.",
+      "navHint": "Użyj nawigacji powyżej, aby uzyskać dostęp do różnych sekcji panelu."
+    },
+    "gallery": {
+      "title": "Galeria",
+      "description": "Zarządzaj zdjęciami i filmami z Twoich wydarzeń",
+      "deleteSelected": "Usuń zaznaczone",
+      "noUploads": "Brak przesyłek",
+      "noUploadsDescription": "Zdjęcia i filmy pojawią się tutaj, gdy goście zaczną przesyłać.",
+      "deleteSuccess": "Przesyłka usunięta pomyślnie",
+      "deleteError": "Nie udało się usunąć przesyłki",
+      "bulkDeleteError": "Wystąpił błąd podczas usuwania",
+      "deleteSelected": "Usuń zaznaczone",
+      "download": "Pobierz",
+      "delete": "Usuń"
+    },
+    "qrCode": {
+      "title": "Generator kodów QR",
+      "description": "Generuj kody QR dla swoich wydarzeń",
+      "noEvents": "Brak aktywnych wydarzeń. Utwórz wydarzenie, aby wygenerować kody QR.",
+      "shareDescription": "Udostępnij ten kod QR gościom, aby uzyskali dostęp do strony wydarzenia",
+      "generating": "Generowanie kodu QR...",
+      "failed": "Nie udało się wygenerować kodu QR",
+      "generatePdf": "Generuj PDF z kodem QR",
+      "generatingPdf": "Generowanie...",
+      "pdfSuccess": "PDF został wygenerowany!",
+      "pdfError": "Nie udało się wygenerować PDF"
+    },
+    "settings": {
+      "title": "Ustawienia wydarzenia",
+      "description": "Edytuj informacje o swoim weselu",
+      "noEvents": "Nie znaleziono aktywnych wydarzeń. Utwórz wydarzenie, aby edytować ustawienia.",
+      "selectEvent": "Wybierz wydarzenie",
+      "eventName": "Nazwa wydarzenia",
+      "eventNamePlaceholder": "np. Anna i Jan",
+      "eventDate": "Data wydarzenia",
+      "location": "Miejsce",
+      "locationPlaceholder": "Nazwa lub adres miejsca",
+      "themeColor": "Kolor motywu",
+      "saving": "Zapisywanie...",
+      "save": "Zapisz",
+      "saveSuccess": "Ustawienia zostały zapisane",
+      "saveError": "Nie udało się zapisać",
+      "privacy": {
+        "title": "Prywatność",
+        "description": "Kontroluj kto może przeglądać i dodawać do wydarzenia",
+        "publicViewing": "Publiczne przeglądanie",
+        "publicViewingDesc": "Zezwól każdemu z linkiem na przeglądanie zdjęć",
+        "moderation": "Wymagana moderacja",
+        "moderationDesc": "Sprawdzaj uploady przed publikacją"
+      },
+      "account": {
+        "title": "Konto",
+        "description": "Zarządzaj ustawieniami konta",
+        "signOut": "Wyloguj",
+        "signingOut": "Wylogowywanie..."
+      },
+      "dangerZone": {
+        "title": "Strefa niebezpieczna",
+        "description": "Nieodwracalne działania",
+        "deleteEvent": "Usuń wydarzenie"
+      }
+    }
+  },
+  "guestView": {
+    "addPhoto": "Dodaj zdjęcie",
+    "noPhotos": "Brak zdjęć",
+    "noPhotosSubtitle": "Bądź pierwszy, który podzieli się wspomnieniem!",
+    "eventNotFound": "Wydarzenie nie znalezione",
+    "eventNotFoundDesc": "Szukane wydarzenie nie istnieje.",
+    "upload": {
+      "title": "Dodaj wspomnienie",
+      "description": "Podziel się zdjęciem lub filmem z uroczystości",
+      "photoOrVideo": "Zdjęcie lub film",
+      "yourName": "Twoje imię (opcjonalnie)",
+      "yourNamePlaceholder": "Jan Kowalski",
+      "message": "Wiadomość (opcjonalnie)",
+      "messagePlaceholder": "Podziel się życzeniami...",
+      "selected": "Wybrano",
+      "uploading": "Przesyłanie...",
+      "uploadButton": "Prześlij",
+      "cancel": "Anuluj",
+      "selectFile": "Wybierz plik",
+      "invalidFileType": "Wybierz zdjęcie (JPEG, PNG, WebP) lub film (MP4, MOV)",
+      "fileTooLarge": "Rozmiar pliku musi być mniejszy niż 50MB",
+      "success": "Zdjęcie przesłane pomyślnie!",
+      "error": "Wystąpił błąd podczas przesyłania"
+    },
+    "memory": "Wspomnienie z wesela",
+    "videoAlt": "Film z wesela"
+  },
+  "qrPdf": {
+    "instruction": "Zeskanuj poniższy kod QR aparatem telefonu,\naby otworzyć naszą księgę gości.\nPodziel się z nami swoimi życzeniami i zdjęciami!"
+  }
+}

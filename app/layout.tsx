@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { getLocale } from "next-intl/server";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,13 +20,15 @@ export const metadata: Metadata = {
   description: "Share your special moments - Upload photos and leave wishes",
 };
 
-export default function RootLayout({
+async function RootLayoutContent({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  const locale = await getLocale();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -32,5 +36,27 @@ export default function RootLayout({
         <Toaster />
       </body>
     </html>
+  );
+}
+
+function RootLayoutFallback() {
+  return (
+    <html lang="pl">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen animate-pulse bg-muted`}
+      />
+    </html>
+  );
+}
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <Suspense fallback={<RootLayoutFallback />}>
+      <RootLayoutContent>{children}</RootLayoutContent>
+    </Suspense>
   );
 }

@@ -1,0 +1,238 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "anonymous": "Anonymous",
+    "unknownEvent": "Unknown Event",
+    "image": "Image",
+    "video": "Video",
+    "upload": "Upload",
+    "uploading": "Uploading...",
+    "download": "Download",
+    "delete": "Delete",
+    "copy": "Copy",
+    "copied": "Copied"
+  },
+  "landing": {
+    "hero": {
+      "badge": "Share your special moments",
+      "title": "Virtual Wedding Guestbook",
+      "subtitle": "Let your guests upload photos and leave wishes directly from their phones. No app download required. Simple, fast, and beautiful.",
+      "createAccount": "Create Free Account",
+      "viewDemo": "View Demo"
+    },
+    "features": {
+      "title": "Everything you need in one place",
+      "uploads": {
+        "title": "Easy Photo Uploads",
+        "description": "Guests scan a QR code and upload photos directly from their phones. No app installation needed."
+      },
+      "gallery": {
+        "title": "Beautiful Gallery",
+        "description": "All photos are displayed in a beautiful, mobile-optimized gallery that everyone can enjoy."
+      },
+      "management": {
+        "title": "Simple Management",
+        "description": "Moderate content, download photos, and manage your event all from one dashboard."
+      }
+    },
+    "pricing": {
+      "title": "Simple Pricing",
+      "subtitle": "Choose the plan that works for you",
+      "free": {
+        "title": "Free",
+        "description": "Perfect for trying out",
+        "perMonth": "/month",
+        "event": "1 Event",
+        "photos": "Up to 50 photos",
+        "features": "Basic features",
+        "cta": "Get Started"
+      },
+      "pro": {
+        "title": "Pro",
+        "description": "Most popular",
+        "perMonth": "/month",
+        "events": "Unlimited events",
+        "photos": "Unlimited photos",
+        "support": "Priority support",
+        "download": "Download all photos",
+        "cta": "Get Started"
+      },
+      "enterprise": {
+        "title": "Enterprise",
+        "description": "For large events",
+        "perMonth": "/month",
+        "everything": "Everything in Pro",
+        "branding": "Custom branding",
+        "support": "Dedicated support",
+        "analytics": "Advanced analytics",
+        "cta": "Contact Sales"
+      }
+    },
+    "cta": {
+      "title": "Ready to get started?",
+      "subtitle": "Create your free account and set up your first event in minutes.",
+      "button": "Create Free Account"
+    }
+  },
+  "auth": {
+    "login": {
+      "welcomeBack": "Welcome Back",
+      "signInToManage": "Sign in to manage your wedding events",
+      "title": "Login",
+      "description": "Enter your email and password to continue",
+      "email": "Email",
+      "password": "Password",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Sign In",
+      "submitting": "Signing in...",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up"
+    },
+    "signup": {
+      "createAccount": "Create Account",
+      "signUpToStart": "Sign up to start creating your wedding events",
+      "title": "Sign Up",
+      "description": "Create your account to get started",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Sign Up",
+      "submitting": "Creating account...",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in"
+    },
+    "errors": {
+      "fillAll": "Please fill in all fields",
+      "invalidCredentials": "Invalid credentials",
+      "loginError": "An error occurred during login",
+      "passwordsNoMatch": "Passwords do not match",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "signupError": "An error occurred during signup",
+      "createAccountError": "Failed to create account"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "signedInAs": "Signed in as",
+    "nav": {
+      "overview": "Overview",
+      "gallery": "Gallery",
+      "qrCode": "QR Code",
+      "settings": "Settings"
+    },
+    "overview": {
+      "totalPhotos": "Total Photos",
+      "storageUsed": "Storage Used",
+      "activeEvents": "Active Events",
+      "recentUploads": "Recent Uploads",
+      "acrossAllEvents": "Across all events",
+      "totalStorage": "Total storage",
+      "currentlyActive": "Currently active",
+      "last24Hours": "Last 24 hours",
+      "eventLinks": "Event Links",
+      "shareEventLinks": "Share Your Event Links",
+      "copyShareDescription": "Copy and share these links with your guests",
+      "copyLink": "Copy link",
+      "linkCopied": "Link copied",
+      "linkCopiedFor": "Link copied for {name}",
+      "copyFailed": "Failed to copy link",
+      "noEvents": "No active events. Create an event to generate links.",
+      "welcomeBack": "Welcome Back!",
+      "manageDescription": "Manage your wedding events and view guest uploads from here.",
+      "navHint": "Use the navigation above to access different sections of your dashboard."
+    },
+    "gallery": {
+      "title": "Gallery",
+      "description": "Manage photos and videos from your events",
+      "deleteSelected": "Delete selected",
+      "noUploads": "No uploads",
+      "noUploadsDescription": "Photos and videos will appear here when guests start uploading.",
+      "deleteSuccess": "Upload deleted successfully",
+      "deleteError": "Failed to delete upload",
+      "bulkDeleteError": "An error occurred during bulk delete",
+      "deleteSelected": "Delete selected",
+      "download": "Download",
+      "delete": "Delete"
+    },
+    "qrCode": {
+      "title": "QR Code Generator",
+      "description": "Generate QR codes for your events",
+      "noEvents": "No active events found. Create an event to generate QR codes.",
+      "shareDescription": "Share this QR code with your guests to access the event page",
+      "generating": "Generating QR code...",
+      "failed": "Failed to generate QR code",
+      "generatePdf": "Generate QR Code PDF",
+      "generatingPdf": "Generating...",
+      "pdfSuccess": "PDF has been generated!",
+      "pdfError": "Failed to generate PDF"
+    },
+    "settings": {
+      "title": "Event Settings",
+      "description": "Edit your wedding information",
+      "noEvents": "No active events found. Create an event to edit settings.",
+      "selectEvent": "Select event",
+      "eventName": "Event name",
+      "eventNamePlaceholder": "e.g. Anna & John",
+      "eventDate": "Event date",
+      "location": "Location",
+      "locationPlaceholder": "Venue name or address",
+      "themeColor": "Theme color",
+      "saving": "Saving...",
+      "save": "Save",
+      "saveSuccess": "Settings saved successfully",
+      "saveError": "Failed to save",
+      "privacy": {
+        "title": "Privacy",
+        "description": "Control who can view and upload to your event",
+        "publicViewing": "Public viewing",
+        "publicViewingDesc": "Allow anyone with the link to view photos",
+        "moderation": "Require moderation",
+        "moderationDesc": "Review uploads before they appear publicly"
+      },
+      "account": {
+        "title": "Account",
+        "description": "Manage your account settings",
+        "signOut": "Sign Out",
+        "signingOut": "Signing out..."
+      },
+      "dangerZone": {
+        "title": "Danger Zone",
+        "description": "Irreversible actions",
+        "deleteEvent": "Delete Event"
+      }
+    }
+  },
+  "guestView": {
+    "addPhoto": "Add Photo",
+    "noPhotos": "No photos yet",
+    "noPhotosSubtitle": "Be the first to share a memory!",
+    "eventNotFound": "Event not found",
+    "eventNotFoundDesc": "The event you're looking for doesn't exist.",
+    "upload": {
+      "title": "Add a Memory",
+      "description": "Share a photo or video from the celebration",
+      "photoOrVideo": "Photo or Video",
+      "yourName": "Your Name (Optional)",
+      "yourNamePlaceholder": "John Doe",
+      "message": "Message (Optional)",
+      "messagePlaceholder": "Share your wishes...",
+      "selected": "Selected",
+      "uploading": "Uploading...",
+      "uploadButton": "Upload",
+      "cancel": "Cancel",
+      "selectFile": "Please select a file",
+      "invalidFileType": "Please select an image (JPEG, PNG, WebP) or video (MP4, MOV)",
+      "fileTooLarge": "File size must be less than 50MB",
+      "success": "Photo uploaded successfully!",
+      "error": "An error occurred during upload"
+    },
+    "memory": "Wedding memory",
+    "videoAlt": "Wedding video"
+  },
+  "qrPdf": {
+    "instruction": "Scan the QR code below with your phone camera\nto open our guestbook.\nShare your wishes and photos with us!"
+  }
+}
