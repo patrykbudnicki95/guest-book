@@ -53,13 +53,22 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
     generateQRCodes();
   }, [events]);
 
-  const handleGeneratePDF = (eventId: string, eventName: string) => {
+  const handleGeneratePDF = async (eventId: string, eventName: string) => {
+    const qrCodeDataUrl = qrCodes[eventId];
+    if (!qrCodeDataUrl) return;
+
     setGeneratingPDF(eventId);
-    // Placeholder for PDF generation
-    setTimeout(() => {
-      toast.info(`PDF generation for ${eventName} will be implemented soon`);
+    try {
+      const { generateQRCodePDF } = await import("./qr-code-pdf");
+      const eventUrl = `${window.location.origin}/e/${eventId}`;
+      await generateQRCodePDF(eventName, qrCodeDataUrl, eventUrl);
+      toast.success("PDF został wygenerowany!");
+    } catch (error) {
+      console.error("[handleGeneratePDF] Failed to generate PDF:", error);
+      toast.error("Nie udało się wygenerować PDF");
+    } finally {
       setGeneratingPDF(null);
-    }, 500);
+    }
   };
 
   if (events.length === 0) {

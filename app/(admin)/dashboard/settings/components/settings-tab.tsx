@@ -1,83 +1,271 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { signOut } from "@/app/actions/auth-actions";
+import { updateEventSettings } from "@/app/actions/settings-actions";
+import type { EventSettings } from "@/app/actions/settings-actions";
+import {
+  eventSettingsFormSchema,
+  type EventSettingsFormValues,
+} from "../schemas/settings-schema";
 import { toast } from "sonner";
 
-export function SettingsTab() {
+interface SettingsTabProps {
+  events: EventSettings[];
+}
+
+export function SettingsTab({ events }: SettingsTabProps) {
   const [isPending, startTransition] = useTransition();
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+
+  const effectiveEventId = selectedEventId ?? events[0]?.id ?? null;
+  const selectedEvent =
+    events.find((e) => e.id === effectiveEventId) ?? events[0] ?? null;
+
+  const form = useForm<EventSettingsFormValues>({
+    resolver: zodResolver(eventSettingsFormSchema),
+    defaultValues: {
+      names: "",
+      date: "",
+      location: "",
+      theme_color: "",
+    },
+  });
+
+  useEffect(() => {
+    const event =
+      events.find((e) => e.id === effectiveEventId) ?? events[0];
+    if (event) {
+      form.reset({
+        names: event.names,
+        date: event.date ? event.date.split("T")[0] : "",
+        location: event.location ?? "",
+        theme_color: event.theme_color ?? "",
+      });
+    }
+  }, [effectiveEventId, events, form]);
+
+  const handleSave = (values: EventSettingsFormValues) => {
+    if (!effectiveEventId) return;
+
+    startTransition(async () => {
+      const result = await updateEventSettings(effectiveEventId, values);
+
+      if (result.success) {
+        toast.success("Ustawienia zostały zapisane");
+      } else {
+        toast.error(result.error ?? "Nie udało się zapisać");
+      }
+    });
+  };
 
   const handleSignOut = () => {
     startTransition(async () => {
       try {
         await signOut();
-        // Redirect is handled in the server action
       } catch (error: unknown) {
         const err = error as { message?: string; name?: string; digest?: string };
-        
-        // Check if this is a Next.js redirect (which is expected)
-        if (err?.digest?.includes('NEXT_REDIRECT')) {
-          return; // Don't show error for redirects
+
+        if (err?.digest?.includes("NEXT_REDIRECT")) {
+          return;
         }
-        
+
         toast.error("Failed to sign out");
         console.error(error);
       }
     });
   };
 
+  if (events.length === 0) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Ustawienia</CardTitle>
+            <CardDescription>Zarządzaj ustawieniami wydarzenia</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-center text-sm text-muted-foreground py-8">
+              Nie znaleziono aktywnych wydarzeń. Utwórz wydarzenie, aby edytować
+              ustawienia.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Event Settings</CardTitle>
+          <CardTitle>Ustawienia wydarzenia</CardTitle>
           <CardDescription>
-            Manage your event configuration
+            Edytuj informacje o swoim weselu
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="event-name">Event Name</Label>
-            <Input id="event-name" defaultValue="John & Jane's Wedding" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="event-date">Event Date</Label>
-            <Input id="event-date" type="date" defaultValue="2025-06-15" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
-            <Input id="location" placeholder="Venue name or address" />
-          </div>
+          {events.length > 1 && (
+            <div className="space-y-2">
+              <Label>Wydarzenie</Label>
+              <Select
+                value={effectiveEventId ?? ""}
+                onValueChange={setSelectedEventId}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Wybierz wydarzenie" />
+                </SelectTrigger>
+                <SelectContent>
+                  {events.map((event) => (
+                    <SelectItem key={event.id} value={event.id}>
+                      {event.names}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSave)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="names"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nazwa wydarzenia</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="np. Anna i Jan"
+                        disabled={!selectedEvent}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Data wydarzenia</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="date"
+                        disabled={!selectedEvent}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Miejsce</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Nazwa lub adres miejsca"
+                        disabled={!selectedEvent}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="theme_color"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Kolor motywu</FormLabel>
+                    <FormControl>
+                      <div className="flex gap-2">
+                        <Input
+                          type="color"
+                          className="h-10 w-14 p-1 cursor-pointer"
+                          value={field.value || "#000000"}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          disabled={!selectedEvent}
+                        />
+                        <Input
+                          value={field.value}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          placeholder="#000000"
+                          className="flex-1"
+                          disabled={!selectedEvent}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={isPending || !selectedEvent}>
+                {isPending ? "Zapisywanie..." : "Zapisz"}
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Privacy Settings</CardTitle>
+          <CardTitle>Prywatność</CardTitle>
           <CardDescription>
-            Control who can view and upload to your event
+            Kontroluj kto może przeglądać i dodawać do wydarzenia
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="public-viewing">Public Viewing</Label>
+              <Label htmlFor="public-viewing">Publiczne przeglądanie</Label>
               <p className="text-sm text-muted-foreground">
-                Allow anyone with the link to view photos
+                Zezwól każdemu z linkiem na przeglądanie zdjęć
               </p>
             </div>
             <Switch id="public-viewing" defaultChecked />
           </div>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="moderation">Require Moderation</Label>
+              <Label htmlFor="moderation">Wymagana moderacja</Label>
               <p className="text-sm text-muted-foreground">
-                Review uploads before they appear publicly
+                Sprawdzaj uploady przed publikacją
               </p>
             </div>
             <Switch id="moderation" />
@@ -87,10 +275,8 @@ export function SettingsTab() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Account</CardTitle>
-          <CardDescription>
-            Manage your account settings
-          </CardDescription>
+          <CardTitle>Konto</CardTitle>
+          <CardDescription>Zarządzaj ustawieniami konta</CardDescription>
         </CardHeader>
         <CardContent>
           <Button
@@ -98,23 +284,20 @@ export function SettingsTab() {
             onClick={handleSignOut}
             disabled={isPending}
           >
-            {isPending ? "Signing out..." : "Sign Out"}
+            {isPending ? "Wylogowywanie..." : "Wyloguj"}
           </Button>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Danger Zone</CardTitle>
-          <CardDescription>
-            Irreversible actions
-          </CardDescription>
+          <CardTitle>Strefa niebezpieczna</CardTitle>
+          <CardDescription>Nieodwracalne działania</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button variant="destructive">Delete Event</Button>
+          <Button variant="destructive">Usuń wydarzenie</Button>
         </CardContent>
       </Card>
     </div>
   );
 }
-

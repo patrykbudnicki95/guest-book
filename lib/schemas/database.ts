@@ -20,6 +20,21 @@ export const EventBasicSchema = z.object({
   date: z.string(),
 });
 
+export const EventSettingsSchema = z.object({
+  id: z.string().uuid(),
+  names: z.string(),
+  date: z.string(),
+  location: z.string().nullable(),
+  theme_color: z.string().nullable(),
+});
+
+export const EventSettingsUpdateSchema = z.object({
+  names: z.string().min(1, "Nazwa jest wymagana"),
+  date: z.string().min(1, "Data jest wymagana"),
+  location: z.string().optional(),
+  theme_color: z.string().optional(),
+});
+
 // Upload schemas
 export const UploadFileUrlSchema = z.object({
   file_url: z.string().url(),
@@ -66,6 +81,8 @@ export const UploadInsertSchema = z.object({
 export type EventId = z.infer<typeof EventIdSchema>;
 export type EventIdWithNames = z.infer<typeof EventIdWithNamesSchema>;
 export type EventOwner = z.infer<typeof EventOwnerSchema>;
+export type EventSettings = z.infer<typeof EventSettingsSchema>;
+export type EventSettingsUpdate = z.infer<typeof EventSettingsUpdateSchema>;
 export type UploadFileUrl = z.infer<typeof UploadFileUrlSchema>;
 export type UploadFull = z.infer<typeof UploadFullSchema>;
 export type UploadGuest = z.infer<typeof UploadGuestSchema>;
