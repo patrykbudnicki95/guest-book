@@ -18,9 +18,8 @@
     "hero": {
       "badge": "Share your special moments",
       "title": "Virtual Wedding Guestbook",
-      "subtitle": "Let your guests upload photos and leave wishes directly from their phones. No app download required. Simple, fast, and beautiful.",
-      "createAccount": "Create Free Account",
-      "viewDemo": "View Demo"
+      "subtitle": "Let your guests upload photos and leave wishes from their phones. No app download required.",
+      "viewDemo": "Try Demo"
     },
     "features": {
       "title": "Everything you need in one place",
@@ -38,42 +37,116 @@
       }
     },
     "pricing": {
-      "title": "Simple Pricing",
-      "subtitle": "Choose the plan that works for you",
-      "free": {
-        "title": "Free",
-        "description": "Perfect for trying out",
-        "perMonth": "/month",
-        "event": "1 Event",
-        "photos": "Up to 50 photos",
-        "features": "Basic features",
-        "cta": "Get Started"
+      "title": "Choose your plan",
+      "subtitle": "Select the package that fits your wedding",
+      "choosePlan": "Choose plan",
+      "basic": {
+        "title": "Basic",
+        "description": "Classic wedding guestbook",
+        "price": "299",
+        "originalPrice": "399",
+        "features": {
+          "1": "Classic app look",
+          "2": "Photo gallery during the wedding",
+          "3": "14 days to download photos and videos",
+          "4": "QR instruction within 48h of purchase",
+          "5": "3-day guest access (guests can add photos)"
+        }
       },
-      "pro": {
-        "title": "Pro",
+      "silver": {
+        "title": "Silver",
         "description": "Most popular",
-        "perMonth": "/month",
-        "events": "Unlimited events",
-        "photos": "Unlimited photos",
-        "support": "Priority support",
-        "download": "Download all photos",
-        "cta": "Get Started"
+        "price": "399",
+        "originalPrice": "499",
+        "features": {
+          "1": "Custom colors, photo and font",
+          "2": "Photo gallery + wedding schedule",
+          "3": "30 days to download photos and videos",
+          "4": "Personalized QR instruction within 48h",
+          "5": "5-day guest access"
+        }
       },
-      "enterprise": {
-        "title": "Enterprise",
-        "description": "For large events",
-        "perMonth": "/month",
-        "everything": "Everything in Pro",
-        "branding": "Custom branding",
-        "support": "Dedicated support",
-        "analytics": "Advanced analytics",
-        "cta": "Contact Sales"
+      "gold": {
+        "title": "Gold",
+        "description": "Complete package",
+        "price": "499",
+        "originalPrice": "599",
+        "features": {
+          "1": "All Silver features",
+          "2": "Photo and video gallery",
+          "3": "60 days to download",
+          "4": "14-day guest access",
+          "5": "3 QR table cards",
+          "6": "Find Your Table feature"
+        }
       }
     },
     "cta": {
       "title": "Ready to get started?",
-      "subtitle": "Create your free account and set up your first event in minutes.",
-      "button": "Create Free Account"
+      "subtitle": "Create your account and set up your wedding guestbook in minutes.",
+      "button": "Create Account"
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "step1": {
+        "title": "Create your guestbook",
+        "description": "Choose a plan and receive your personalized guestbook within minutes."
+      },
+      "step2": {
+        "title": "Share the QR code",
+        "description": "Print or display the QR code at your wedding. Guests scan to join."
+      },
+      "step3": {
+        "title": "Guests add photos",
+        "description": "Everyone uploads photos and wishes directly from their phones—no app needed."
+      },
+      "step4": {
+        "title": "Download your memories",
+        "description": "After the wedding, download all photos and videos as a keepsake."
+      }
+    },
+    "testimonials": {
+      "title": "Happy couples",
+      "1": {
+        "quote": "Guests loved the schedule, shared photos and checked the menu. Perfect!",
+        "author": "Claudia & Andrew"
+      },
+      "2": {
+        "quote": "So easy to use, everything in one place. Highly recommend!",
+        "author": "Anita & Paul"
+      },
+      "3": {
+        "quote": "The app was a hit! Guests shared photos live and everyone knew what was on the menu.",
+        "author": "Michelle & Jack"
+      }
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "1": {
+        "question": "Can I buy the guestbook in advance and keep the promotional price?",
+        "answer": "Yes! Once you purchase, your price is locked in. You can set up your guestbook whenever you're ready."
+      },
+      "2": {
+        "question": "Can I download photos and videos later?",
+        "answer": "Absolutely. Depending on your plan, you have 14–60 days after the wedding to download all content."
+      },
+      "3": {
+        "question": "Can guests see the gallery?",
+        "answer": "Yes. The gallery is visible to all guests who join via QR code. They can view and add their own photos."
+      },
+      "4": {
+        "question": "Is there a limit on photos and videos guests can upload?",
+        "answer": "No hidden limits. Your plan includes generous storage for your wedding memories."
+      },
+      "5": {
+        "question": "Can guests upload after the wedding?",
+        "answer": "Yes. Guests can add photos during the access period (3–14 days depending on plan) from the wedding date."
+      }
+    },
+    "demo": {
+      "title": "Try the app",
+      "description": "Scan the QR code or click below to see a sample guestbook.",
+      "button": "Try Demo"
     }
   },
   "auth": {

@@ -18,9 +18,8 @@
     "hero": {
       "badge": "Podziel się wyjątkowymi chwilami",
       "title": "Wirtualna Księga Gości",
-      "subtitle": "Pozwól gościom przesyłać zdjęcia i składać życzenia bezpośrednio z telefonu. Bez pobierania aplikacji. Prosto, szybko i pięknie.",
-      "createAccount": "Utwórz darmowe konto",
-      "viewDemo": "Zobacz demo"
+      "subtitle": "Pozwól gościom przesyłać zdjęcia i życzenia z telefonu. Bez pobierania aplikacji.",
+      "viewDemo": "Przetestuj"
     },
     "features": {
       "title": "Wszystko w jednym miejscu",
@@ -38,42 +37,116 @@
       }
     },
     "pricing": {
-      "title": "Proste ceny",
-      "subtitle": "Wybierz plan dopasowany do Twoich potrzeb",
-      "free": {
-        "title": "Darmowy",
-        "description": "Idealny na początek",
-        "perMonth": "/mies.",
-        "event": "1 Wydarzenie",
-        "photos": "Do 50 zdjęć",
-        "features": "Podstawowe funkcje",
-        "cta": "Rozpocznij"
+      "title": "Wybierz pakiet",
+      "subtitle": "Dopasuj ofertę do swojego wesela",
+      "choosePlan": "Wybierz pakiet",
+      "basic": {
+        "title": "Basic",
+        "description": "Klasyczna księga gości",
+        "price": "299",
+        "originalPrice": "399",
+        "features": {
+          "1": "Klasyczny wygląd aplikacji",
+          "2": "Galeria zdjęć w trakcie wesela",
+          "3": "14 dni na pobranie zdjęć i wideo",
+          "4": "Instrukcja z kodem QR do 48h po zakupie",
+          "5": "Dostęp przez 3 dni (goście mogą dodawać zdjęcia)"
+        }
       },
-      "pro": {
-        "title": "Pro",
-        "description": "Najpopularniejszy",
-        "perMonth": "/mies.",
-        "events": "Nieograniczone wydarzenia",
-        "photos": "Nieograniczone zdjęcia",
-        "support": "Priorytetowe wsparcie",
-        "download": "Pobierz wszystkie zdjęcia",
-        "cta": "Rozpocznij"
+      "silver": {
+        "title": "Silver",
+        "description": "Najczęściej wybierany",
+        "price": "399",
+        "originalPrice": "499",
+        "features": {
+          "1": "Zmiana koloru, zdjęcia i czcionki",
+          "2": "Galeria zdjęć + harmonogram wesela",
+          "3": "30 dni na pobranie zdjęć i wideo",
+          "4": "Personalizowana instrukcja z kodem QR do 48h",
+          "5": "Dostęp przez 5 dni"
+        }
       },
-      "enterprise": {
-        "title": "Enterprise",
-        "description": "Dla dużych wydarzeń",
-        "perMonth": "/mies.",
-        "everything": "Wszystko z Pro",
-        "branding": "Własna marka",
-        "support": "Dedykowane wsparcie",
-        "analytics": "Zaawansowana analityka",
-        "cta": "Skontaktuj się"
+      "gold": {
+        "title": "Gold",
+        "description": "Pełny pakiet",
+        "price": "499",
+        "originalPrice": "599",
+        "features": {
+          "1": "Wszystko z Silver",
+          "2": "Galeria zdjęć i wideo",
+          "3": "60 dni na pobranie",
+          "4": "Dostęp przez 14 dni",
+          "5": "3 tabliczki z kodem QR na stół",
+          "6": "Funkcja Znajdź Swój Stół"
+        }
       }
     },
     "cta": {
       "title": "Gotowy do startu?",
-      "subtitle": "Utwórz darmowe konto i skonfiguruj pierwsze wydarzenie w kilka minut.",
-      "button": "Utwórz darmowe konto"
+      "subtitle": "Utwórz konto i skonfiguruj księgę gości w kilka minut.",
+      "button": "Utwórz konto"
+    },
+    "howItWorks": {
+      "title": "Jak to działa",
+      "step1": {
+        "title": "Stwórz księgę gości",
+        "description": "Wybierz pakiet i otrzymaj spersonalizowaną księgę w kilka minut."
+      },
+      "step2": {
+        "title": "Udostępnij kod QR",
+        "description": "Wydrukuj lub wyświetl kod QR na weselu. Goście skanują, by dołączyć."
+      },
+      "step3": {
+        "title": "Goście dodają zdjęcia",
+        "description": "Wszyscy przesyłają zdjęcia i życzenia z telefonu—bez instalacji aplikacji."
+      },
+      "step4": {
+        "title": "Pobierz wspomnienia",
+        "description": "Po weselu pobierz wszystkie zdjęcia i filmy jako pamiątkę."
+      }
+    },
+    "testimonials": {
+      "title": "Zadowoleni klienci",
+      "1": {
+        "quote": "Goście widzieli harmonogram, dzielili się zdjęciami i sprawdzali menu. Super!",
+        "author": "Klaudia i Andrzej"
+      },
+      "2": {
+        "quote": "Prosta w obsłudze, wszystko w jednym miejscu. Polecam!",
+        "author": "Anita i Paweł"
+      },
+      "3": {
+        "quote": "Aplikacja okazała się strzałem w dziesiątkę! Goście na bieżąco dzielili się zdjęciami.",
+        "author": "Michalina i Jacek"
+      }
+    },
+    "faq": {
+      "title": "Często pytacie",
+      "1": {
+        "question": "Czy można wykupić księgę wcześniej i zachować cenę promocyjną?",
+        "answer": "Tak! Po zakupie cena jest zablokowana. Możesz skonfigurować księgę, gdy będziesz gotowy."
+      },
+      "2": {
+        "question": "Czy zdjęcia i filmy można później pobrać?",
+        "answer": "Oczywiście. W zależności od pakietu masz 14–60 dni po weselu na pobranie wszystkich materiałów."
+      },
+      "3": {
+        "question": "Czy galeria jest widoczna dla gości?",
+        "answer": "Tak. Galeria jest widoczna dla wszystkich gości, którzy dołączą przez kod QR."
+      },
+      "4": {
+        "question": "Jaki jest limit zdjęć i filmów?",
+        "answer": "Brak ukrytych limitów. Twój pakiet obejmuje wystarczającą przestrzeń na wspomnienia."
+      },
+      "5": {
+        "question": "Czy goście mogą przesyłać zdjęcia po weselu?",
+        "answer": "Tak. Goście mogą dodawać zdjęcia w okresie dostępu (3–14 dni w zależności od pakietu) od dnia wesela."
+      }
+    },
+    "demo": {
+      "title": "Przetestuj aplikację",
+      "description": "Zeskanuj kod QR lub kliknij poniżej, aby zobaczyć przykładową księgę.",
+      "button": "Przetestuj"
     }
   },
   "auth": {
