@@ -2,13 +2,6 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { LanguageSwitcher } from "@/components/language-switcher";
-import {
   Camera,
   Download,
   Heart,
@@ -16,10 +9,13 @@ import {
   Smartphone,
   Sparkles,
 } from "lucide-react";
+import { HeroSection } from "./components/hero-section";
 import { PricingCard } from "./components/pricing-card";
 import { HowItWorks } from "./components/how-it-works";
 import { Testimonials } from "./components/testimonials";
 import { FAQ } from "./components/faq";
+import { LandingHeader } from "./components/landing-header";
+import { LandingFooter } from "./components/landing-footer";
 
 export default async function LandingPage() {
   const t = await getTranslations("landing");
@@ -28,22 +24,22 @@ export default async function LandingPage() {
     {
       title: t("howItWorks.step1.title"),
       description: t("howItWorks.step1.description"),
-      icon: <Smartphone className="size-6" />,
+      icon: <Smartphone className="size-7" />,
     },
     {
       title: t("howItWorks.step2.title"),
       description: t("howItWorks.step2.description"),
-      icon: <QrCode className="size-6" />,
+      icon: <QrCode className="size-7" />,
     },
     {
       title: t("howItWorks.step3.title"),
       description: t("howItWorks.step3.description"),
-      icon: <Camera className="size-6" />,
+      icon: <Camera className="size-7" />,
     },
     {
       title: t("howItWorks.step4.title"),
       description: t("howItWorks.step4.description"),
-      icon: <Download className="size-6" />,
+      icon: <Download className="size-7" />,
     },
   ];
 
@@ -88,135 +84,152 @@ export default async function LandingPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="absolute right-4 top-4 z-10">
-        <LanguageSwitcher />
-      </header>
+      <LandingHeader />
 
-      {/* Above the fold: Compact Hero + Pricing */}
-      <section className="container mx-auto flex min-h-[85vh] flex-col justify-center px-4 py-12">
-        <div className="mb-8 text-center">
-          <div className="mb-4 inline-flex items-center rounded-full border bg-muted px-4 py-2 text-sm">
-            <Sparkles className="mr-2 size-4" />
-            {t("hero.badge")}
-          </div>
-          <h1 className="mb-3 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-            {t("hero.title")}
-          </h1>
-          <p className="mb-4 text-muted-foreground sm:text-lg">
-            {t("hero.subtitle")}
-          </p>
-          <Button asChild variant="link" className="text-base">
-            <Link href="/e/demo-event-123">{t("hero.viewDemo")}</Link>
-          </Button>
-        </div>
-
-        <div className="mb-4 text-center">
-          <h2 className="mb-1 text-xl font-semibold">{t("pricing.title")}</h2>
-          <p className="text-muted-foreground text-sm">{t("pricing.subtitle")}</p>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-3">
-          <PricingCard
-            planId="basic"
-            title={t("pricing.basic.title")}
-            description={t("pricing.basic.description")}
-            price={t("pricing.basic.price")}
-            originalPrice={t("pricing.basic.originalPrice")}
-            features={basicFeatures}
-            cta={t("pricing.choosePlan")}
-          />
-          <PricingCard
-            planId="silver"
-            title={t("pricing.silver.title")}
-            description={t("pricing.silver.description")}
-            price={t("pricing.silver.price")}
-            originalPrice={t("pricing.silver.originalPrice")}
-            features={silverFeatures}
-            cta={t("pricing.choosePlan")}
-            highlighted
-          />
-          <PricingCard
-            planId="gold"
-            title={t("pricing.gold.title")}
-            description={t("pricing.gold.description")}
-            price={t("pricing.gold.price")}
-            originalPrice={t("pricing.gold.originalPrice")}
-            features={goldFeatures}
-            cta={t("pricing.choosePlan")}
-          />
-        </div>
-      </section>
-
-      {/* Demo CTA */}
-      <section className="border-t bg-muted/50 py-12">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="mb-2 text-2xl font-bold">{t("demo.title")}</h2>
-          <p className="mb-6 text-muted-foreground">{t("demo.description")}</p>
-          <Button asChild size="lg">
-            <Link href="/e/demo-event-123">{t("demo.button")}</Link>
-          </Button>
-        </div>
-      </section>
+      <HeroSection
+        badge={t("hero.badge")}
+        title={t("hero.title")}
+        titleAccent={t("hero.titleAccent")}
+        subtitle={t("hero.subtitle")}
+        ctaText={t("cta.button")}
+        demoText={t("hero.viewDemo")}
+      />
 
       {/* How it works */}
-      <HowItWorks title={t("howItWorks.title")} steps={howItWorksSteps} />
+      <div id="how-it-works">
+        <HowItWorks
+          title={t("howItWorks.title")}
+          subtitle={t("howItWorks.subtitle")}
+          steps={howItWorksSteps}
+        />
+      </div>
 
-      {/* Benefits (Features) */}
-      <section className="border-t py-16">
+      {/* Features / Benefits */}
+      <section className="bg-muted/30 py-20 md:py-28">
         <div className="container mx-auto px-4">
-          <h2 className="mb-12 text-center text-3xl font-bold">
-            {t("features.title")}
-          </h2>
+          <div className="mb-16 text-center">
+            <h2 className="mb-3 text-3xl font-bold md:text-4xl">
+              {t("features.title")}
+            </h2>
+            <p className="mx-auto max-w-2xl text-muted-foreground">
+              {t("features.subtitle")}
+            </p>
+          </div>
           <div className="grid gap-6 md:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <Camera className="mb-2 size-8 text-primary" />
-                <CardTitle>{t("features.uploads.title")}</CardTitle>
-                <CardDescription>
-                  {t("features.uploads.description")}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader>
-                <Heart className="mb-2 size-8 text-primary" />
-                <CardTitle>{t("features.gallery.title")}</CardTitle>
-                <CardDescription>
-                  {t("features.gallery.description")}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-            <Card>
-              <CardHeader>
-                <Sparkles className="mb-2 size-8 text-primary" />
-                <CardTitle>{t("features.management.title")}</CardTitle>
-                <CardDescription>
-                  {t("features.management.description")}
-                </CardDescription>
-              </CardHeader>
-            </Card>
+            <div className="group rounded-2xl border bg-white p-8 shadow-sm transition-all hover:shadow-md">
+              <div className="mb-5 flex size-14 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/15">
+                <Camera className="size-7 text-primary" />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold">
+                {t("features.uploads.title")}
+              </h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("features.uploads.description")}
+              </p>
+            </div>
+            <div className="group rounded-2xl border bg-white p-8 shadow-sm transition-all hover:shadow-md">
+              <div className="mb-5 flex size-14 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/15">
+                <Heart className="size-7 text-primary" />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold">
+                {t("features.gallery.title")}
+              </h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("features.gallery.description")}
+              </p>
+            </div>
+            <div className="group rounded-2xl border bg-white p-8 shadow-sm transition-all hover:shadow-md">
+              <div className="mb-5 flex size-14 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/15">
+                <Sparkles className="size-7 text-primary" />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold">
+                {t("features.management.title")}
+              </h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("features.management.description")}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="py-20 md:py-28">
+        <div className="container mx-auto px-4">
+          <div className="mb-16 text-center">
+            <h2 className="mb-3 text-3xl font-bold md:text-4xl">
+              {t("pricing.title")}
+            </h2>
+            <p className="text-muted-foreground">{t("pricing.subtitle")}</p>
+          </div>
+          <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-3">
+            <PricingCard
+              planId="basic"
+              title={t("pricing.basic.title")}
+              description={t("pricing.basic.description")}
+              price={t("pricing.basic.price")}
+              originalPrice={t("pricing.basic.originalPrice")}
+              features={basicFeatures}
+              cta={t("pricing.choosePlan")}
+            />
+            <PricingCard
+              planId="silver"
+              title={t("pricing.silver.title")}
+              description={t("pricing.silver.description")}
+              price={t("pricing.silver.price")}
+              originalPrice={t("pricing.silver.originalPrice")}
+              features={silverFeatures}
+              cta={t("pricing.choosePlan")}
+              highlighted
+            />
+            <PricingCard
+              planId="gold"
+              title={t("pricing.gold.title")}
+              description={t("pricing.gold.description")}
+              price={t("pricing.gold.price")}
+              originalPrice={t("pricing.gold.originalPrice")}
+              features={goldFeatures}
+              cta={t("pricing.choosePlan")}
+            />
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <Testimonials title={t("testimonials.title")} items={testimonials} />
+      <Testimonials
+        title={t("testimonials.title")}
+        subtitle={t("testimonials.subtitle")}
+        items={testimonials}
+      />
 
       {/* FAQ */}
-      <FAQ title={t("faq.title")} items={faqItems} />
+      <div id="faq">
+        <FAQ title={t("faq.title")} items={faqItems} />
+      </div>
 
       {/* Final CTA */}
-      <section className="border-t bg-muted/50 py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="mb-4 text-3xl font-bold">{t("cta.title")}</h2>
-          <p className="mb-8 text-lg text-muted-foreground">
+      <section className="relative overflow-hidden py-20 md:py-28">
+        <div className="absolute inset-0 bg-linear-to-br from-primary via-primary to-pink-400" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1),transparent)]" />
+        <div className="container relative mx-auto px-4 text-center">
+          <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
+            {t("cta.title")}
+          </h2>
+          <p className="mx-auto mb-8 max-w-lg text-lg text-white/80">
             {t("cta.subtitle")}
           </p>
-          <Button asChild size="lg" className="text-lg">
+          <Button
+            asChild
+            size="lg"
+            variant="secondary"
+            className="rounded-full bg-white px-10 text-base font-semibold text-primary shadow-xl hover:bg-white/90"
+          >
             <Link href="/signup">{t("cta.button")}</Link>
           </Button>
         </div>
       </section>
+
+      <LandingFooter />
     </div>
   );
 }

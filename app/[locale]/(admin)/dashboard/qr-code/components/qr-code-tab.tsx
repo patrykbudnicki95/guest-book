@@ -7,12 +7,32 @@ import QRCode from "qrcode";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Download } from "lucide-react";
-import type { UserEvent } from "@/app/actions/dashboard-actions";
+import { Download, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { UserEventForPdf } from "@/app/actions/dashboard-actions";
+import type { PdfTheme } from "./qr-code-pdf";
 
 interface QRCodeTabProps {
-  events: UserEvent[];
+  events: UserEventForPdf[];
 }
+
+const THEMES: { id: PdfTheme; previewClass: string; accentClass: string }[] = [
+  {
+    id: "elegant",
+    previewClass: "bg-[#FFFEF9] border-[#C9A84C]",
+    accentClass: "text-[#C9A84C]",
+  },
+  {
+    id: "floral",
+    previewClass: "bg-[#FFF5F7] border-[#F8BBD0]",
+    accentClass: "text-[#C2185B]",
+  },
+  {
+    id: "bold",
+    previewClass: "bg-[#1A1A2E] border-[#E91E63]",
+    accentClass: "text-[#E91E63]",
+  },
+];
 
 export function QRCodeTab({ events }: QRCodeTabProps) {
   const t = useTranslations("dashboard.qrCode");
@@ -20,6 +40,7 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
   const [qrCodes, setQrCodes] = useState<Record<string, string>>({});
   const [loadingQRCodes, setLoadingQRCodes] = useState<Set<string>>(new Set());
   const [generatingPDF, setGeneratingPDF] = useState<string | null>(null);
+  const [selectedTheme, setSelectedTheme] = useState<PdfTheme>("elegant");
 
   useEffect(() => {
     const generateQRCodes = async () => {
@@ -54,17 +75,25 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
     };
 
     generateQRCodes();
-  }, [events]);
+  }, [events, t]);
 
-  const handleGeneratePDF = async (eventId: string, eventName: string) => {
-    const qrCodeDataUrl = qrCodes[eventId];
+  const handleGeneratePDF = async (event: UserEventForPdf) => {
+    const qrCodeDataUrl = qrCodes[event.id];
     if (!qrCodeDataUrl) return;
 
-    setGeneratingPDF(eventId);
+    setGeneratingPDF(event.id);
     try {
       const { generateQRCodePDF } = await import("./qr-code-pdf");
-      const eventUrl = `${window.location.origin}/e/${eventId}`;
-      await generateQRCodePDF(eventName, qrCodeDataUrl, eventUrl, tPdf("instruction"));
+      const eventUrl = `${window.location.origin}/e/${event.id}`;
+      await generateQRCodePDF(
+        event.names,
+        qrCodeDataUrl,
+        eventUrl,
+        tPdf("instruction"),
+        selectedTheme,
+        event.date,
+        event.location,
+      );
       toast.success(t("pdfSuccess"));
     } catch (error) {
       console.error("[handleGeneratePDF] Failed to generate PDF:", error);
@@ -76,13 +105,13 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
 
   if (events.length === 0) {
     return (
-      <Card>
+      <Card className="rounded-xl border-0 shadow-sm">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
           <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-sm text-muted-foreground py-8">
+          <p className="py-8 text-center text-sm text-muted-foreground">
             {t("noEvents")}
           </p>
         </CardContent>
@@ -92,18 +121,68 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
 
   return (
     <div className="space-y-6">
+      {/* Theme selector */}
+      <Card className="rounded-xl border-0 shadow-sm">
+        <CardHeader>
+          <CardTitle className="text-lg">{t("theme.title")}</CardTitle>
+          <CardDescription>{t("theme.description")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3">
+            {THEMES.map((theme) => {
+              const isSelected = selectedTheme === theme.id;
+              return (
+                <button
+                  key={theme.id}
+                  type="button"
+                  onClick={() => setSelectedTheme(theme.id)}
+                  className={cn(
+                    "relative flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all",
+                    theme.previewClass,
+                    isSelected
+                      ? "ring-2 ring-primary ring-offset-2"
+                      : "opacity-70 hover:opacity-100",
+                  )}
+                >
+                  {isSelected && (
+                    <div className="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full bg-primary text-white">
+                      <Check className="size-3" />
+                    </div>
+                  )}
+                  <div
+                    className={cn(
+                      "flex size-12 items-center justify-center rounded-lg text-lg font-bold",
+                      theme.id === "bold" ? "text-white" : theme.accentClass,
+                    )}
+                  >
+                    Aa
+                  </div>
+                  <span
+                    className={cn(
+                      "text-xs font-medium",
+                      theme.id === "bold" ? "text-white" : "text-foreground",
+                    )}
+                  >
+                    {t(`theme.${theme.id}`)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Event QR cards */}
       {events.map((event) => {
         const qrCodeDataUrl = qrCodes[event.id];
         const isLoading = loadingQRCodes.has(event.id);
         const isGeneratingPDF = generatingPDF === event.id;
 
         return (
-          <Card key={event.id}>
+          <Card key={event.id} className="rounded-xl border-0 shadow-sm">
             <CardHeader>
               <CardTitle>{event.names}</CardTitle>
-            <CardDescription>
-              {t("shareDescription")}
-            </CardDescription>
+              <CardDescription>{t("shareDescription")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8">
@@ -123,7 +202,7 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
                         className="size-auto"
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground text-center max-w-sm">
+                    <p className="max-w-sm text-center text-xs text-muted-foreground">
                       {`${window.location.origin}/e/${event.id}`}
                     </p>
                   </div>
@@ -135,9 +214,10 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
               </div>
               <div className="flex justify-center">
                 <Button
-                  onClick={() => handleGeneratePDF(event.id, event.names)}
+                  onClick={() => handleGeneratePDF(event)}
                   disabled={isGeneratingPDF || isLoading || !qrCodeDataUrl}
                   size="lg"
+                  className="rounded-full shadow-md shadow-primary/20"
                 >
                   <Download className="mr-2 size-4" />
                   {isGeneratingPDF ? t("generatingPdf") : t("generatePdf")}
@@ -150,4 +230,3 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
     </div>
   );
 }
-

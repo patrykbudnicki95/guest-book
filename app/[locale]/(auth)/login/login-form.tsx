@@ -47,9 +47,9 @@ export function LoginForm() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
+    <Card className="rounded-2xl border-0 shadow-lg">
+      <CardHeader className="text-center">
+        <CardTitle className="text-lg">{t("title")}</CardTitle>
         <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
@@ -63,6 +63,7 @@ export function LoginForm() {
               placeholder={t("emailPlaceholder")}
               required
               disabled={isPending}
+              className="rounded-lg"
             />
           </div>
           <div className="space-y-2">
@@ -74,16 +75,17 @@ export function LoginForm() {
               placeholder="••••••••"
               required
               disabled={isPending}
+              className="rounded-lg"
             />
           </div>
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button type="submit" className="w-full rounded-full" disabled={isPending}>
             {isPending ? t("submitting") : t("submit")}
           </Button>
         </form>
-        <div className="mt-4 text-center text-sm text-muted-foreground">
+        <div className="mt-6 text-center text-sm text-muted-foreground">
           <p>
             {t("noAccount")}{" "}
-            <Link href="/signup" className="text-primary underline">
+            <Link href="/signup" className="font-medium text-primary hover:underline">
               {t("signUp")}
             </Link>
           </p>
@@ -92,4 +94,3 @@ export function LoginForm() {
     </Card>
   );
 }
-

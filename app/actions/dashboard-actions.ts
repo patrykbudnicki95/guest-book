@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { EventIdSchema, EventIdWithNamesSchema, UploadFileUrlSchema, UploadFullSchema } from "@/lib/schemas/database";
+import { EventIdSchema, EventIdWithNamesSchema, EventForPdfSchema, UploadFileUrlSchema, UploadFullSchema } from "@/lib/schemas/database";
 
 export interface DashboardStats {
   totalPhotos: number;
@@ -26,6 +26,13 @@ export interface DashboardUpload {
 export interface UserEvent {
   id: string;
   names: string;
+}
+
+export interface UserEventForPdf {
+  id: string;
+  names: string;
+  date: string;
+  location: string | null;
 }
 
 export async function getDashboardStats(userId: string): Promise<DashboardStats> {
@@ -193,4 +200,29 @@ export async function getUserEvents(userId: string): Promise<UserEvent[]> {
     id: event.id,
     names: event.names,
   }));
+}
+
+export async function getUserEventsForPdf(userId: string): Promise<UserEventForPdf[]> {
+  const supabase = await createClient();
+
+  const { data: events, error: eventsError } = await supabase
+    .from("events")
+    .select("id, names, date, location")
+    .eq("owner_id", userId)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false });
+
+  if (eventsError || !events) {
+    console.error("[getUserEventsForPdf] Error fetching events:", eventsError);
+    return [];
+  }
+
+  const parsedEvents = z.array(EventForPdfSchema).safeParse(events);
+  if (!parsedEvents.success) {
+    console.error("[getUserEventsForPdf] Zod validation failed:", z.prettifyError(parsedEvents.error));
+    console.error("[getUserEventsForPdf] Raw data:", JSON.stringify(events, null, 2));
+    return [];
+  }
+
+  return parsedEvents.data;
 }

@@ -8,6 +8,7 @@ DONE:
 - qr code generation
 - pdf download generated qr code only
 - translations
+- main page styles
 
 TODO (sorted by priorites):
 
@@ -19,8 +20,8 @@ TODO (sorted by priorites):
 - limitations by selected plan
 - giving info about the plan
 - download all
-- main page styles
 - pdf download styles
 - cookies/policy
 - payments
 - qr code + fancy card that they can print/we can print and send them
+- games ? terenowa gra z qr kodami z pytaniami o państwa młodych, kto do 12 zbierze najwięcej punktów to coś wygrywa, no i wiesz dajesz kilkanaście pytań, dostajesz qr kody ukrywasz gdzieś tam przy ekspresie do kawy XD

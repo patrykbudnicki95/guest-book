@@ -230,13 +230,13 @@ export function UploadDrawer({
           <Button
             onClick={handleSubmit}
             disabled={!file || isPending}
-            className="w-full"
+            className="w-full rounded-full shadow-md shadow-primary/20"
             size="lg"
           >
             {isPending ? t("uploading") : t("uploadButton")}
           </Button>
           <DrawerClose asChild>
-            <Button variant="outline" disabled={isPending}>
+            <Button variant="outline" disabled={isPending} className="rounded-full">
               {t("cancel")}
             </Button>
           </DrawerClose>

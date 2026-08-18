@@ -41,6 +41,10 @@ export interface Database {
           location: string | null;
           qr_code_url: string | null;
           theme_color: string | null;
+          cover_photo_url: string | null;
+          welcome_message: string | null;
+          schedule: Json | null;
+          menu: Json | null;
           is_active: boolean;
           created_at: string;
           updated_at: string;
@@ -53,6 +57,10 @@ export interface Database {
           location?: string | null;
           qr_code_url?: string | null;
           theme_color?: string | null;
+          cover_photo_url?: string | null;
+          welcome_message?: string | null;
+          schedule?: Json | null;
+          menu?: Json | null;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -65,6 +73,10 @@ export interface Database {
           location?: string | null;
           qr_code_url?: string | null;
           theme_color?: string | null;
+          cover_photo_url?: string | null;
+          welcome_message?: string | null;
+          schedule?: Json | null;
+          menu?: Json | null;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -105,4 +117,3 @@ export interface Database {
     };
   };
 }
-

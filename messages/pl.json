@@ -15,14 +15,23 @@
     "copied": "Skopiowano"
   },
   "landing": {
+    "nav": {
+      "howItWorks": "Jak to działa",
+      "pricing": "Cennik",
+      "faq": "FAQ",
+      "login": "Zaloguj się",
+      "getStarted": "Rozpocznij"
+    },
     "hero": {
       "badge": "Podziel się wyjątkowymi chwilami",
-      "title": "Wirtualna Księga Gości",
-      "subtitle": "Pozwól gościom przesyłać zdjęcia i życzenia z telefonu. Bez pobierania aplikacji.",
-      "viewDemo": "Przetestuj"
+      "title": "Wirtualna",
+      "titleAccent": "Księga Gości",
+      "subtitle": "Pozwól gościom przesyłać zdjęcia i życzenia z telefonu. Bez pobierania aplikacji. Twoja piękna księga gości online — gotowa w kilka minut.",
+      "viewDemo": "Zobacz demo"
     },
     "features": {
       "title": "Wszystko w jednym miejscu",
+      "subtitle": "Wszystko czego potrzebujesz, aby zebrać wspomnienia z najważniejszego dnia",
       "uploads": {
         "title": "Łatwe przesyłanie zdjęć",
         "description": "Goście skanują kod QR i przesyłają zdjęcia bezpośrednio z telefonu. Bez instalacji aplikacji."
@@ -82,12 +91,13 @@
       }
     },
     "cta": {
-      "title": "Gotowy do startu?",
-      "subtitle": "Utwórz konto i skonfiguruj księgę gości w kilka minut.",
-      "button": "Utwórz konto"
+      "title": "Stwórz niezapomnianą pamiątkę",
+      "subtitle": "Dołącz do par, które już korzystają z naszej wirtualnej księgi gości. Prosta konfiguracja, piękne wspomnienia.",
+      "button": "Rozpocznij za darmo"
     },
     "howItWorks": {
-      "title": "Jak to działa",
+      "title": "Jak to działa?",
+      "subtitle": "Cztery proste kroki dzielą Cię od pięknej księgi gości",
       "step1": {
         "title": "Stwórz księgę gości",
         "description": "Wybierz pakiet i otrzymaj spersonalizowaną księgę w kilka minut."
@@ -107,6 +117,7 @@
     },
     "testimonials": {
       "title": "Zadowoleni klienci",
+      "subtitle": "Dołącz do setek par, które nam zaufały",
       "1": {
         "quote": "Goście widzieli harmonogram, dzielili się zdjęciami i sprawdzali menu. Super!",
         "author": "Klaudia i Andrzej"
@@ -192,6 +203,7 @@
     "signedInAs": "Zalogowano jako",
     "nav": {
       "overview": "Przegląd",
+      "eventPage": "Strona wydarzenia",
       "gallery": "Galeria",
       "qrCode": "Kod QR",
       "settings": "Ustawienia"
@@ -237,10 +249,62 @@
       "shareDescription": "Udostępnij ten kod QR gościom, aby uzyskali dostęp do strony wydarzenia",
       "generating": "Generowanie kodu QR...",
       "failed": "Nie udało się wygenerować kodu QR",
-      "generatePdf": "Generuj PDF z kodem QR",
+      "generatePdf": "Pobierz kartę PDF",
       "generatingPdf": "Generowanie...",
       "pdfSuccess": "PDF został wygenerowany!",
-      "pdfError": "Nie udało się wygenerować PDF"
+      "pdfError": "Nie udało się wygenerować PDF",
+      "theme": {
+        "title": "Wybierz motyw karty",
+        "description": "Wybierz styl karty z kodem QR, którą wydrukujesz na stół",
+        "elegant": "Elegancki",
+        "floral": "Kwiatowy",
+        "bold": "Nowoczesny"
+      }
+    },
+    "eventPage": {
+      "title": "Strona wydarzenia",
+      "description": "Dostosuj wygląd strony widocznej dla gości",
+      "noEvents": "Brak aktywnych wydarzeń. Utwórz wydarzenie, aby edytować stronę.",
+      "selectEvent": "Wybierz wydarzenie",
+      "save": "Zapisz zmiany",
+      "saving": "Zapisywanie...",
+      "saveSuccess": "Zmiany zostały zapisane",
+      "saveError": "Nie udało się zapisać",
+      "cover": {
+        "title": "Zdjęcie okładkowe",
+        "description": "Główne zdjęcie wyświetlane na górze strony wydarzenia",
+        "empty": "Brak zdjęcia okładkowego",
+        "upload": "Prześlij zdjęcie",
+        "uploading": "Przesyłanie...",
+        "remove": "Usuń",
+        "invalidType": "Wybierz zdjęcie JPEG, PNG lub WebP",
+        "tooLarge": "Maksymalny rozmiar pliku to 10 MB",
+        "uploadSuccess": "Zdjęcie okładkowe przesłane!",
+        "uploadError": "Nie udało się przesłać zdjęcia"
+      },
+      "welcome": {
+        "title": "Wiadomość powitalna",
+        "description": "Krótki tekst powitalny dla gości",
+        "placeholder": "Dziękujemy, że jesteście z nami w ten wyjątkowy dzień..."
+      },
+      "schedule": {
+        "title": "Harmonogram",
+        "description": "Dodaj punkty programu wesela",
+        "empty": "Brak punktów harmonogramu. Dodaj pierwszy!",
+        "add": "Dodaj punkt",
+        "timePlaceholder": "np. 16:00",
+        "titlePlaceholder": "np. Ceremonia",
+        "descPlaceholder": "Opcjonalny opis..."
+      },
+      "menu": {
+        "title": "Menu",
+        "description": "Dodaj sekcje menu weselnego",
+        "empty": "Brak sekcji menu. Dodaj pierwszą!",
+        "addSection": "Dodaj sekcję",
+        "addItem": "Dodaj pozycję",
+        "sectionPlaceholder": "np. Przystawki",
+        "itemPlaceholder": "np. Carpaccio z łososia"
+      }
     },
     "settings": {
       "title": "Ustawienia wydarzenia",
@@ -280,10 +344,17 @@
   },
   "guestView": {
     "addPhoto": "Dodaj zdjęcie",
+    "galleryTitle": "Galeria wspomnień",
     "noPhotos": "Brak zdjęć",
     "noPhotosSubtitle": "Bądź pierwszy, który podzieli się wspomnieniem!",
     "eventNotFound": "Wydarzenie nie znalezione",
     "eventNotFoundDesc": "Szukane wydarzenie nie istnieje.",
+    "schedule": {
+      "title": "Harmonogram dnia"
+    },
+    "menu": {
+      "title": "Menu"
+    },
     "upload": {
       "title": "Dodaj wspomnienie",
       "description": "Podziel się zdjęciem lub filmem z uroczystości",

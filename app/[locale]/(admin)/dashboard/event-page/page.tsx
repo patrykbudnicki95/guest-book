@@ -2,21 +2,21 @@ import { Suspense } from "react";
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { getUserEventsForPdf } from "@/app/actions/dashboard-actions";
-import { QRCodeTab } from "./components/qr-code-tab";
+import { getEventPageDataList } from "@/app/actions/event-page-actions";
+import { EventPageTab } from "./components/event-page-tab";
 import { Skeleton } from "@/components/ui/skeleton";
 
-function QRCodeSkeleton() {
+function EventPageSkeleton() {
   return (
     <div className="space-y-6">
-      {Array.from({ length: 2 }).map((_, i) => (
-        <Skeleton key={i} className="h-64" />
-      ))}
+      <Skeleton className="h-64" />
+      <Skeleton className="h-48" />
+      <Skeleton className="h-48" />
     </div>
   );
 }
 
-async function QRCodeContent() {
+async function EventPageContent() {
   const supabase = await createClient();
   const locale = await getLocale();
   const {
@@ -27,15 +27,15 @@ async function QRCodeContent() {
     return redirect({ href: "/login", locale: locale as "pl" | "en" });
   }
 
-  const events = await getUserEventsForPdf(user.id);
+  const events = await getEventPageDataList(user.id);
 
-  return <QRCodeTab events={events} />;
+  return <EventPageTab events={events} />;
 }
 
-export default function QRCodePage() {
+export default function EventPagePage() {
   return (
-    <Suspense fallback={<QRCodeSkeleton />}>
-      <QRCodeContent />
+    <Suspense fallback={<EventPageSkeleton />}>
+      <EventPageContent />
     </Suspense>
   );
 }

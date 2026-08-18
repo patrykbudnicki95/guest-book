@@ -15,18 +15,21 @@ export function PhotoGrid({ uploads }: PhotoGridProps) {
   if (uploads.length === 0) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center p-8 text-center">
-        <p className="text-lg text-muted-foreground">{t("noPhotos")}</p>
-        <p className="mt-2 text-sm text-muted-foreground">{t("noPhotosSubtitle")}</p>
+        <div className="mb-4 flex size-16 items-center justify-center rounded-full bg-primary/10">
+          <Play className="size-6 text-primary" />
+        </div>
+        <p className="text-lg font-medium">{t("noPhotos")}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{t("noPhotosSubtitle")}</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-2 gap-2 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+    <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       {uploads.map((upload) => (
         <div
           key={upload.id}
-          className="group relative aspect-square overflow-hidden rounded-lg bg-muted"
+          className="group relative aspect-square overflow-hidden rounded-xl bg-muted shadow-sm"
         >
           {upload.media_type === "image" ? (
             <Image
@@ -59,7 +62,7 @@ export function PhotoGrid({ uploads }: PhotoGridProps) {
             </div>
           )}
           {upload.caption && (
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
               <p className="line-clamp-2 text-xs text-white">{upload.caption}</p>
             </div>
           )}

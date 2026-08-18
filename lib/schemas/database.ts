@@ -10,6 +10,13 @@ export const EventIdWithNamesSchema = z.object({
   names: z.string(),
 });
 
+export const EventForPdfSchema = z.object({
+  id: z.string().uuid(),
+  names: z.string(),
+  date: z.string(),
+  location: z.string().nullable(),
+});
+
 export const EventOwnerSchema = z.object({
   owner_id: z.string().uuid(),
 });
@@ -33,6 +40,44 @@ export const EventSettingsUpdateSchema = z.object({
   date: z.string().min(1, "Data jest wymagana"),
   location: z.string().optional(),
   theme_color: z.string().optional(),
+});
+
+// Schedule & Menu schemas
+export const ScheduleItemSchema = z.object({
+  time: z.string(),
+  title: z.string(),
+  description: z.string().nullish(),
+});
+
+export const MenuItemSchema = z.object({
+  name: z.string(),
+  description: z.string().nullish(),
+});
+
+export const MenuSectionSchema = z.object({
+  title: z.string(),
+  items: z.array(MenuItemSchema),
+});
+
+// Full event schema (for guest page)
+export const EventFullSchema = z.object({
+  id: z.string().uuid(),
+  names: z.string(),
+  date: z.string(),
+  location: z.string().nullable(),
+  theme_color: z.string().nullable(),
+  cover_photo_url: z.string().nullable(),
+  welcome_message: z.string().nullable(),
+  schedule: z.array(ScheduleItemSchema).nullable(),
+  menu: z.array(MenuSectionSchema).nullable(),
+});
+
+// Event page content update schema
+export const EventPageContentUpdateSchema = z.object({
+  cover_photo_url: z.string().nullable().optional(),
+  welcome_message: z.string().nullable().optional(),
+  schedule: z.array(ScheduleItemSchema).nullable().optional(),
+  menu: z.array(MenuSectionSchema).nullable().optional(),
 });
 
 // Upload schemas
@@ -80,9 +125,15 @@ export const UploadInsertSchema = z.object({
 // Type exports
 export type EventId = z.infer<typeof EventIdSchema>;
 export type EventIdWithNames = z.infer<typeof EventIdWithNamesSchema>;
+export type EventForPdf = z.infer<typeof EventForPdfSchema>;
 export type EventOwner = z.infer<typeof EventOwnerSchema>;
 export type EventSettings = z.infer<typeof EventSettingsSchema>;
 export type EventSettingsUpdate = z.infer<typeof EventSettingsUpdateSchema>;
+export type ScheduleItem = z.infer<typeof ScheduleItemSchema>;
+export type MenuItem = z.infer<typeof MenuItemSchema>;
+export type MenuSection = z.infer<typeof MenuSectionSchema>;
+export type EventFull = z.infer<typeof EventFullSchema>;
+export type EventPageContentUpdate = z.infer<typeof EventPageContentUpdateSchema>;
 export type UploadFileUrl = z.infer<typeof UploadFileUrlSchema>;
 export type UploadFull = z.infer<typeof UploadFullSchema>;
 export type UploadGuest = z.infer<typeof UploadGuestSchema>;

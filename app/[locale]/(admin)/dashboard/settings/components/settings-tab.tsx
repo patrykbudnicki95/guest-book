@@ -130,7 +130,7 @@ export function SettingsTab({ events }: SettingsTabProps) {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="rounded-xl border-0 shadow-sm">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
           <CardDescription>{t("description")}</CardDescription>
@@ -238,7 +238,7 @@ export function SettingsTab({ events }: SettingsTabProps) {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isPending || !selectedEvent}>
+              <Button type="submit" disabled={isPending || !selectedEvent} className="rounded-full">
                 {isPending ? t("saving") : t("save")}
               </Button>
             </form>
@@ -246,7 +246,7 @@ export function SettingsTab({ events }: SettingsTabProps) {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="rounded-xl border-0 shadow-sm">
         <CardHeader>
           <CardTitle>{tPrivacy("title")}</CardTitle>
           <CardDescription>{tPrivacy("description")}</CardDescription>
@@ -269,7 +269,7 @@ export function SettingsTab({ events }: SettingsTabProps) {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="rounded-xl border-0 shadow-sm">
         <CardHeader>
           <CardTitle>{tAccount("title")}</CardTitle>
           <CardDescription>{tAccount("description")}</CardDescription>
@@ -285,7 +285,7 @@ export function SettingsTab({ events }: SettingsTabProps) {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="rounded-xl border-0 shadow-sm">
         <CardHeader>
           <CardTitle>{tDanger("title")}</CardTitle>
           <CardDescription>{tDanger("description")}</CardDescription>

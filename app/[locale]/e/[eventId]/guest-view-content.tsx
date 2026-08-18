@@ -2,14 +2,16 @@ import { z } from "zod";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { GuestViewContentClient } from "./guest-view-content-client";
-import { EventBasicSchema, UploadGuestSchema } from "@/lib/schemas/database";
+import { EventFullSchema, UploadGuestSchema } from "@/lib/schemas/database";
 import type { Upload } from "./upload-drawer";
 
 async function getEvent(eventId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("events")
-    .select("id, names, date")
+    .select(
+      "id, names, date, location, theme_color, cover_photo_url, welcome_message, schedule, menu",
+    )
     .eq("id", eventId)
     .eq("is_active", true)
     .single();
@@ -19,10 +21,12 @@ async function getEvent(eventId: string) {
     return null;
   }
 
-  // Parse and validate with Zod
-  const parsed = EventBasicSchema.safeParse(data);
+  const parsed = EventFullSchema.safeParse(data);
   if (!parsed.success) {
-    console.error("[getEvent] Zod validation failed:", z.prettifyError(parsed.error));
+    console.error(
+      "[getEvent] Zod validation failed:",
+      z.prettifyError(parsed.error),
+    );
     console.error("[getEvent] Raw data:", data);
     return null;
   }
@@ -34,7 +38,9 @@ async function getEventUploads(eventId: string): Promise<Upload[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("uploads")
-    .select("id, file_url, thumbnail_url, media_type, guest_name, caption, created_at")
+    .select(
+      "id, file_url, thumbnail_url, media_type, guest_name, caption, created_at",
+    )
     .eq("event_id", eventId)
     .order("created_at", { ascending: false });
 
@@ -48,11 +54,13 @@ async function getEventUploads(eventId: string): Promise<Upload[]> {
     return [];
   }
 
-  // Parse and validate with Zod
   const parsed = z.array(UploadGuestSchema).safeParse(data);
   if (!parsed.success) {
     console.error("[getEventUploads] Zod validation failed:");
-    console.error("Validation errors:", JSON.stringify(parsed.error.format(), null, 2));
+    console.error(
+      "Validation errors:",
+      JSON.stringify(parsed.error.format(), null, 2),
+    );
     console.error("Raw data:", JSON.stringify(data, null, 2));
     return [];
   }
@@ -80,7 +88,9 @@ export async function GuestViewContent({ eventId }: { eventId: string }) {
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="text-center">
           <h1 className="text-2xl font-semibold">{t("eventNotFound")}</h1>
-          <p className="mt-2 text-muted-foreground">{t("eventNotFoundDesc")}</p>
+          <p className="mt-2 text-muted-foreground">
+            {t("eventNotFoundDesc")}
+          </p>
         </div>
       </div>
     );
@@ -88,4 +98,3 @@ export async function GuestViewContent({ eventId }: { eventId: string }) {
 
   return <GuestViewContentClient event={event} initialUploads={uploads} />;
 }
-

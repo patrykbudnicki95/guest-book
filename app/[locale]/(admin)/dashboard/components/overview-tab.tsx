@@ -40,53 +40,61 @@ export function OverviewTab({ stats, events }: OverviewTabProps) {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="overflow-hidden rounded-xl border-0 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t("totalPhotos")}</CardTitle>
-            <Camera className="size-4 text-muted-foreground" />
+            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10">
+              <Camera className="size-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalPhotos}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-3xl font-bold">{stats.totalPhotos}</div>
+            <p className="mt-1 text-xs text-muted-foreground">
               {t("acrossAllEvents")}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="overflow-hidden rounded-xl border-0 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t("storageUsed")}</CardTitle>
-            <HardDrive className="size-4 text-muted-foreground" />
+            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10">
+              <HardDrive className="size-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalStorage}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-3xl font-bold">{stats.totalStorage}</div>
+            <p className="mt-1 text-xs text-muted-foreground">
               {t("totalStorage")}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="overflow-hidden rounded-xl border-0 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t("activeEvents")}</CardTitle>
-            <Calendar className="size-4 text-muted-foreground" />
+            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10">
+              <Calendar className="size-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.activeEvents}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-3xl font-bold">{stats.activeEvents}</div>
+            <p className="mt-1 text-xs text-muted-foreground">
               {t("currentlyActive")}
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="overflow-hidden rounded-xl border-0 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t("recentUploads")}</CardTitle>
-            <Upload className="size-4 text-muted-foreground" />
+            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10">
+              <Upload className="size-4 text-primary" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.recentUploads}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-3xl font-bold">{stats.recentUploads}</div>
+            <p className="mt-1 text-xs text-muted-foreground">
               {t("last24Hours")}
             </p>
           </CardContent>
@@ -94,7 +102,7 @@ export function OverviewTab({ stats, events }: OverviewTabProps) {
       </div>
 
       {events.length > 0 && (
-        <Card>
+        <Card className="rounded-xl border-0 shadow-sm">
           <CardHeader>
             <CardTitle>{t("shareEventLinks")}</CardTitle>
             <CardDescription>{t("copyShareDescription")}</CardDescription>
@@ -112,7 +120,7 @@ export function OverviewTab({ stats, events }: OverviewTabProps) {
                       variant="outline"
                       size="sm"
                       onClick={() => copyToClipboard(event.id, event.names)}
-                      className="gap-2"
+                      className="gap-2 rounded-full"
                     >
                       {isCopied ? (
                         <>
@@ -131,7 +139,7 @@ export function OverviewTab({ stats, events }: OverviewTabProps) {
                     <Input
                       value={eventUrl}
                       readOnly
-                      className="font-mono text-sm"
+                      className="rounded-lg font-mono text-sm"
                       onClick={(e) => e.currentTarget.select()}
                     />
                   </div>
@@ -142,7 +150,7 @@ export function OverviewTab({ stats, events }: OverviewTabProps) {
         </Card>
       )}
 
-      <Card>
+      <Card className="rounded-xl border-0 shadow-sm">
         <CardHeader>
           <CardTitle>{t("welcomeBack")}</CardTitle>
           <CardDescription>{t("manageDescription")}</CardDescription>
@@ -154,4 +162,3 @@ export function OverviewTab({ stats, events }: OverviewTabProps) {
     </div>
   );
 }
-

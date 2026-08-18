@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Playfair_Display } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { getLocale } from "next-intl/server";
 import "./globals.css";
@@ -15,8 +16,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+});
+
 export const metadata: Metadata = {
-  title: "Virtual Wedding Guestbook",
+  title: "Wirtualna Księga Gości",
   description: "Share your special moments - Upload photos and leave wishes",
 };
 
@@ -30,7 +38,7 @@ async function RootLayoutContent({
   return (
     <html lang={locale}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased`}
       >
         {children}
         <Toaster />
@@ -43,7 +51,7 @@ function RootLayoutFallback() {
   return (
     <html lang="pl">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen animate-pulse bg-muted`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased min-h-screen animate-pulse bg-muted`}
       />
     </html>
   );

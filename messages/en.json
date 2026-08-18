@@ -15,14 +15,23 @@
     "copied": "Copied"
   },
   "landing": {
+    "nav": {
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "login": "Log in",
+      "getStarted": "Get Started"
+    },
     "hero": {
       "badge": "Share your special moments",
-      "title": "Virtual Wedding Guestbook",
-      "subtitle": "Let your guests upload photos and leave wishes from their phones. No app download required.",
-      "viewDemo": "Try Demo"
+      "title": "Virtual Wedding",
+      "titleAccent": "Guestbook",
+      "subtitle": "Let your guests upload photos and leave wishes from their phones. No app download required. Your beautiful online guestbook — ready in minutes.",
+      "viewDemo": "View Demo"
     },
     "features": {
       "title": "Everything you need in one place",
+      "subtitle": "Everything you need to capture memories from your most important day",
       "uploads": {
         "title": "Easy Photo Uploads",
         "description": "Guests scan a QR code and upload photos directly from their phones. No app installation needed."
@@ -82,12 +91,13 @@
       }
     },
     "cta": {
-      "title": "Ready to get started?",
-      "subtitle": "Create your account and set up your wedding guestbook in minutes.",
-      "button": "Create Account"
+      "title": "Create an unforgettable keepsake",
+      "subtitle": "Join couples who are already using our virtual guestbook. Simple setup, beautiful memories.",
+      "button": "Get started free"
     },
     "howItWorks": {
-      "title": "How it works",
+      "title": "How it works?",
+      "subtitle": "Four simple steps to your beautiful guestbook",
       "step1": {
         "title": "Create your guestbook",
         "description": "Choose a plan and receive your personalized guestbook within minutes."
@@ -107,6 +117,7 @@
     },
     "testimonials": {
       "title": "Happy couples",
+      "subtitle": "Join hundreds of couples who trusted us",
       "1": {
         "quote": "Guests loved the schedule, shared photos and checked the menu. Perfect!",
         "author": "Claudia & Andrew"
@@ -192,6 +203,7 @@
     "signedInAs": "Signed in as",
     "nav": {
       "overview": "Overview",
+      "eventPage": "Event Page",
       "gallery": "Gallery",
       "qrCode": "QR Code",
       "settings": "Settings"
@@ -237,10 +249,62 @@
       "shareDescription": "Share this QR code with your guests to access the event page",
       "generating": "Generating QR code...",
       "failed": "Failed to generate QR code",
-      "generatePdf": "Generate QR Code PDF",
+      "generatePdf": "Download table card PDF",
       "generatingPdf": "Generating...",
       "pdfSuccess": "PDF has been generated!",
-      "pdfError": "Failed to generate PDF"
+      "pdfError": "Failed to generate PDF",
+      "theme": {
+        "title": "Choose card theme",
+        "description": "Pick a style for the QR table card you'll print",
+        "elegant": "Elegant",
+        "floral": "Floral",
+        "bold": "Modern"
+      }
+    },
+    "eventPage": {
+      "title": "Event Page",
+      "description": "Customize the page your guests will see",
+      "noEvents": "No active events found. Create an event to edit the page.",
+      "selectEvent": "Select event",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "saveSuccess": "Changes saved successfully",
+      "saveError": "Failed to save",
+      "cover": {
+        "title": "Cover photo",
+        "description": "Main photo displayed at the top of the event page",
+        "empty": "No cover photo yet",
+        "upload": "Upload photo",
+        "uploading": "Uploading...",
+        "remove": "Remove",
+        "invalidType": "Please select a JPEG, PNG or WebP image",
+        "tooLarge": "Maximum file size is 10 MB",
+        "uploadSuccess": "Cover photo uploaded!",
+        "uploadError": "Failed to upload photo"
+      },
+      "welcome": {
+        "title": "Welcome message",
+        "description": "A short greeting for your guests",
+        "placeholder": "Thank you for celebrating with us on this special day..."
+      },
+      "schedule": {
+        "title": "Schedule",
+        "description": "Add wedding day timeline items",
+        "empty": "No schedule items yet. Add the first one!",
+        "add": "Add item",
+        "timePlaceholder": "e.g. 4:00 PM",
+        "titlePlaceholder": "e.g. Ceremony",
+        "descPlaceholder": "Optional description..."
+      },
+      "menu": {
+        "title": "Menu",
+        "description": "Add wedding menu sections",
+        "empty": "No menu sections yet. Add the first one!",
+        "addSection": "Add section",
+        "addItem": "Add item",
+        "sectionPlaceholder": "e.g. Appetizers",
+        "itemPlaceholder": "e.g. Salmon carpaccio"
+      }
     },
     "settings": {
       "title": "Event Settings",
@@ -280,10 +344,17 @@
   },
   "guestView": {
     "addPhoto": "Add Photo",
+    "galleryTitle": "Memory Gallery",
     "noPhotos": "No photos yet",
     "noPhotosSubtitle": "Be the first to share a memory!",
     "eventNotFound": "Event not found",
     "eventNotFoundDesc": "The event you're looking for doesn't exist.",
+    "schedule": {
+      "title": "Day Schedule"
+    },
+    "menu": {
+      "title": "Menu"
+    },
     "upload": {
       "title": "Add a Memory",
       "description": "Share a photo or video from the celebration",

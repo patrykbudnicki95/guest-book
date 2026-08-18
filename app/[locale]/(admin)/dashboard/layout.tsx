@@ -5,15 +5,22 @@ import { createClient } from "@/lib/supabase/server";
 import { DashboardNav } from "./dashboard-nav";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Heart } from "lucide-react";
 
 function HeaderSkeleton() {
   return (
-    <div className="container mx-auto p-4">
-      <div className="mb-6 flex items-center justify-between">
-        <Skeleton className="h-10 w-48" />
-        <Skeleton className="h-5 w-32" />
+    <div className="min-h-screen bg-muted/20">
+      <div className="border-b bg-white">
+        <div className="container mx-auto p-4">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-5 w-32" />
+          </div>
+        </div>
       </div>
-      <Skeleton className="h-10 w-full" />
+      <div className="container mx-auto p-6">
+        <Skeleton className="h-10 w-full rounded-xl" />
+      </div>
     </div>
   );
 }
@@ -32,17 +39,26 @@ async function DashboardLayoutContent({ children }: { children: React.ReactNode 
   const t = await getTranslations("dashboard");
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-4">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <h1 className="text-3xl font-bold">{t("title")}</h1>
+    <div className="min-h-screen bg-muted/20">
+      <header className="sticky top-0 z-40 border-b bg-white/80 backdrop-blur-lg">
+        <div className="container mx-auto flex items-center justify-between gap-4 px-4 py-3">
+          <div className="flex items-center gap-3">
+            <Heart className="size-5 fill-primary text-primary" />
+            <h1 className="text-xl font-bold">{t("title")}</h1>
+          </div>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
-            <div className="text-sm text-muted-foreground">
-              {t("signedInAs")} <span className="font-medium text-foreground">{user.email || ""}</span>
+            <div className="hidden text-sm text-muted-foreground sm:block">
+              {t("signedInAs")}{" "}
+              <span className="font-medium text-foreground">
+                {user.email || ""}
+              </span>
             </div>
           </div>
         </div>
+      </header>
+
+      <div className="container mx-auto px-4 py-6">
         <DashboardNav />
         <div className="mt-6">{children}</div>
       </div>
@@ -57,4 +73,3 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </Suspense>
   );
 }
-

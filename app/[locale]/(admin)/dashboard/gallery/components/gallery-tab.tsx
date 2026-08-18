@@ -102,7 +102,7 @@ export function GalleryTab({ uploads: initialUploads }: GalleryTabProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold">{t("title")}</h2>
+          <h2 className="text-2xl font-bold">{t("title")}</h2>
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
         {selectedIds.size > 0 && (
@@ -110,13 +110,14 @@ export function GalleryTab({ uploads: initialUploads }: GalleryTabProps) {
             variant="destructive"
             onClick={handleBulkDelete}
             disabled={isPending}
+            className="rounded-full"
           >
             {t("deleteSelected")} ({selectedIds.size})
           </Button>
         )}
       </div>
 
-      <div className="rounded-md border">
+      <div className="overflow-hidden rounded-xl border-0 bg-white shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>
@@ -153,7 +154,7 @@ export function GalleryTab({ uploads: initialUploads }: GalleryTabProps) {
                     />
                   </TableCell>
                   <TableCell>
-                    <div className="relative size-16 overflow-hidden rounded-md">
+                    <div className="relative size-16 overflow-hidden rounded-lg">
                       {upload.thumbnail_url ? (
                         <Image
                           src={upload.thumbnail_url}

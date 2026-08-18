@@ -19,6 +19,10 @@ CREATE TABLE IF NOT EXISTS events (
   location TEXT,
   qr_code_url TEXT,
   theme_color TEXT,
+  cover_photo_url TEXT,
+  welcome_message TEXT,
+  schedule JSONB,
+  menu JSONB,
   is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
