@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,19 +27,34 @@ import {
   updateEventPageContent,
   getPresignedUrlForCoverPhoto,
 } from "@/app/actions/event-page-actions";
-import { hasFeature } from "@/lib/permissions";
+import { hasFeature, formatBytes } from "@/lib/permissions";
 import { PlanLock } from "../../components/plan-lock";
 import type {
   EventFull,
+  EventPageContentUpdate,
   ScheduleItem,
   MenuSection,
 } from "@/lib/schemas/database";
 
 interface EventPageTabProps {
   events: EventFull[];
+  onSave?: (
+    eventId: string,
+    data: EventPageContentUpdate,
+  ) => Promise<{ success: boolean; error?: string }>;
+  onCoverUpload?: (file: File) => Promise<{ publicUrl: string }>;
+  maxCoverBytes?: number;
+  /** Shown when this event has no uploaded cover. Demo uses a sample photo. */
+  fallbackCoverUrl?: string;
 }
 
-export function EventPageTab({ events }: EventPageTabProps) {
+export function EventPageTab({
+  events,
+  onSave,
+  onCoverUpload,
+  maxCoverBytes,
+  fallbackCoverUrl,
+}: EventPageTabProps) {
   const t = useTranslations("dashboard.eventPage");
   const [isPending, startTransition] = useTransition();
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
@@ -57,6 +72,9 @@ export function EventPageTab({ events }: EventPageTabProps) {
   const canBrand = hasFeature({ plan, feature: "customBranding" });
   const canEditSchedule = hasFeature({ plan, feature: "schedule" });
   const canEditMenu = hasFeature({ plan, feature: "menu" });
+  const displayedCover = coverPhotoUrl ?? fallbackCoverUrl ?? null;
+  const canRemoveCover =
+    Boolean(coverPhotoUrl) && coverPhotoUrl !== fallbackCoverUrl;
 
   useEffect(() => {
     if (selectedEvent) {
@@ -77,13 +95,21 @@ export function EventPageTab({ events }: EventPageTabProps) {
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error(t("cover.tooLarge"));
+    const coverLimit = maxCoverBytes ?? 10 * 1024 * 1024;
+    if (file.size > coverLimit) {
+      toast.error(t("cover.tooLarge", { size: formatBytes(coverLimit) }));
       return;
     }
 
     setUploadingCover(true);
     try {
+      if (onCoverUpload) {
+        const { publicUrl } = await onCoverUpload(file);
+        setCoverPhotoUrl(publicUrl);
+        toast.success(t("cover.uploadSuccess"));
+        return;
+      }
+
       const { uploadUrl, publicUrl } = await getPresignedUrlForCoverPhoto(
         file.name,
         file.type,
@@ -118,14 +144,18 @@ export function EventPageTab({ events }: EventPageTabProps) {
     startTransition(async () => {
       // Locked fields are left out entirely so the action does not reject the
       // whole save over a surface the couple cannot even see.
-      const result = await updateEventPageContent(effectiveEventId, {
+      const payload: EventPageContentUpdate = {
         welcome_message: welcomeMessage || null,
         ...(canBrand ? { cover_photo_url: coverPhotoUrl } : {}),
         ...(canEditSchedule
           ? { schedule: schedule.length > 0 ? schedule : null }
           : {}),
         ...(canEditMenu ? { menu: menu.length > 0 ? menu : null } : {}),
-      });
+      };
+
+      const result = onSave
+        ? await onSave(effectiveEventId, payload)
+        : await updateEventPageContent(effectiveEventId, payload);
 
       if (result.success) {
         toast.success(t("saveSuccess"));
@@ -272,10 +302,10 @@ export function EventPageTab({ events }: EventPageTabProps) {
         <CardContent className="space-y-4">
           {!canBrand ? (
             <PlanLock feature="customBranding" />
-          ) : coverPhotoUrl ? (
+          ) : displayedCover ? (
             <div className="relative aspect-video w-full max-w-lg overflow-hidden rounded-xl">
-              <Image
-                src={coverPhotoUrl}
+              <MediaImage
+                src={displayedCover}
                 alt="Cover"
                 fill
                 className="object-cover"
@@ -305,7 +335,7 @@ export function EventPageTab({ events }: EventPageTabProps) {
               onChange={handleCoverUpload}
               disabled={uploadingCover}
             />
-            {coverPhotoUrl && (
+            {canRemoveCover && (
               <Button
                 variant="outline"
                 size="sm"

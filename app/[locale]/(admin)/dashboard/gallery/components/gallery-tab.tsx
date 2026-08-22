@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -32,11 +32,13 @@ interface GalleryTabProps {
    * signed GETs is what would make the deadline real.
    */
   downloadOpenByEvent: Record<string, boolean>;
+  onDelete?: (uploadId: string) => Promise<{ success: boolean }>;
 }
 
 export function GalleryTab({
   uploads: initialUploads,
   downloadOpenByEvent,
+  onDelete,
 }: GalleryTabProps) {
   const t = useTranslations("dashboard.gallery");
   const tCommon = useTranslations("common");
@@ -44,6 +46,19 @@ export function GalleryTab({
   const [uploads, setUploads] = useState(initialUploads);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setUploads(initialUploads);
+  }, [initialUploads]);
+
+  const removeUpload = async (uploadId: string) => {
+    if (onDelete) {
+      await onDelete(uploadId);
+      return;
+    }
+
+    await deleteUpload(uploadId);
+  };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -66,7 +81,7 @@ export function GalleryTab({
   const handleDelete = (uploadId: string) => {
     startTransition(async () => {
       try {
-        await deleteUpload(uploadId);
+        await removeUpload(uploadId);
         setUploads((prev) => prev.filter((u) => u.id !== uploadId));
         setSelectedIds((prev) => {
           const newSet = new Set(prev);
@@ -89,7 +104,7 @@ export function GalleryTab({
     startTransition(async () => {
       const ids = Array.from(selectedIds);
       try {
-        await Promise.all(ids.map((id) => deleteUpload(id)));
+        await Promise.all(ids.map((id) => removeUpload(id)));
         setUploads((prev) => prev.filter((u) => !selectedIds.has(u.id)));
         setSelectedIds(new Set());
         toast.success(t("deleteSuccess"));
@@ -165,7 +180,7 @@ export function GalleryTab({
                   <TableCell>
                     <div className="relative size-16 overflow-hidden rounded-lg">
                       {upload.thumbnail_url ? (
-                        <Image
+                        <MediaImage
                           src={upload.thumbnail_url}
                           alt={upload.caption || "Upload"}
                           fill

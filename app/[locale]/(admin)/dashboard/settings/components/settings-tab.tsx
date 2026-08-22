@@ -49,12 +49,21 @@ import { toast } from "sonner";
 
 interface SettingsTabProps {
   events: EventSettings[];
+  variant?: "default" | "demo";
+  onSave?: (
+    eventId: string,
+    data: EventSettingsFormValues,
+  ) => Promise<{ success: boolean; error?: string }>;
 }
 
 const planSwitcherEnabled =
   process.env.NEXT_PUBLIC_ENABLE_PLAN_SWITCHER === "true";
 
-export function SettingsTab({ events }: SettingsTabProps) {
+export function SettingsTab({
+  events,
+  variant = "default",
+  onSave,
+}: SettingsTabProps) {
   const t = useTranslations("dashboard.settings");
   const tAccount = useTranslations("dashboard.settings.account");
   const tPrivacy = useTranslations("dashboard.settings.privacy");
@@ -99,7 +108,9 @@ export function SettingsTab({ events }: SettingsTabProps) {
     if (!effectiveEventId) return;
 
     startTransition(async () => {
-      const result = await updateEventSettings(effectiveEventId, values);
+      const result = onSave
+        ? await onSave(effectiveEventId, values)
+        : await updateEventSettings(effectiveEventId, values);
 
       if (result.success) {
         toast.success(t("saveSuccess"));
@@ -284,7 +295,7 @@ export function SettingsTab({ events }: SettingsTabProps) {
         </CardContent>
       </Card>
 
-      {planSwitcherEnabled && effectiveEventId && (
+      {variant !== "demo" && planSwitcherEnabled && effectiveEventId && (
         <Card className="rounded-xl border-0 border-dashed shadow-sm ring-1 ring-amber-200">
           <CardHeader>
             <CardTitle>{tPlan("title")}</CardTitle>
@@ -335,31 +346,35 @@ export function SettingsTab({ events }: SettingsTabProps) {
         </CardContent>
       </Card>
 
-      <Card className="rounded-xl border-0 shadow-sm">
-        <CardHeader>
-          <CardTitle>{tAccount("title")}</CardTitle>
-          <CardDescription>{tAccount("description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button
-            variant="outline"
-            onClick={handleSignOut}
-            disabled={isPending}
-          >
-            {isPending ? tAccount("signingOut") : tAccount("signOut")}
-          </Button>
-        </CardContent>
-      </Card>
+      {variant !== "demo" && (
+        <Card className="rounded-xl border-0 shadow-sm">
+          <CardHeader>
+            <CardTitle>{tAccount("title")}</CardTitle>
+            <CardDescription>{tAccount("description")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              variant="outline"
+              onClick={handleSignOut}
+              disabled={isPending}
+            >
+              {isPending ? tAccount("signingOut") : tAccount("signOut")}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
-      <Card className="rounded-xl border-0 shadow-sm">
-        <CardHeader>
-          <CardTitle>{tDanger("title")}</CardTitle>
-          <CardDescription>{tDanger("description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button variant="destructive">{tDanger("deleteEvent")}</Button>
-        </CardContent>
-      </Card>
+      {variant !== "demo" && (
+        <Card className="rounded-xl border-0 shadow-sm">
+          <CardHeader>
+            <CardTitle>{tDanger("title")}</CardTitle>
+            <CardDescription>{tDanger("description")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button variant="destructive">{tDanger("deleteEvent")}</Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

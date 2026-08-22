@@ -26,5 +26,5 @@ TODO (sorted by priorites):
 - payments
 - qr code + fancy card that they can print/we can print and send them
 - games ? terenowa gra z qr kodami z pytaniami o państwa młodych, kto do 12 zbierze najwięcej punktów to coś wygrywa, no i wiesz dajesz kilkanaście pytań, dostajesz qr kody ukrywasz gdzieś tam przy ekspresie do kawy XD
-- test mode -> guest can browse example event, see details, update all settings, and entries to the guest book that is assigned to that test event BUT ALL of those changes are saved only on his local browser(so users can override that one event locally, to not store any test data/images on our side) - and user should have a button that allow him to save changes of the event after he will buy an real event)
+- test mode -> guest can browse example event, see details, update all settings, and entries to the guest book that is assigned to that test event BUT ALL of those changes are saved only on his local browser(so users can override that one event locally, to not store any test data/images on our side) - and user should have a button that allow him to save changes of the event after he will buy an real event) -> DONE BUT NEEDS TO BE UPDATED PROBABLY DURING ADDING NEW FEATURES TO MAIN APP
 - basic auth - póki nie ma proda, zeby nie zaczęło pozycjonować

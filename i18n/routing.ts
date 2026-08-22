@@ -15,6 +15,12 @@ export const pathnames = {
   "/dashboard/settings": "/dashboard/settings",
   "/dashboard/qr-code": "/dashboard/qr-code",
   "/dashboard/event-page": "/dashboard/event-page",
+  "/demo": "/demo",
+  "/demo/dashboard": "/demo/dashboard",
+  "/demo/dashboard/gallery": "/demo/dashboard/gallery",
+  "/demo/dashboard/settings": "/demo/dashboard/settings",
+  "/demo/dashboard/qr-code": "/demo/dashboard/qr-code",
+  "/demo/dashboard/event-page": "/demo/dashboard/event-page",
   "/e/[eventId]": "/e/[eventId]",
   "/pricing": {
     pl: "/cennik",

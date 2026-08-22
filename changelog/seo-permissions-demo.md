@@ -5,6 +5,7 @@ Gives the app a real SEO foundation plus per-event plan entitlements that the UI
 ## Added
 
 - Locale-aware metadata, crawl files (`robots.txt`, `sitemap.xml`, `llms.txt`, OG image) and indexable marketing pages (`/cennik`, `/pakiety/*`, `/poradnik`, `/wirtualna-ksiega-gosci`).
+- Unauthenticated `/demo` sandbox: one Gold sample event whose settings, page content and uploads live in IndexedDB, with a sample hero until they upload their own, couple tools at `/demo/dashboard`, and a stub “save to my event” until payments exist.
 - `lib/permissions` entitlements table: storage, per-file size, guest upload window, download window and feature flags per plan, including placeholders for Save the Date, games and Find Your Table.
 - Real storage accounting (`uploads.file_size_bytes`, `events.storage_used_bytes`) with quota checks on guest upload, R2 `ContentLength` signing, `HeadObject` verification and object deletion on remove.
 - Dashboard plan usage card, locked editors for branding/schedule/menu, and a `NEXT_PUBLIC_ENABLE_PLAN_SWITCHER` selector in Settings for testing tiers before Stripe.

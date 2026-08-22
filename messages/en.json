@@ -521,7 +521,7 @@
         "uploading": "Uploading...",
         "remove": "Remove",
         "invalidType": "Please select a JPEG, PNG or WebP image",
-        "tooLarge": "Maximum file size is 10 MB",
+        "tooLarge": "Maximum file size is {size}",
         "uploadSuccess": "Cover photo uploaded!",
         "uploadError": "Failed to upload photo"
       },
@@ -632,6 +632,26 @@
     },
     "memory": "Wedding memory",
     "videoAlt": "Wedding video"
+  },
+  "demo": {
+    "metaTitle": "Try the guestbook",
+    "banner": "This is a local try-out. Nothing is stored on our servers.",
+    "bannerShort": "Local try-out",
+    "guest": "Guest page",
+    "dashboard": "Couple tools",
+    "reset": "Reset demo",
+    "resetDone": "Demo reset to the sample wedding",
+    "save": "Save to my event",
+    "persistTitle": "Save this guestbook to a real event",
+    "persistBody": "After you buy a package, you will be able to copy this local guestbook onto your real wedding. Payments are not live yet — pick a package and create an account to get started.",
+    "persistPricing": "See packages",
+    "persistSignup": "Create an account",
+    "persistClose": "Not now",
+    "overviewTitle": "Sample wedding stored in this browser",
+    "openGuest": "Open the guest guestbook",
+    "photos": "Photos",
+    "storage": "Storage used",
+    "capHint": "Up to {count} files, {size} each. Stored only on this device."
   },
   "qrPdf": {
     "instruction": "Scan the QR code below with your phone camera\nto open our guestbook.\nShare your wishes and photos with us!"

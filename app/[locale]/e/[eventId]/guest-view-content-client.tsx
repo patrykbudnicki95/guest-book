@@ -1,42 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormatter, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Camera } from "lucide-react";
 import { PhotoGrid } from "./photo-grid";
-import { UploadDrawer, type Upload } from "./upload-drawer";
+import {
+  UploadDrawer,
+  type LocalUploadInput,
+  type LocalUploadResult,
+  type Upload,
+} from "./upload-drawer";
 import { EventHero } from "./components/event-hero";
 import { EventInfo } from "./components/event-info";
 import { EventSchedule } from "./components/event-schedule";
 import { EventMenu } from "./components/event-menu";
 import { hasFeature } from "@/lib/permissions";
 import type { EventFull } from "@/lib/schemas/database";
+import { cn } from "@/lib/utils";
 
 export function GuestViewContentClient({
   event,
   initialUploads,
   uploadWindow,
+  onUpload,
+  maxFileBytes,
+  headerClassName,
 }: {
   event: EventFull;
   initialUploads: Upload[];
   uploadWindow: { isOpen: boolean; closesAt: string };
+  onUpload?: (input: LocalUploadInput) => Promise<LocalUploadResult>;
+  maxFileBytes?: number;
+  headerClassName?: string;
 }) {
   const t = useTranslations("guestView");
   const format = useFormatter();
   const [uploads, setUploads] = useState(initialUploads);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  useEffect(() => {
+    setUploads(initialUploads);
+  }, [initialUploads]);
+
   const handleUploadSuccess = (newUpload: Upload) => {
-    setUploads((prev) => [newUpload, ...prev]);
+    setUploads((prev) =>
+      prev.some((upload) => upload.id === newUpload.id)
+        ? prev
+        : [newUpload, ...prev],
+    );
     setIsDrawerOpen(false);
   };
 
   return (
     <>
       {/* Sticky top bar */}
-      <header className="sticky top-0 z-20 border-b bg-white/90 backdrop-blur-lg">
+      <header
+        className={cn(
+          "sticky z-20 border-b bg-white/90 backdrop-blur-lg",
+          headerClassName ?? "top-0",
+        )}
+      >
         <div className="flex items-center justify-between gap-2 px-4 py-2.5">
           <p className="truncate text-sm font-semibold">{event.names}</p>
           <div className="flex shrink-0 items-center gap-2">
@@ -110,6 +135,8 @@ export function GuestViewContentClient({
         isOpen={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
         onUploadSuccess={handleUploadSuccess}
+        onUpload={onUpload}
+        maxFileBytes={maxFileBytes}
       />
     </>
   );

@@ -521,7 +521,7 @@
         "uploading": "Przesyłanie...",
         "remove": "Usuń",
         "invalidType": "Wybierz zdjęcie JPEG, PNG lub WebP",
-        "tooLarge": "Maksymalny rozmiar pliku to 10 MB",
+        "tooLarge": "Maksymalny rozmiar pliku to {size}",
         "uploadSuccess": "Zdjęcie okładkowe przesłane!",
         "uploadError": "Nie udało się przesłać zdjęcia"
       },
@@ -632,6 +632,26 @@
     },
     "memory": "Wspomnienie z wesela",
     "videoAlt": "Film z wesela"
+  },
+  "demo": {
+    "metaTitle": "Wypróbuj księgę gości",
+    "banner": "To jest lokalna próbka. Nic nie trafia na nasze serwery.",
+    "bannerShort": "Lokalna próbka",
+    "guest": "Strona gości",
+    "dashboard": "Panel pary",
+    "reset": "Resetuj demo",
+    "resetDone": "Demo wróciło do przykładowego wesela",
+    "save": "Zapisz na moje wesele",
+    "persistTitle": "Zapisz tę księgę na prawdziwe wesele",
+    "persistBody": "Po zakupie pakietu będzie można skopiować tę lokalną księgę na prawdziwe wydarzenie. Płatności jeszcze nie działają — wybierz pakiet i załóż konto, żeby zacząć.",
+    "persistPricing": "Zobacz pakiety",
+    "persistSignup": "Załóż konto",
+    "persistClose": "Nie teraz",
+    "overviewTitle": "Przykładowe wesele zapisane w tej przeglądarce",
+    "openGuest": "Otwórz księgę gości",
+    "photos": "Zdjęcia",
+    "storage": "Wykorzystane miejsce",
+    "capHint": "Do {count} plików, po {size} każdy. Tylko na tym urządzeniu."
   },
   "qrPdf": {
     "instruction": "Zeskanuj poniższy kod QR aparatem telefonu,\naby otworzyć naszą księgę gości.\nPodziel się z nami swoimi życzeniami i zdjęciami!"

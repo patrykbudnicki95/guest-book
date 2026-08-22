@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import { Play } from "lucide-react";
 import type { Upload } from "./upload-drawer";
 
@@ -32,7 +32,7 @@ export function PhotoGrid({ uploads }: PhotoGridProps) {
           className="group relative aspect-square overflow-hidden rounded-xl bg-muted shadow-sm"
         >
           {upload.media_type === "image" ? (
-            <Image
+            <MediaImage
               src={upload.thumbnail_url || upload.file_url}
               alt={upload.caption || t("memory")}
               fill
@@ -42,7 +42,7 @@ export function PhotoGrid({ uploads }: PhotoGridProps) {
           ) : (
             <div className="relative h-full w-full">
               {upload.thumbnail_url ? (
-                <Image
+                <MediaImage
                   src={upload.thumbnail_url}
                   alt={upload.caption || t("videoAlt")}
                   fill

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import QRCode from "qrcode";
 import { Button } from "@/components/ui/button";
@@ -11,11 +11,14 @@ import { Download, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getLimits, hasFeature } from "@/lib/permissions";
 import { PlanLock } from "../../components/plan-lock";
+import { getPathname } from "@/i18n/navigation";
+import type { AppLocale } from "@/i18n/routing";
 import type { UserEventForPdf } from "@/app/actions/dashboard-actions";
 import type { PdfTheme } from "./qr-code-pdf";
 
 interface QRCodeTabProps {
   events: UserEventForPdf[];
+  guestHref?: "/demo";
 }
 
 const THEMES: { id: PdfTheme; previewClass: string; accentClass: string }[] = [
@@ -36,14 +39,26 @@ const THEMES: { id: PdfTheme; previewClass: string; accentClass: string }[] = [
   },
 ];
 
-export function QRCodeTab({ events }: QRCodeTabProps) {
+export function QRCodeTab({ events, guestHref }: QRCodeTabProps) {
   const t = useTranslations("dashboard.qrCode");
   const tPdf = useTranslations("qrPdf");
   const tPlan = useTranslations("dashboard.plan");
+  const locale = useLocale() as AppLocale;
   const [qrCodes, setQrCodes] = useState<Record<string, string>>({});
   const [loadingQRCodes, setLoadingQRCodes] = useState<Set<string>>(new Set());
   const [generatingPDF, setGeneratingPDF] = useState<string | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<PdfTheme>("elegant");
+
+  const guestUrlFor = useCallback(
+    (eventId: string) => {
+      if (guestHref) {
+        return `${window.location.origin}${getPathname({ href: guestHref, locale })}`;
+      }
+
+      return `${window.location.origin}/e/${eventId}`;
+    },
+    [guestHref, locale],
+  );
 
   // Every plan gets a QR card; only the paid tiers can restyle it.
   const canPersonalizeCard = events.some((event) =>
@@ -60,7 +75,7 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
       for (const event of events) {
         loadingSet.add(event.id);
         try {
-          const eventUrl = `${window.location.origin}/e/${event.id}`;
+          const eventUrl = guestUrlFor(event.id);
           const dataUrl = await QRCode.toDataURL(eventUrl, {
             width: 300,
             margin: 2,
@@ -83,7 +98,7 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
     };
 
     generateQRCodes();
-  }, [events, t]);
+  }, [events, t, guestUrlFor]);
 
   const handleGeneratePDF = async (event: UserEventForPdf) => {
     const qrCodeDataUrl = qrCodes[event.id];
@@ -92,7 +107,7 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
     setGeneratingPDF(event.id);
     try {
       const { generateQRCodePDF } = await import("./qr-code-pdf");
-      const eventUrl = `${window.location.origin}/e/${event.id}`;
+      const eventUrl = guestUrlFor(event.id);
       await generateQRCodePDF(
         event.names,
         qrCodeDataUrl,
@@ -217,7 +232,7 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
                       />
                     </div>
                     <p className="max-w-sm text-center text-xs text-muted-foreground">
-                      {`${window.location.origin}/e/${event.id}`}
+                      {guestUrlFor(event.id)}
                     </p>
                   </div>
                 ) : (

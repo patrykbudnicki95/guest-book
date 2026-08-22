@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { Heart, MapPin, Calendar } from "lucide-react";
+import { MediaImage } from "@/components/media-image";
 
 interface EventHeroProps {
   names: string;
@@ -32,7 +32,7 @@ export function EventHero({
     <section className="relative overflow-hidden">
       {coverPhotoUrl ? (
         <div className="relative aspect-[4/3] w-full sm:aspect-[16/9] md:aspect-[21/9]">
-          <Image
+          <MediaImage
             src={coverPhotoUrl}
             alt={names}
             fill

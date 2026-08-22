@@ -38,12 +38,24 @@ export interface Upload {
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const VIDEO_TYPES = ["video/mp4", "video/quicktime"];
 
+export type LocalUploadInput = {
+  file: File;
+  guestName?: string;
+  caption?: string;
+};
+
+export type LocalUploadResult =
+  | { ok: true; upload: Upload }
+  | { ok: false; reason: UploadFailureReason };
+
 interface UploadDrawerProps {
   eventId: string;
   plan: PlanId;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onUploadSuccess: (upload: Upload) => void;
+  onUpload?: (input: LocalUploadInput) => Promise<LocalUploadResult>;
+  maxFileBytes?: number;
 }
 
 export function UploadDrawer({
@@ -52,6 +64,8 @@ export function UploadDrawer({
   isOpen,
   onOpenChange,
   onUploadSuccess,
+  onUpload,
+  maxFileBytes,
 }: UploadDrawerProps) {
   const t = useTranslations("guestView.upload");
   const [file, setFile] = useState<File | null>(null);
@@ -65,7 +79,8 @@ export function UploadDrawer({
   const acceptedTypes = videoAllowed
     ? [...IMAGE_TYPES, ...VIDEO_TYPES]
     : IMAGE_TYPES;
-  const maxFileLabel = formatBytes(limits.maxFileBytes);
+  const fileSizeLimit = maxFileBytes ?? limits.maxFileBytes;
+  const maxFileLabel = formatBytes(fileSizeLimit);
 
   const messageForReason = (reason: UploadFailureReason) => {
     switch (reason) {
@@ -95,7 +110,7 @@ export function UploadDrawer({
       return;
     }
 
-    if (selectedFile.size > limits.maxFileBytes) {
+    if (selectedFile.size > fileSizeLimit) {
       toast.error(t("fileTooLarge", { size: maxFileLabel }));
       return;
     }
@@ -113,6 +128,30 @@ export function UploadDrawer({
 
     startTransition(async () => {
       try {
+        if (onUpload) {
+          setUploadProgress(40);
+          const result = await onUpload({
+            file,
+            guestName: guestName || undefined,
+            caption: caption || undefined,
+          });
+
+          if (!result.ok) {
+            toast.error(messageForReason(result.reason));
+            setUploadProgress(0);
+            return;
+          }
+
+          setUploadProgress(100);
+          toast.success(t("success"));
+          onUploadSuccess(result.upload);
+          setFile(null);
+          setCaption("");
+          setGuestName("");
+          setUploadProgress(0);
+          return;
+        }
+
         const presigned = await getPresignedUrl({
           fileName: file.name,
           fileType: file.type,
