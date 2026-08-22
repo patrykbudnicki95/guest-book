@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS events (
   welcome_message TEXT,
   schedule JSONB,
   menu JSONB,
+  plan_id TEXT NOT NULL DEFAULT 'basic' CHECK (plan_id IN ('basic', 'silver', 'gold')),
+  storage_used_bytes BIGINT NOT NULL DEFAULT 0,
   is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -35,6 +37,7 @@ CREATE TABLE IF NOT EXISTS uploads (
   file_url TEXT NOT NULL,
   thumbnail_url TEXT,
   media_type TEXT NOT NULL CHECK (media_type IN ('image', 'video')),
+  file_size_bytes BIGINT NOT NULL DEFAULT 0,
   guest_name TEXT,
   caption TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -115,6 +118,40 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW
   EXECUTE FUNCTION handle_new_user();
 
+-- Keep events.storage_used_bytes in sync with the uploads table so plan quota
+-- checks are a single indexed read.
+CREATE OR REPLACE FUNCTION sync_event_storage_used()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF (TG_OP = 'INSERT') THEN
+    UPDATE events
+      SET storage_used_bytes = storage_used_bytes + NEW.file_size_bytes
+      WHERE id = NEW.event_id;
+    RETURN NEW;
+  ELSIF (TG_OP = 'DELETE') THEN
+    UPDATE events
+      SET storage_used_bytes = GREATEST(0, storage_used_bytes - OLD.file_size_bytes)
+      WHERE id = OLD.event_id;
+    RETURN OLD;
+  ELSIF (TG_OP = 'UPDATE') THEN
+    UPDATE events
+      SET storage_used_bytes = GREATEST(
+        0,
+        storage_used_bytes - OLD.file_size_bytes + NEW.file_size_bytes
+      )
+      WHERE id = NEW.event_id;
+    RETURN NEW;
+  END IF;
+
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER sync_event_storage_used_trigger
+  AFTER INSERT OR UPDATE OF file_size_bytes OR DELETE ON uploads
+  FOR EACH ROW
+  EXECUTE FUNCTION sync_event_storage_used();
+
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -140,4 +177,12 @@ CREATE INDEX IF NOT EXISTS idx_events_owner_id ON events(owner_id);
 CREATE INDEX IF NOT EXISTS idx_events_is_active ON events(is_active);
 CREATE INDEX IF NOT EXISTS idx_uploads_event_id ON uploads(event_id);
 CREATE INDEX IF NOT EXISTS idx_uploads_created_at ON uploads(created_at DESC);
+
+-- Table privileges. RLS decides which rows a role sees; these GRANTs decide
+-- whether the role may touch the table at all, and both are required.
+GRANT SELECT ON public.events TO anon, authenticated;
+GRANT INSERT, UPDATE, DELETE ON public.events TO authenticated;
+GRANT SELECT, INSERT ON public.uploads TO anon, authenticated;
+GRANT DELETE ON public.uploads TO authenticated;
+GRANT SELECT, UPDATE ON public.profiles TO authenticated;
 

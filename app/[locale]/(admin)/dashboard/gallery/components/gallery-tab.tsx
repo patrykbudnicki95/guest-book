@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -26,14 +26,39 @@ import type { DashboardUpload } from "@/app/actions/dashboard-actions";
 
 interface GalleryTabProps {
   uploads: DashboardUpload[];
+  /**
+   * Whether each event is still inside its plan's download window. Files sit on
+   * a public R2 domain, so this only hides the button — a private bucket with
+   * signed GETs is what would make the deadline real.
+   */
+  downloadOpenByEvent: Record<string, boolean>;
+  onDelete?: (uploadId: string) => Promise<{ success: boolean }>;
 }
 
-export function GalleryTab({ uploads: initialUploads }: GalleryTabProps) {
+export function GalleryTab({
+  uploads: initialUploads,
+  downloadOpenByEvent,
+  onDelete,
+}: GalleryTabProps) {
   const t = useTranslations("dashboard.gallery");
   const tCommon = useTranslations("common");
+  const tPlan = useTranslations("dashboard.plan");
   const [uploads, setUploads] = useState(initialUploads);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setUploads(initialUploads);
+  }, [initialUploads]);
+
+  const removeUpload = async (uploadId: string) => {
+    if (onDelete) {
+      await onDelete(uploadId);
+      return;
+    }
+
+    await deleteUpload(uploadId);
+  };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -56,7 +81,7 @@ export function GalleryTab({ uploads: initialUploads }: GalleryTabProps) {
   const handleDelete = (uploadId: string) => {
     startTransition(async () => {
       try {
-        await deleteUpload(uploadId);
+        await removeUpload(uploadId);
         setUploads((prev) => prev.filter((u) => u.id !== uploadId));
         setSelectedIds((prev) => {
           const newSet = new Set(prev);
@@ -79,7 +104,7 @@ export function GalleryTab({ uploads: initialUploads }: GalleryTabProps) {
     startTransition(async () => {
       const ids = Array.from(selectedIds);
       try {
-        await Promise.all(ids.map((id) => deleteUpload(id)));
+        await Promise.all(ids.map((id) => removeUpload(id)));
         setUploads((prev) => prev.filter((u) => !selectedIds.has(u.id)));
         setSelectedIds(new Set());
         toast.success(t("deleteSuccess"));
@@ -92,10 +117,9 @@ export function GalleryTab({ uploads: initialUploads }: GalleryTabProps) {
 
   const handleDownload = (uploadId: string) => {
     const upload = uploads.find((u) => u.id === uploadId);
-    if (upload) {
-      // Open file in new tab for download
-      window.open(upload.file_url, "_blank");
-    }
+    if (!upload || downloadOpenByEvent[upload.event_id] === false) return;
+
+    window.open(upload.file_url, "_blank");
   };
 
   return (
@@ -156,7 +180,7 @@ export function GalleryTab({ uploads: initialUploads }: GalleryTabProps) {
                   <TableCell>
                     <div className="relative size-16 overflow-hidden rounded-lg">
                       {upload.thumbnail_url ? (
-                        <Image
+                        <MediaImage
                           src={upload.thumbnail_url}
                           alt={upload.caption || "Upload"}
                           fill
@@ -190,9 +214,16 @@ export function GalleryTab({ uploads: initialUploads }: GalleryTabProps) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleDownload(upload.id)}>
+                        <DropdownMenuItem
+                          onClick={() => handleDownload(upload.id)}
+                          disabled={
+                            downloadOpenByEvent[upload.event_id] === false
+                          }
+                        >
                           <Download className="mr-2 size-4" />
-                          {tCommon("download")}
+                          {downloadOpenByEvent[upload.event_id] === false
+                            ? tPlan("closed")
+                            : tCommon("download")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDelete(upload.id)}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,8 +33,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { signOut } from "@/app/actions/auth-actions";
-import { updateEventSettings } from "@/app/actions/settings-actions";
+import {
+  setEventPlan,
+  updateEventSettings,
+} from "@/app/actions/settings-actions";
 import type { EventSettings } from "@/app/actions/settings-actions";
+import { hasFeature } from "@/lib/permissions";
+import { PLAN_IDS, PLAN_LABELS } from "@/lib/pricing";
+import { PlanLock } from "../../components/plan-lock";
 import {
   eventSettingsFormSchema,
   type EventSettingsFormValues,
@@ -42,19 +49,37 @@ import { toast } from "sonner";
 
 interface SettingsTabProps {
   events: EventSettings[];
+  variant?: "default" | "demo";
+  onSave?: (
+    eventId: string,
+    data: EventSettingsFormValues,
+  ) => Promise<{ success: boolean; error?: string }>;
 }
 
-export function SettingsTab({ events }: SettingsTabProps) {
+const planSwitcherEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_PLAN_SWITCHER === "true";
+
+export function SettingsTab({
+  events,
+  variant = "default",
+  onSave,
+}: SettingsTabProps) {
   const t = useTranslations("dashboard.settings");
   const tAccount = useTranslations("dashboard.settings.account");
   const tPrivacy = useTranslations("dashboard.settings.privacy");
   const tDanger = useTranslations("dashboard.settings.dangerZone");
+  const tPlan = useTranslations("dashboard.settings.planSwitcher");
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   const effectiveEventId = selectedEventId ?? events[0]?.id ?? null;
   const selectedEvent =
     events.find((e) => e.id === effectiveEventId) ?? events[0] ?? null;
+  const canBrand = hasFeature({
+    plan: selectedEvent?.plan_id ?? "basic",
+    feature: "customBranding",
+  });
 
   const form = useForm<EventSettingsFormValues>({
     resolver: zodResolver(eventSettingsFormSchema),
@@ -83,10 +108,27 @@ export function SettingsTab({ events }: SettingsTabProps) {
     if (!effectiveEventId) return;
 
     startTransition(async () => {
-      const result = await updateEventSettings(effectiveEventId, values);
+      const result = onSave
+        ? await onSave(effectiveEventId, values)
+        : await updateEventSettings(effectiveEventId, values);
 
       if (result.success) {
         toast.success(t("saveSuccess"));
+      } else {
+        toast.error(result.error ?? t("saveError"));
+      }
+    });
+  };
+
+  const handlePlanChange = (planId: string) => {
+    if (!effectiveEventId) return;
+
+    startTransition(async () => {
+      const result = await setEventPlan(effectiveEventId, planId);
+
+      if (result.success) {
+        toast.success(tPlan("updated", { plan: planId }));
+        router.refresh();
       } else {
         toast.error(result.error ?? t("saveError"));
       }
@@ -210,34 +252,41 @@ export function SettingsTab({ events }: SettingsTabProps) {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="theme_color"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("themeColor")}</FormLabel>
-                    <FormControl>
-                      <div className="flex gap-2">
-                        <Input
-                          type="color"
-                          className="h-10 w-14 p-1 cursor-pointer"
-                          value={field.value || "#000000"}
-                          onChange={(e) => field.onChange(e.target.value)}
-                          disabled={!selectedEvent}
-                        />
-                        <Input
-                          value={field.value}
-                          onChange={(e) => field.onChange(e.target.value)}
-                          placeholder="#000000"
-                          className="flex-1"
-                          disabled={!selectedEvent}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {canBrand ? (
+                <FormField
+                  control={form.control}
+                  name="theme_color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("themeColor")}</FormLabel>
+                      <FormControl>
+                        <div className="flex gap-2">
+                          <Input
+                            type="color"
+                            className="h-10 w-14 p-1 cursor-pointer"
+                            value={field.value || "#000000"}
+                            onChange={(e) => field.onChange(e.target.value)}
+                            disabled={!selectedEvent}
+                          />
+                          <Input
+                            value={field.value}
+                            onChange={(e) => field.onChange(e.target.value)}
+                            placeholder="#000000"
+                            className="flex-1"
+                            disabled={!selectedEvent}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : (
+                <div className="space-y-2">
+                  <Label>{t("themeColor")}</Label>
+                  <PlanLock feature="customBranding" />
+                </div>
+              )}
               <Button type="submit" disabled={isPending || !selectedEvent} className="rounded-full">
                 {isPending ? t("saving") : t("save")}
               </Button>
@@ -245,6 +294,34 @@ export function SettingsTab({ events }: SettingsTabProps) {
           </Form>
         </CardContent>
       </Card>
+
+      {variant !== "demo" && planSwitcherEnabled && effectiveEventId && (
+        <Card className="rounded-xl border-0 border-dashed shadow-sm ring-1 ring-amber-200">
+          <CardHeader>
+            <CardTitle>{tPlan("title")}</CardTitle>
+            <CardDescription>{tPlan("description")}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Label>{tPlan("label")}</Label>
+            <Select
+              value={selectedEvent?.plan_id ?? "basic"}
+              onValueChange={handlePlanChange}
+              disabled={isPending}
+            >
+              <SelectTrigger className="w-full max-w-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PLAN_IDS.map((planId) => (
+                  <SelectItem key={planId} value={planId}>
+                    {PLAN_LABELS[planId]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="rounded-xl border-0 shadow-sm">
         <CardHeader>
@@ -269,31 +346,35 @@ export function SettingsTab({ events }: SettingsTabProps) {
         </CardContent>
       </Card>
 
-      <Card className="rounded-xl border-0 shadow-sm">
-        <CardHeader>
-          <CardTitle>{tAccount("title")}</CardTitle>
-          <CardDescription>{tAccount("description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button
-            variant="outline"
-            onClick={handleSignOut}
-            disabled={isPending}
-          >
-            {isPending ? tAccount("signingOut") : tAccount("signOut")}
-          </Button>
-        </CardContent>
-      </Card>
+      {variant !== "demo" && (
+        <Card className="rounded-xl border-0 shadow-sm">
+          <CardHeader>
+            <CardTitle>{tAccount("title")}</CardTitle>
+            <CardDescription>{tAccount("description")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              variant="outline"
+              onClick={handleSignOut}
+              disabled={isPending}
+            >
+              {isPending ? tAccount("signingOut") : tAccount("signOut")}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
-      <Card className="rounded-xl border-0 shadow-sm">
-        <CardHeader>
-          <CardTitle>{tDanger("title")}</CardTitle>
-          <CardDescription>{tDanger("description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button variant="destructive">{tDanger("deleteEvent")}</Button>
-        </CardContent>
-      </Card>
+      {variant !== "demo" && (
+        <Card className="rounded-xl border-0 shadow-sm">
+          <CardHeader>
+            <CardTitle>{tDanger("title")}</CardTitle>
+            <CardDescription>{tDanger("description")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button variant="destructive">{tDanger("deleteEvent")}</Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

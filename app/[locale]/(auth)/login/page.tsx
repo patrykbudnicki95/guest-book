@@ -1,6 +1,22 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { noindexMetadata } from "@/lib/seo/metadata";
+import type { AppLocale } from "@/i18n/routing";
 import { LoginForm } from "./login-form";
 import { Heart } from "lucide-react";
+
+type LoginPageProps = {
+  params: Promise<{ locale: AppLocale }>;
+};
+
+export async function generateMetadata({
+  params,
+}: LoginPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "metadata.login" });
+
+  return noindexMetadata(t("title"));
+}
 
 export default async function LoginPage() {
   const t = await getTranslations("auth.login");

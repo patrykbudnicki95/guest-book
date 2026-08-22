@@ -53,7 +53,6 @@ You are a Senior Full Stack Developer and UI/UX Expert specializing in modern we
    - Always use Signed URLs for direct client-to-R2 uploads to save bandwidth costs.
    - Use `aws-sdk/client-s3` to generate presigned URLs on the server.
 2. **Database (Supabase)**:
-
    - Use Supabase SSR client helpers.
    - Row Level Security (RLS) is mandatory for all tables.
    - Guests do not authenticate via email/password. They access via event UUID/QR Code.
@@ -70,10 +69,66 @@ You are a Senior Full Stack Developer and UI/UX Expert specializing in modern we
 
 # File Organization
 
-- **Route-specific components**: Components used only in a specific route MUST be placed in a `components` folder within that route directory.  schemas in 'schemas' directory, and API calls in 'api' directory
+- **Route-specific components**: Components used only in a specific route MUST be placed in a `components` folder within that route directory. schemas in 'schemas' directory, and API calls in 'api' directory
   - Example: `app/(admin)/dashboard/gallery/components/gallery-tab.tsx` for a component only used in the gallery route
   - Example: `app/(admin)/dashboard/components/overview-tab.tsx` for a component used in the root dashboard route
 - **Shared components**: Components used across multiple routes should be in `components/` at the app root or in `lib/` if they're utilities.
 - **Layout components**: Components used in layouts (like navigation) can stay at the layout level if they're only used by that layout.
 - **Rule of thumb**: If a component/schema/action is used in only ONE route, it belongs in that route's `components` folder. If used in multiple routes, it belongs in a shared location.
 
+# Permissions
+
+Plans live on the **event** (`events.plan_id`), not the profile. One user can own a Basic wedding(or maybe in the future different kind of events) and later a Gold one. Prices stay in `lib/pricing.ts`; what a plan may do lives in `lib/permissions/entitlements.ts`.
+
+`PLAN_ENTITLEMENTS` is the single source of truth. The UI, server actions and marketing bullets all read from it. Change a limit or add a feature there — never hardcode days, GB or "is Gold?" checks elsewhere.
+
+## How to check
+
+```typescript
+import { hasFeature, getLimits, checkUploadAllowed } from "@/lib/permissions";
+import { getEventPlanContext } from "@/lib/permissions/server";
+
+hasFeature({ plan, feature: "schedule" });
+getLimits(plan).storageBytes;
+
+const context = await getEventPlanContext(eventId);
+// context: { plan_id, date, is_active, storage_used_bytes }
+```
+
+- **UI** (`hasFeature`, `PlanLock`): hide or lock surfaces the plan does not include. This is UX only.
+- **Server actions** must re-check. Guest uploads go through `checkUploadAllowed`. Owner mutations use `getEventPlanContext` / `requireOwnedEventFeature` before writing.
+- Marketing numbers use ICU placeholders filled by `planCopyValues` / `planRangeValues` in `lib/plan-features.ts`, so the pricing page cannot promise something the app rejects.
+
+## Adding a feature later
+
+1. Add the key to `PLAN_FEATURES` and to the plans that should have it in `PLAN_ENTITLEMENTS`.
+2. Gate the UI with `hasFeature` (and `PlanLock` in the dashboard).
+3. Gate the server action the same way. A client-only check is not enough.
+
+Some keys (`saveTheDate`, `weddingGames`, `findYourTable`) are declared on Gold with no consumer yet — that is intentional.
+
+## Limits that are not fully real yet
+
+The download window is gated in the gallery UI only. Files sit on a public R2 URL, so the deadline is not enforceable until the bucket is private and downloads go through signed GETs. Do not pretend otherwise.
+
+The Settings plan switcher (`setEventPlan`) is a dev escape hatch. It only runs when `NEXT_PUBLIC_ENABLE_PLAN_SWITCHER=true`, re-checked on the server. Leave it off in production.
+
+# Testing
+
+You're not allowed to run dev server - you can verify only if build and lint passes - rest thing will be tested manually by me, I don't to waste tokens for your tests.
+
+# Changelog
+
+Every branch gets exactly one changelog file: `changelog/<branch-name>.md`.
+
+- ALWAYS follow `changelog/TEMPLATE.md`. Do not invent a different structure.
+- Sections are `Added`, `Changed`, `Removed`, plus `Manual steps` when the reader
+  has to do something themselves (new env vars, SQL to run, dashboard settings).
+- Omit empty sections.
+- Keep it short: at most 8 bullets in total, only the most important changes.
+- Describe the change, not the files. No file-by-file listings.
+- When continuing work on a branch, update its existing file instead of adding a new one.
+
+# NOT PRODUCTION
+
+We re not in production yet, so you don't need to worry about breaking changes, we don't need backward compatibility for now

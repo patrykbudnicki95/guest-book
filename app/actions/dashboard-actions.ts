@@ -2,13 +2,36 @@
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { EventIdSchema, EventIdWithNamesSchema, EventForPdfSchema, UploadFileUrlSchema, UploadFullSchema } from "@/lib/schemas/database";
+import { EventIdWithNamesSchema, EventForPdfSchema, EventPlanSummarySchema, UploadFileUrlSchema, UploadFullSchema } from "@/lib/schemas/database";
+import {
+  formatBytes,
+  getDownloadWindowEnd,
+  getStorageState,
+  getUploadWindowEnd,
+  isDownloadOpen,
+  isGuestUploadOpen,
+  type StorageState,
+} from "@/lib/permissions";
+import type { PlanId } from "@/lib/pricing";
 
 export interface DashboardStats {
   totalPhotos: number;
   totalStorage: string;
+  totalStorageBytes: number;
   activeEvents: number;
   recentUploads: number;
+}
+
+export interface EventPlanSummary {
+  id: string;
+  names: string;
+  date: string;
+  plan: PlanId;
+  storage: StorageState;
+  uploadWindowEnd: string;
+  downloadWindowEnd: string;
+  isUploadOpen: boolean;
+  isDownloadOpen: boolean;
 }
 
 export interface DashboardUpload {
@@ -33,7 +56,16 @@ export interface UserEventForPdf {
   names: string;
   date: string;
   location: string | null;
+  plan_id: PlanId;
 }
+
+const EMPTY_STATS: DashboardStats = {
+  totalPhotos: 0,
+  totalStorage: formatBytes(0),
+  totalStorageBytes: 0,
+  activeEvents: 0,
+  recentUploads: 0,
+};
 
 export async function getDashboardStats(userId: string): Promise<DashboardStats> {
   const supabase = await createClient();
@@ -41,40 +73,35 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
   // Get user's events
   const { data: events, error: eventsError } = await supabase
     .from("events")
-    .select("id")
+    .select("id, names, date, plan_id, storage_used_bytes")
     .eq("owner_id", userId)
     .eq("is_active", true);
 
   if (eventsError || !events) {
-    return {
-      totalPhotos: 0,
-      totalStorage: "0 MB",
-      activeEvents: 0,
-      recentUploads: 0,
-    };
+    console.error("[getDashboardStats] Error fetching events:", eventsError);
+    return EMPTY_STATS;
   }
 
   // Parse and validate with Zod
-  const parsedEvents = z.array(EventIdSchema).safeParse(events);
+  const parsedEvents = z.array(EventPlanSummarySchema).safeParse(events);
   if (!parsedEvents.success) {
-    return {
-      totalPhotos: 0,
-      totalStorage: "0 MB",
-      activeEvents: 0,
-      recentUploads: 0,
-    };
+    console.error("[getDashboardStats] Zod validation failed:", z.prettifyError(parsedEvents.error));
+    console.error("[getDashboardStats] Raw data:", JSON.stringify(events, null, 2));
+    return EMPTY_STATS;
   }
 
   const eventIds = parsedEvents.data.map((e) => e.id);
 
   if (eventIds.length === 0) {
-    return {
-      totalPhotos: 0,
-      totalStorage: "0 MB",
-      activeEvents: 0,
-      recentUploads: 0,
-    };
+    return EMPTY_STATS;
   }
+
+  // The counter is maintained by a trigger on uploads, so this is the real
+  // number rather than an estimate from the file count.
+  const totalStorageBytes = parsedEvents.data.reduce(
+    (sum, event) => sum + event.storage_used_bytes,
+    0,
+  );
 
   // Get all uploads for user's events
   const { data: uploads, error: uploadsError } = await supabase
@@ -84,10 +111,10 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
 
   if (uploadsError || !uploads) {
     return {
-      totalPhotos: 0,
-      totalStorage: "0 MB",
+      ...EMPTY_STATS,
+      totalStorage: formatBytes(totalStorageBytes),
+      totalStorageBytes,
       activeEvents: eventIds.length,
-      recentUploads: 0,
     };
   }
 
@@ -100,18 +127,54 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
   oneDayAgo.setHours(oneDayAgo.getHours() - 24);
   const recentUploads = validUploads.filter((upload) => new Date(upload.created_at) > oneDayAgo).length;
 
-  // Calculate total storage (rough estimate based on file count)
-  // In a real app, you'd track actual file sizes
-  const totalPhotos = validUploads.length;
-  const estimatedMB = Math.round((totalPhotos * 3) / 10) / 100; // Rough estimate: ~3MB per photo average
-  const totalStorage = estimatedMB < 1 ? `${Math.round(estimatedMB * 1000)} KB` : `${estimatedMB.toFixed(2)} MB`;
-
   return {
-    totalPhotos,
-    totalStorage,
+    totalPhotos: validUploads.length,
+    totalStorage: formatBytes(totalStorageBytes),
+    totalStorageBytes,
     activeEvents: eventIds.length,
     recentUploads,
   };
+}
+
+/** Plan, quota usage and access windows for every event the user owns. */
+export async function getEventPlanSummaries(userId: string): Promise<EventPlanSummary[]> {
+  const supabase = await createClient();
+
+  const { data: events, error } = await supabase
+    .from("events")
+    .select("id, names, date, plan_id, storage_used_bytes")
+    .eq("owner_id", userId)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false });
+
+  if (error || !events) {
+    console.error("[getEventPlanSummaries] Error fetching events:", error);
+    return [];
+  }
+
+  const parsed = z.array(EventPlanSummarySchema).safeParse(events);
+  if (!parsed.success) {
+    console.error("[getEventPlanSummaries] Zod validation failed:", z.prettifyError(parsed.error));
+    console.error("[getEventPlanSummaries] Raw data:", JSON.stringify(events, null, 2));
+    return [];
+  }
+
+  return parsed.data.map((event) => {
+    const plan = event.plan_id;
+    const eventDate = event.date;
+
+    return {
+      id: event.id,
+      names: event.names,
+      date: eventDate,
+      plan,
+      storage: getStorageState({ plan, usedBytes: event.storage_used_bytes }),
+      uploadWindowEnd: getUploadWindowEnd({ plan, eventDate }).toISOString(),
+      downloadWindowEnd: getDownloadWindowEnd({ plan, eventDate }).toISOString(),
+      isUploadOpen: isGuestUploadOpen({ plan, eventDate }),
+      isDownloadOpen: isDownloadOpen({ plan, eventDate }),
+    };
+  });
 }
 
 export async function getUserUploads(userId: string): Promise<DashboardUpload[]> {
@@ -144,7 +207,7 @@ export async function getUserUploads(userId: string): Promise<DashboardUpload[]>
   // Get all uploads for user's events
   const { data: uploads, error } = await supabase
     .from("uploads")
-    .select("id, file_url, thumbnail_url, media_type, guest_name, caption, created_at, event_id")
+    .select("id, file_url, thumbnail_url, media_type, file_size_bytes, guest_name, caption, created_at, event_id")
     .in("event_id", eventIds)
     .order("created_at", { ascending: false });
 
@@ -207,7 +270,7 @@ export async function getUserEventsForPdf(userId: string): Promise<UserEventForP
 
   const { data: events, error: eventsError } = await supabase
     .from("events")
-    .select("id, names, date, location")
+    .select("id, names, date, location, plan_id")
     .eq("owner_id", userId)
     .eq("is_active", true)
     .order("created_at", { ascending: false });

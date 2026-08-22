@@ -1,9 +1,60 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
+import { z } from "zod";
+import { getTranslations } from "next-intl/server";
+import { createClient } from "@/lib/supabase/server";
+import { EventIdWithNamesSchema } from "@/lib/schemas/database";
+import { noindexMetadata } from "@/lib/seo/metadata";
+import type { AppLocale } from "@/i18n/routing";
 import { GuestViewContent } from "./guest-view-content";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface GuestViewPageProps {
-  params: Promise<{ eventId: string }>;
+  params: Promise<{ locale: AppLocale; eventId: string }>;
+}
+
+async function getEventNames(eventId: string): Promise<string | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("events")
+    .select("id, names")
+    .eq("id", eventId)
+    .eq("is_active", true)
+    .single();
+
+  if (error || !data) {
+    return null;
+  }
+
+  const parsed = EventIdWithNamesSchema.safeParse(data);
+  if (!parsed.success) {
+    console.error(
+      "[getEventNames] Zod validation failed:",
+      z.prettifyError(parsed.error),
+    );
+    console.error("[getEventNames] Raw data:", JSON.stringify(data, null, 2));
+    return null;
+  }
+
+  return parsed.data.names;
+}
+
+/**
+ * Guest galleries contain photos and names of private guests, so they must never
+ * be indexed. The title is still event-specific for link previews when couples
+ * share the URL in a chat.
+ */
+export async function generateMetadata({
+  params,
+}: GuestViewPageProps): Promise<Metadata> {
+  const { locale, eventId } = await params;
+  const t = await getTranslations({ locale, namespace: "metadata.event" });
+  const names = await getEventNames(eventId);
+
+  return noindexMetadata(
+    names ? t("title", { names }) : t("fallbackTitle"),
+    t("description"),
+  );
 }
 
 function GuestViewSkeleton() {

@@ -45,7 +45,7 @@ export function HeroSection({
                 size="lg"
                 className="rounded-full px-8 text-base"
               >
-                <Link href="/e/demo-event-123">{demoText}</Link>
+                <Link href="/demo">{demoText}</Link>
               </Button>
             </div>
           </div>

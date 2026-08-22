@@ -16,7 +16,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { getPresignedUrl, saveUploadToDb } from "@/app/actions/upload-actions";
+import {
+  getPresignedUrl,
+  saveUploadToDb,
+  type UploadFailureReason,
+} from "@/app/actions/upload-actions";
+import { formatBytes, getLimits, hasFeature } from "@/lib/permissions";
+import type { PlanId } from "@/lib/pricing";
 import { toast } from "sonner";
 
 export interface Upload {
@@ -29,18 +35,37 @@ export interface Upload {
   created_at: string;
 }
 
+const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const VIDEO_TYPES = ["video/mp4", "video/quicktime"];
+
+export type LocalUploadInput = {
+  file: File;
+  guestName?: string;
+  caption?: string;
+};
+
+export type LocalUploadResult =
+  | { ok: true; upload: Upload }
+  | { ok: false; reason: UploadFailureReason };
+
 interface UploadDrawerProps {
   eventId: string;
+  plan: PlanId;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onUploadSuccess: (upload: Upload) => void;
+  onUpload?: (input: LocalUploadInput) => Promise<LocalUploadResult>;
+  maxFileBytes?: number;
 }
 
 export function UploadDrawer({
   eventId,
+  plan,
   isOpen,
   onOpenChange,
   onUploadSuccess,
+  onUpload,
+  maxFileBytes,
 }: UploadDrawerProps) {
   const t = useTranslations("guestView.upload");
   const [file, setFile] = useState<File | null>(null);
@@ -49,21 +74,44 @@ export function UploadDrawer({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isPending, startTransition] = useTransition();
 
+  const limits = getLimits(plan);
+  const videoAllowed = hasFeature({ plan, feature: "videoUploads" });
+  const acceptedTypes = videoAllowed
+    ? [...IMAGE_TYPES, ...VIDEO_TYPES]
+    : IMAGE_TYPES;
+  const fileSizeLimit = maxFileBytes ?? limits.maxFileBytes;
+  const maxFileLabel = formatBytes(fileSizeLimit);
+
+  const messageForReason = (reason: UploadFailureReason) => {
+    switch (reason) {
+      case "fileTooLarge":
+        return t("fileTooLarge", { size: maxFileLabel });
+      case "mediaTypeNotAllowed":
+        return t("imagesOnly");
+      case "invalidFileType":
+        return t("invalidFileType");
+      case "quotaExceeded":
+        return t("quotaExceeded");
+      case "windowClosed":
+        return t("windowClosed");
+      case "eventInactive":
+        return t("eventInactive");
+      default:
+        return t("error");
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
-    // Validate file type
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "video/mp4", "video/quicktime"];
-    if (!validTypes.includes(selectedFile.type)) {
-      toast.error(t("invalidFileType"));
+    if (!acceptedTypes.includes(selectedFile.type)) {
+      toast.error(videoAllowed ? t("invalidFileType") : t("imagesOnly"));
       return;
     }
 
-    // Validate file size (max 50MB)
-    const maxSize = 50 * 1024 * 1024; // 50MB
-    if (selectedFile.size > maxSize) {
-      toast.error(t("fileTooLarge"));
+    if (selectedFile.size > fileSizeLimit) {
+      toast.error(t("fileTooLarge", { size: maxFileLabel }));
       return;
     }
 
@@ -80,14 +128,43 @@ export function UploadDrawer({
 
     startTransition(async () => {
       try {
-        // Step 1: Get presigned URL
-        const { uploadUrl, fileKey } = await getPresignedUrl(
-          file.name,
-          file.type,
-          eventId
-        );
+        if (onUpload) {
+          setUploadProgress(40);
+          const result = await onUpload({
+            file,
+            guestName: guestName || undefined,
+            caption: caption || undefined,
+          });
 
-        // Step 2: Upload file to R2 using XMLHttpRequest for progress tracking
+          if (!result.ok) {
+            toast.error(messageForReason(result.reason));
+            setUploadProgress(0);
+            return;
+          }
+
+          setUploadProgress(100);
+          toast.success(t("success"));
+          onUploadSuccess(result.upload);
+          setFile(null);
+          setCaption("");
+          setGuestName("");
+          setUploadProgress(0);
+          return;
+        }
+
+        const presigned = await getPresignedUrl({
+          fileName: file.name,
+          fileType: file.type,
+          fileSize: file.size,
+          eventId,
+        });
+
+        if (!presigned.ok) {
+          toast.error(messageForReason(presigned.reason));
+          setUploadProgress(0);
+          return;
+        }
+
         await new Promise<void>((resolve, reject) => {
           const xhr = new XMLHttpRequest();
 
@@ -114,50 +191,45 @@ export function UploadDrawer({
             reject(new Error("Upload aborted"));
           });
 
-          xhr.open("PUT", uploadUrl);
+          xhr.open("PUT", presigned.uploadUrl);
           xhr.setRequestHeader("Content-Type", file.type);
           xhr.send(file);
         });
 
         setUploadProgress(100);
 
-        // Step 3: Determine media type
-        const mediaType = file.type.startsWith("image/") ? "image" : "video";
-
-        // Step 4: Save upload metadata to database
-        const uploadData = await saveUploadToDb({
+        const result = await saveUploadToDb({
           eventId,
-          fileKey,
-          mediaType,
+          fileKey: presigned.fileKey,
           guestName: guestName || undefined,
           caption: caption || undefined,
         });
 
+        if (!result.ok) {
+          toast.error(messageForReason(result.reason));
+          setUploadProgress(0);
+          return;
+        }
+
         toast.success(t("success"));
 
-        // Step 5: Create upload object for callback
-        const newUpload: Upload = {
-          id: uploadData.id,
-          file_url: uploadData.file_url,
-          thumbnail_url: uploadData.thumbnail_url,
-          media_type: mediaType,
+        onUploadSuccess({
+          id: result.id,
+          file_url: result.file_url,
+          thumbnail_url: result.thumbnail_url,
+          media_type: result.media_type,
           guest_name: guestName || null,
           caption: caption || null,
           created_at: new Date().toISOString(),
-        };
+        });
 
-        onUploadSuccess(newUpload);
-
-        // Reset form
         setFile(null);
         setCaption("");
         setGuestName("");
         setUploadProgress(0);
       } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : t("error")
-        );
-        console.error(error);
+        toast.error(t("error"));
+        console.error("[UploadDrawer] Upload failed:", error);
         setUploadProgress(0);
       }
     });
@@ -174,17 +246,22 @@ export function UploadDrawer({
         <div className="space-y-4 p-4">
           {/* File input */}
           <div className="space-y-2">
-            <Label htmlFor="file">{t("photoOrVideo")}</Label>
+            <Label htmlFor="file">
+              {videoAllowed ? t("photoOrVideo") : t("photoOnly")}
+            </Label>
             <Input
               id="file"
               type="file"
-              accept="image/*,video/*"
+              accept={acceptedTypes.join(",")}
               onChange={handleFileChange}
               disabled={isPending}
             />
+            <p className="text-xs text-muted-foreground">
+              {t("maxFileSize", { size: maxFileLabel })}
+            </p>
             {file && (
               <p className="text-sm text-muted-foreground">
-                {t("selected")}: {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                {t("selected")}: {file.name} ({formatBytes(file.size)})
               </p>
             )}
           </div>
@@ -236,7 +313,11 @@ export function UploadDrawer({
             {isPending ? t("uploading") : t("uploadButton")}
           </Button>
           <DrawerClose asChild>
-            <Button variant="outline" disabled={isPending} className="rounded-full">
+            <Button
+              variant="outline"
+              disabled={isPending}
+              className="rounded-full"
+            >
               {t("cancel")}
             </Button>
           </DrawerClose>
@@ -245,4 +326,3 @@ export function UploadDrawer({
     </Drawer>
   );
 }
-

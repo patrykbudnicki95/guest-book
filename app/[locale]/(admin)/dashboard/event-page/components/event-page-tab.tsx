@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
+import { MediaImage } from "@/components/media-image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,13 +27,34 @@ import {
   updateEventPageContent,
   getPresignedUrlForCoverPhoto,
 } from "@/app/actions/event-page-actions";
-import type { EventFull, ScheduleItem, MenuSection } from "@/lib/schemas/database";
+import { hasFeature, formatBytes } from "@/lib/permissions";
+import { PlanLock } from "../../components/plan-lock";
+import type {
+  EventFull,
+  EventPageContentUpdate,
+  ScheduleItem,
+  MenuSection,
+} from "@/lib/schemas/database";
 
 interface EventPageTabProps {
   events: EventFull[];
+  onSave?: (
+    eventId: string,
+    data: EventPageContentUpdate,
+  ) => Promise<{ success: boolean; error?: string }>;
+  onCoverUpload?: (file: File) => Promise<{ publicUrl: string }>;
+  maxCoverBytes?: number;
+  /** Shown when this event has no uploaded cover. Demo uses a sample photo. */
+  fallbackCoverUrl?: string;
 }
 
-export function EventPageTab({ events }: EventPageTabProps) {
+export function EventPageTab({
+  events,
+  onSave,
+  onCoverUpload,
+  maxCoverBytes,
+  fallbackCoverUrl,
+}: EventPageTabProps) {
   const t = useTranslations("dashboard.eventPage");
   const [isPending, startTransition] = useTransition();
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
@@ -46,6 +67,14 @@ export function EventPageTab({ events }: EventPageTabProps) {
   const effectiveEventId = selectedEventId ?? events[0]?.id ?? null;
   const selectedEvent =
     events.find((e) => e.id === effectiveEventId) ?? events[0] ?? null;
+
+  const plan = selectedEvent?.plan_id ?? "basic";
+  const canBrand = hasFeature({ plan, feature: "customBranding" });
+  const canEditSchedule = hasFeature({ plan, feature: "schedule" });
+  const canEditMenu = hasFeature({ plan, feature: "menu" });
+  const displayedCover = coverPhotoUrl ?? fallbackCoverUrl ?? null;
+  const canRemoveCover =
+    Boolean(coverPhotoUrl) && coverPhotoUrl !== fallbackCoverUrl;
 
   useEffect(() => {
     if (selectedEvent) {
@@ -66,13 +95,21 @@ export function EventPageTab({ events }: EventPageTabProps) {
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error(t("cover.tooLarge"));
+    const coverLimit = maxCoverBytes ?? 10 * 1024 * 1024;
+    if (file.size > coverLimit) {
+      toast.error(t("cover.tooLarge", { size: formatBytes(coverLimit) }));
       return;
     }
 
     setUploadingCover(true);
     try {
+      if (onCoverUpload) {
+        const { publicUrl } = await onCoverUpload(file);
+        setCoverPhotoUrl(publicUrl);
+        toast.success(t("cover.uploadSuccess"));
+        return;
+      }
+
       const { uploadUrl, publicUrl } = await getPresignedUrlForCoverPhoto(
         file.name,
         file.type,
@@ -105,12 +142,20 @@ export function EventPageTab({ events }: EventPageTabProps) {
     if (!effectiveEventId) return;
 
     startTransition(async () => {
-      const result = await updateEventPageContent(effectiveEventId, {
-        cover_photo_url: coverPhotoUrl,
+      // Locked fields are left out entirely so the action does not reject the
+      // whole save over a surface the couple cannot even see.
+      const payload: EventPageContentUpdate = {
         welcome_message: welcomeMessage || null,
-        schedule: schedule.length > 0 ? schedule : null,
-        menu: menu.length > 0 ? menu : null,
-      });
+        ...(canBrand ? { cover_photo_url: coverPhotoUrl } : {}),
+        ...(canEditSchedule
+          ? { schedule: schedule.length > 0 ? schedule : null }
+          : {}),
+        ...(canEditMenu ? { menu: menu.length > 0 ? menu : null } : {}),
+      };
+
+      const result = onSave
+        ? await onSave(effectiveEventId, payload)
+        : await updateEventPageContent(effectiveEventId, payload);
 
       if (result.success) {
         toast.success(t("saveSuccess"));
@@ -255,10 +300,12 @@ export function EventPageTab({ events }: EventPageTabProps) {
           <CardDescription>{t("cover.description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {coverPhotoUrl ? (
+          {!canBrand ? (
+            <PlanLock feature="customBranding" />
+          ) : displayedCover ? (
             <div className="relative aspect-video w-full max-w-lg overflow-hidden rounded-xl">
-              <Image
-                src={coverPhotoUrl}
+              <MediaImage
+                src={displayedCover}
                 alt="Cover"
                 fill
                 className="object-cover"
@@ -267,10 +314,12 @@ export function EventPageTab({ events }: EventPageTabProps) {
             </div>
           ) : (
             <div className="flex aspect-video w-full max-w-lg items-center justify-center rounded-xl border-2 border-dashed bg-muted/30">
-              <p className="text-sm text-muted-foreground">{t("cover.empty")}</p>
+              <p className="text-sm text-muted-foreground">
+                {t("cover.empty")}
+              </p>
             </div>
           )}
-          <div className="flex gap-2">
+          <div className={canBrand ? "flex gap-2" : "hidden"}>
             <Label
               htmlFor="cover-upload"
               className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90"
@@ -286,7 +335,7 @@ export function EventPageTab({ events }: EventPageTabProps) {
               onChange={handleCoverUpload}
               disabled={uploadingCover}
             />
-            {coverPhotoUrl && (
+            {canRemoveCover && (
               <Button
                 variant="outline"
                 size="sm"
@@ -326,64 +375,68 @@ export function EventPageTab({ events }: EventPageTabProps) {
               <CardTitle className="text-lg">{t("schedule.title")}</CardTitle>
               <CardDescription>{t("schedule.description")}</CardDescription>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full"
-              onClick={addScheduleItem}
-            >
-              <Plus className="mr-1 size-3.5" />
-              {t("schedule.add")}
-            </Button>
+            {canEditSchedule && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                onClick={addScheduleItem}
+              >
+                <Plus className="mr-1 size-3.5" />
+                {t("schedule.add")}
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          {schedule.length === 0 && (
+          {!canEditSchedule && <PlanLock feature="schedule" />}
+          {canEditSchedule && schedule.length === 0 && (
             <p className="py-4 text-center text-sm text-muted-foreground">
               {t("schedule.empty")}
             </p>
           )}
-          {schedule.map((item, index) => (
-            <div
-              key={index}
-              className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-start"
-            >
-              <Input
-                value={item.time}
-                onChange={(e) =>
-                  updateScheduleItem(index, "time", e.target.value)
-                }
-                placeholder={t("schedule.timePlaceholder")}
-                className="rounded-lg sm:w-28"
-              />
-              <div className="flex-1 space-y-2">
-                <Input
-                  value={item.title}
-                  onChange={(e) =>
-                    updateScheduleItem(index, "title", e.target.value)
-                  }
-                  placeholder={t("schedule.titlePlaceholder")}
-                  className="rounded-lg"
-                />
-                <Input
-                  value={item.description ?? ""}
-                  onChange={(e) =>
-                    updateScheduleItem(index, "description", e.target.value)
-                  }
-                  placeholder={t("schedule.descPlaceholder")}
-                  className="rounded-lg"
-                />
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => removeScheduleItem(index)}
-                className="shrink-0 text-destructive hover:text-destructive"
+          {canEditSchedule &&
+            schedule.map((item, index) => (
+              <div
+                key={index}
+                className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-start"
               >
-                <Trash2 className="size-4" />
-              </Button>
-            </div>
-          ))}
+                <Input
+                  value={item.time}
+                  onChange={(e) =>
+                    updateScheduleItem(index, "time", e.target.value)
+                  }
+                  placeholder={t("schedule.timePlaceholder")}
+                  className="rounded-lg sm:w-28"
+                />
+                <div className="flex-1 space-y-2">
+                  <Input
+                    value={item.title}
+                    onChange={(e) =>
+                      updateScheduleItem(index, "title", e.target.value)
+                    }
+                    placeholder={t("schedule.titlePlaceholder")}
+                    className="rounded-lg"
+                  />
+                  <Input
+                    value={item.description ?? ""}
+                    onChange={(e) =>
+                      updateScheduleItem(index, "description", e.target.value)
+                    }
+                    placeholder={t("schedule.descPlaceholder")}
+                    className="rounded-lg"
+                  />
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeScheduleItem(index)}
+                  className="shrink-0 text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="size-4" />
+                </Button>
+              </div>
+            ))}
         </CardContent>
       </Card>
 
@@ -395,79 +448,80 @@ export function EventPageTab({ events }: EventPageTabProps) {
               <CardTitle className="text-lg">{t("menu.title")}</CardTitle>
               <CardDescription>{t("menu.description")}</CardDescription>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full"
-              onClick={addMenuSection}
-            >
-              <Plus className="mr-1 size-3.5" />
-              {t("menu.addSection")}
-            </Button>
+            {canEditMenu && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                onClick={addMenuSection}
+              >
+                <Plus className="mr-1 size-3.5" />
+                {t("menu.addSection")}
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {menu.length === 0 && (
+          {!canEditMenu && <PlanLock feature="menu" />}
+          {canEditMenu && menu.length === 0 && (
             <p className="py-4 text-center text-sm text-muted-foreground">
               {t("menu.empty")}
             </p>
           )}
-          {menu.map((section, sIndex) => (
-            <div
-              key={sIndex}
-              className="space-y-3 rounded-lg border p-4"
-            >
-              <div className="flex items-center gap-2">
-                <Input
-                  value={section.title}
-                  onChange={(e) =>
-                    updateMenuSectionTitle(sIndex, e.target.value)
-                  }
-                  placeholder={t("menu.sectionPlaceholder")}
-                  className="rounded-lg font-medium"
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeMenuSection(sIndex)}
-                  className="shrink-0 text-destructive hover:text-destructive"
-                >
-                  <Trash2 className="size-4" />
-                </Button>
+          {canEditMenu &&
+            menu.map((section, sIndex) => (
+              <div key={sIndex} className="space-y-3 rounded-lg border p-4">
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={section.title}
+                    onChange={(e) =>
+                      updateMenuSectionTitle(sIndex, e.target.value)
+                    }
+                    placeholder={t("menu.sectionPlaceholder")}
+                    className="rounded-lg font-medium"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeMenuSection(sIndex)}
+                    className="shrink-0 text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+                <div className="space-y-2 pl-2">
+                  {section.items.map((item, iIndex) => (
+                    <div key={iIndex} className="flex items-center gap-2">
+                      <Input
+                        value={item.name}
+                        onChange={(e) =>
+                          updateMenuItem(sIndex, iIndex, e.target.value)
+                        }
+                        placeholder={t("menu.itemPlaceholder")}
+                        className="rounded-lg"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeMenuItem(sIndex, iIndex)}
+                        className="shrink-0 text-muted-foreground"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => addMenuItem(sIndex)}
+                    className="text-primary"
+                  >
+                    <Plus className="mr-1 size-3.5" />
+                    {t("menu.addItem")}
+                  </Button>
+                </div>
               </div>
-              <div className="space-y-2 pl-2">
-                {section.items.map((item, iIndex) => (
-                  <div key={iIndex} className="flex items-center gap-2">
-                    <Input
-                      value={item.name}
-                      onChange={(e) =>
-                        updateMenuItem(sIndex, iIndex, e.target.value)
-                      }
-                      placeholder={t("menu.itemPlaceholder")}
-                      className="rounded-lg"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeMenuItem(sIndex, iIndex)}
-                      className="shrink-0 text-muted-foreground"
-                    >
-                      <Trash2 className="size-3.5" />
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => addMenuItem(sIndex)}
-                  className="text-primary"
-                >
-                  <Plus className="mr-1 size-3.5" />
-                  {t("menu.addItem")}
-                </Button>
-              </div>
-            </div>
-          ))}
+            ))}
         </CardContent>
       </Card>
 
