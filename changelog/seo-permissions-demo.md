@@ -20,3 +20,4 @@ Gives the app a real SEO foundation plus per-event plan entitlements that the UI
 - Add `NEXT_PUBLIC_SITE_URL=https://your-domain.pl` to `.env` and Vercel.
 - Run `supabase/migrations/002_add_plan_and_upload_size.sql` in the Supabase SQL editor (adds `plan_id`, size columns and the storage-counter trigger).
 - Set `NEXT_PUBLIC_ENABLE_PLAN_SWITCHER=true` locally to change an event's plan from dashboard Settings. Leave it off in production.
+- Until launch the site is behind Basic Auth (`michal` / `patryk`). Remove the check in `proxy.ts` when going to production.
