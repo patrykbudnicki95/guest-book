@@ -26,15 +26,15 @@
     "packages": {
       "basic": {
         "title": "Basic package",
-        "description": "Basic package for {price} PLN: a classic virtual guestbook, a live photo gallery during the wedding and 14 days to download everything."
+        "description": "Basic package for {price} PLN: a classic virtual guestbook, a live photo gallery during the wedding and {downloadDays} days to download everything."
       },
       "silver": {
         "title": "Silver package",
-        "description": "Silver package for {price} PLN: custom styling, photo gallery plus wedding schedule and 30 days to download photos and video."
+        "description": "Silver package for {price} PLN: custom styling, photo gallery plus wedding schedule and {downloadDays} days to download your photos."
       },
       "gold": {
         "title": "Gold package",
-        "description": "Gold package for {price} PLN: photos and video, 60 days to download, 14 days of guest access and 3 printed QR table cards."
+        "description": "Gold package for {price} PLN: photos and video, {downloadDays} days to download, {guestAccessDays} days of guest access and {qrTableCards} printed QR table cards."
       }
     },
     "virtualGuestbook": {
@@ -133,9 +133,9 @@
         "features": {
           "1": "Classic app look",
           "2": "Photo gallery during the wedding",
-          "3": "14 days to download photos and videos",
+          "3": "{downloadDays} days to download your photos",
           "4": "QR instruction within 48h of purchase",
-          "5": "3-day guest access (guests can add photos)"
+          "5": "{guestAccessDays}-day guest access (guests can add photos)"
         }
       },
       "silver": {
@@ -144,9 +144,9 @@
         "features": {
           "1": "Custom colors, photo and font",
           "2": "Photo gallery + wedding schedule",
-          "3": "30 days to download photos and videos",
+          "3": "{downloadDays} days to download your photos",
           "4": "Personalized QR instruction within 48h",
-          "5": "5-day guest access"
+          "5": "{guestAccessDays}-day guest access"
         }
       },
       "gold": {
@@ -155,9 +155,9 @@
         "features": {
           "1": "All Silver features",
           "2": "Photo and video gallery",
-          "3": "60 days to download",
-          "4": "14-day guest access",
-          "5": "3 QR table cards",
+          "3": "{downloadDays} days to download",
+          "4": "{guestAccessDays}-day guest access",
+          "5": "{qrTableCards} QR table cards",
           "6": "Find Your Table feature"
         }
       }
@@ -211,7 +211,7 @@
       },
       "2": {
         "question": "Can I download photos and videos later?",
-        "answer": "Absolutely. Depending on your plan, you have 14–60 days after the wedding to download all content."
+        "answer": "Absolutely. Depending on your plan, you have {minDownloadDays}–{maxDownloadDays} days after the wedding to download all content."
       },
       "3": {
         "question": "Can guests see the gallery?",
@@ -219,11 +219,11 @@
       },
       "4": {
         "question": "Is there a limit on photos and videos guests can upload?",
-        "answer": "No hidden limits. Your plan includes generous storage for your wedding memories."
+        "answer": "Each package has a storage pool — from {minStorage} to {maxStorage}, depending on the plan you pick."
       },
       "5": {
         "question": "Can guests upload after the wedding?",
-        "answer": "Yes. Guests can add photos during the access period (3–14 days depending on plan) from the wedding date."
+        "answer": "Yes. Guests can add photos during the access period ({minGuestAccessDays}–{maxGuestAccessDays} days depending on plan) from the wedding date."
       }
     },
     "demo": {
@@ -310,7 +310,7 @@
       },
       "2": {
         "question": "Can we download everything after the wedding?",
-        "answer": "Yes. Depending on the package you have between 14 and 60 days after the wedding to download photos and videos."
+        "answer": "Yes. Depending on the package you have between {minDownloadDays} and {maxDownloadDays} days after the wedding to download photos and videos."
       },
       "3": {
         "question": "Does it work on iPhone and Android?",
@@ -370,7 +370,7 @@
       "forWhom": "For couples who want the guestbook to match the rest of the wedding styling, and who want guests to know what happens when."
     },
     "gold": {
-      "intro": "The Gold package is the full set: a photo and video gallery, the longest guest access, 60 days to download everything and three printed QR table cards. It also includes the Find Your Table feature.",
+      "intro": "The Gold package is the full set: a photo and video gallery, the longest guest access, {downloadDays} days to download everything and {qrTableCards} printed QR table cards. It also includes the Find Your Table feature.",
       "forWhom": "For larger weddings and couples who want short videos as well as photos, without preparing print material themselves."
     }
   },
@@ -453,6 +453,24 @@
       "welcomeBack": "Welcome Back!",
       "manageDescription": "Manage your wedding events and view guest uploads from here.",
       "navHint": "Use the navigation above to access different sections of your dashboard."
+    },
+    "planLock": {
+      "title": "This feature is locked",
+      "availableIn": "Available in the {plan} package",
+      "comingSoon": "Coming soon",
+      "cta": "See packages"
+    },
+    "plan": {
+      "title": "Your package",
+      "description": "Limits and deadlines for this wedding",
+      "storage": "Storage used",
+      "storageValue": "{used} of {total}",
+      "maxFileSize": "Maximum file size",
+      "guestUploadsUntil": "Guests can upload until",
+      "downloadUntil": "Downloads available until",
+      "closed": "Deadline passed",
+      "qrTableCards": "Printed QR table cards",
+      "noEvents": "No active events."
     },
     "gallery": {
       "title": "Gallery",
@@ -546,6 +564,12 @@
       "save": "Save",
       "saveSuccess": "Settings saved successfully",
       "saveError": "Failed to save",
+      "planSwitcher": {
+        "title": "Package (test mode)",
+        "description": "Visible in development only. Switches the event package without a payment.",
+        "label": "Active package",
+        "updated": "Package changed to {plan}"
+      },
       "privacy": {
         "title": "Privacy",
         "description": "Control who can view and upload to your event",
@@ -584,6 +608,14 @@
       "title": "Add a Memory",
       "description": "Share a photo or video from the celebration",
       "photoOrVideo": "Photo or Video",
+      "photoOnly": "Photo",
+      "maxFileSize": "Maximum file size: {size}",
+      "imagesOnly": "This package only allows photo uploads (JPEG, PNG, WebP)",
+      "quotaExceeded": "The storage for this wedding is full",
+      "windowClosed": "The time for adding memories has passed",
+      "eventInactive": "This event is not active",
+      "closedTitle": "Uploads are closed",
+      "closedDescription": "The deadline for adding photos passed on {date}.",
       "yourName": "Your Name (Optional)",
       "yourNamePlaceholder": "John Doe",
       "message": "Message (Optional)",
@@ -594,7 +626,7 @@
       "cancel": "Cancel",
       "selectFile": "Please select a file",
       "invalidFileType": "Please select an image (JPEG, PNG, WebP) or video (MP4, MOV)",
-      "fileTooLarge": "File size must be less than 50MB",
+      "fileTooLarge": "Maximum file size is {size}",
       "success": "Photo uploaded successfully!",
       "error": "An error occurred during upload"
     },

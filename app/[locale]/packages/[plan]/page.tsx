@@ -13,7 +13,7 @@ import {
   isPlanId,
   type PlanId,
 } from "@/lib/pricing";
-import { planFeatures } from "@/lib/plan-features";
+import { planCopyValues, planFeatures } from "@/lib/plan-features";
 import { JsonLd } from "@/components/json-ld";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
@@ -46,7 +46,10 @@ export async function generateMetadata({
     href: { pathname: "/packages/[plan]", params: { plan } },
     locale,
     title: t("title"),
-    description: t("description", { price: PLANS[plan].price }),
+    description: t("description", {
+      price: PLANS[plan].price,
+      ...planCopyValues(plan),
+    }),
   });
 }
 
@@ -69,6 +72,7 @@ export default async function PackagePage({ params }: PackagePageProps) {
   const tMeta = await getTranslations(`metadata.packages.${planId}`);
 
   const planName = tLanding(`pricing.${planId}.title`);
+  const copyValues = planCopyValues(planId);
   const features = planFeatures(tLanding, planId);
   const packageUrl = localizedUrl(
     { pathname: "/packages/[plan]", params: { plan: planId } },
@@ -118,7 +122,7 @@ export default async function PackagePage({ params }: PackagePageProps) {
                 {tMeta("title")}
               </h1>
               <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-                {t(`${planId}.intro`)}
+                {t(`${planId}.intro`, copyValues)}
               </p>
 
               <h2 className="mt-12 text-2xl font-bold">

@@ -10,7 +10,7 @@ import {
   webSiteNode,
 } from "@/lib/seo/json-ld";
 import { PLAN_LIST } from "@/lib/pricing";
-import { planFeatures } from "@/lib/plan-features";
+import { planFeatures, planRangeValues } from "@/lib/plan-features";
 import { JsonLd } from "@/components/json-ld";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
 import { PricingCard } from "@/components/marketing/pricing-card";
@@ -85,9 +85,10 @@ export default async function LandingPage({ params }: LandingPageProps) {
     { quote: t("testimonials.3.quote"), author: t("testimonials.3.author") },
   ];
 
+  const faqRange = planRangeValues();
   const faqItems = [1, 2, 3, 4, 5].map((index) => ({
     question: t(`faq.${index}.question`),
-    answer: t(`faq.${index}.answer`),
+    answer: t(`faq.${index}.answer`, faqRange),
   }));
 
   const problems = [

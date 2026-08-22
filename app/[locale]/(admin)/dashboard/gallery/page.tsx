@@ -2,7 +2,10 @@ import { Suspense } from "react";
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { getUserUploads } from "@/app/actions/dashboard-actions";
+import {
+  getEventPlanSummaries,
+  getUserUploads,
+} from "@/app/actions/dashboard-actions";
 import { GalleryTab } from "./components/gallery-tab";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -31,9 +34,18 @@ async function GalleryContent() {
     return redirect({ href: "/login", locale: locale as "pl" | "en" });
   }
 
-  const uploads = await getUserUploads(user.id);
+  const [uploads, planSummaries] = await Promise.all([
+    getUserUploads(user.id),
+    getEventPlanSummaries(user.id),
+  ]);
 
-  return <GalleryTab uploads={uploads} />;
+  const downloadOpenByEvent = Object.fromEntries(
+    planSummaries.map((summary) => [summary.id, summary.isDownloadOpen]),
+  );
+
+  return (
+    <GalleryTab uploads={uploads} downloadOpenByEvent={downloadOpenByEvent} />
+  );
 }
 
 export default function GalleryPage() {

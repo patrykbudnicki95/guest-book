@@ -1,27 +1,21 @@
 # seo-foundation
 
-Gives the app a real SEO foundation: locale-aware metadata, crawl files, structured data, and the first indexable marketing and content pages.
+Gives the app a real SEO foundation plus per-event plan entitlements that the UI, server actions and marketing copy all read from.
 
 ## Added
 
-- `lib/seo` module (config, metadata builder with canonical + hreflang, JSON-LD builders) and `lib/pricing.ts` as the single source of truth for plan prices.
-- Crawl files: `robots.txt`, `sitemap.xml` with hreflang alternates, `llms.txt`, an OG image generated via `next/og`, and an SVG favicon.
-- Indexable marketing pages: `/cennik`, `/pakiety/{basic,silver,gold}`, `/wirtualna-ksiega-gosci`, `/o-nas`, `/kontakt`, each with breadcrumbs and JSON-LD.
-- Polish guide hub at `/poradnik` with four articles on a typed TSX content registry; locales without a translation return 404 instead of thin duplicates.
-- Localized route slugs through next-intl `pathnames`, so Polish URLs are Polish and English lives under `/en`.
+- Locale-aware metadata, crawl files (`robots.txt`, `sitemap.xml`, `llms.txt`, OG image) and indexable marketing pages (`/cennik`, `/pakiety/*`, `/poradnik`, `/wirtualna-ksiega-gosci`).
+- `lib/permissions` entitlements table: storage, per-file size, guest upload window, download window and feature flags per plan, including placeholders for Save the Date, games and Find Your Table.
+- Real storage accounting (`uploads.file_size_bytes`, `events.storage_used_bytes`) with quota checks on guest upload, R2 `ContentLength` signing, `HeadObject` verification and object deletion on remove.
+- Dashboard plan usage card, locked editors for branding/schedule/menu, and a `NEXT_PUBLIC_ENABLE_PLAN_SWITCHER` selector in Settings for testing tiers before Stripe.
 
 ## Changed
 
-- Guest event pages, `/login`, `/signup` and the whole `/dashboard` tree now send `noindex`; guest galleries were previously indexable.
-- Header, footer, pricing card and FAQ moved to `components/marketing/` and are shared by every marketing route; nav now links to real pages instead of homepage anchors.
-- Prices come from `lib/pricing.ts` instead of the message files, so on-page prices and `Product` structured data cannot drift apart.
-
-## Removed
-
-- `landing.pricing.*.price` and `originalPrice` keys from `messages/pl.json` and `messages/en.json`.
+- Guest galleries, login, signup and the dashboard send `noindex`. Guest uploads now respect the event's plan (photos-only on Basic/Silver, window and quota on every plan).
+- Plan prices, feature bullets and FAQ numbers come from `lib/pricing.ts` and `PLAN_ENTITLEMENTS`, so marketing copy cannot drift from what the app actually allows.
 
 ## Manual steps
 
-- Add `NEXT_PUBLIC_SITE_URL=https://your-domain.pl` to `.env` and to Vercel. Until it is set, canonicals and the sitemap point at `http://localhost:3000`.
-- Optionally set `NEXT_PUBLIC_CONTACT_EMAIL` to render a real address on `/kontakt` and in `Organization` structured data.
-- Fill in the company data placeholders on `/o-nas` (name, address, NIP, REGON).
+- Add `NEXT_PUBLIC_SITE_URL=https://your-domain.pl` to `.env` and Vercel.
+- Run `supabase/migrations/002_add_plan_and_upload_size.sql` in the Supabase SQL editor (adds `plan_id`, size columns and the storage-counter trigger).
+- Set `NEXT_PUBLIC_ENABLE_PLAN_SWITCHER=true` locally to change an event's plan from dashboard Settings. Leave it off in production.

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { GuestViewContentClient } from "./guest-view-content-client";
 import { EventFullSchema, UploadGuestSchema } from "@/lib/schemas/database";
+import { getUploadWindowEnd, isGuestUploadOpen } from "@/lib/permissions";
 import type { Upload } from "./upload-drawer";
 
 async function getEvent(eventId: string) {
@@ -10,7 +11,7 @@ async function getEvent(eventId: string) {
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, names, date, location, theme_color, cover_photo_url, welcome_message, schedule, menu",
+      "id, names, date, location, theme_color, cover_photo_url, welcome_message, schedule, menu, plan_id, storage_used_bytes",
     )
     .eq("id", eventId)
     .eq("is_active", true)
@@ -96,5 +97,21 @@ export async function GuestViewContent({ eventId }: { eventId: string }) {
     );
   }
 
-  return <GuestViewContentClient event={event} initialUploads={uploads} />;
+  // Computed on the server so a guest with a skewed clock cannot reopen the
+  // window; the server actions enforce it again anyway.
+  const uploadWindow = {
+    isOpen: isGuestUploadOpen({ plan: event.plan_id, eventDate: event.date }),
+    closesAt: getUploadWindowEnd({
+      plan: event.plan_id,
+      eventDate: event.date,
+    }).toISOString(),
+  };
+
+  return (
+    <GuestViewContentClient
+      event={event}
+      initialUploads={uploads}
+      uploadWindow={uploadWindow}
+    />
+  );
 }

@@ -26,15 +26,15 @@
     "packages": {
       "basic": {
         "title": "Pakiet Basic",
-        "description": "Pakiet Basic za {price} zł: klasyczna wirtualna księga gości, galeria zdjęć w trakcie wesela i 14 dni na pobranie materiałów."
+        "description": "Pakiet Basic za {price} zł: klasyczna wirtualna księga gości, galeria zdjęć w trakcie wesela i {downloadDays} dni na pobranie materiałów."
       },
       "silver": {
         "title": "Pakiet Silver",
-        "description": "Pakiet Silver za {price} zł: personalizacja wyglądu, galeria zdjęć i harmonogram wesela, 30 dni na pobranie zdjęć i wideo."
+        "description": "Pakiet Silver za {price} zł: personalizacja wyglądu, galeria zdjęć i harmonogram wesela, {downloadDays} dni na pobranie zdjęć."
       },
       "gold": {
         "title": "Pakiet Gold",
-        "description": "Pakiet Gold za {price} zł: zdjęcia i wideo, 60 dni na pobranie, 14 dni dostępu dla gości i 3 tabliczki z kodem QR na stół."
+        "description": "Pakiet Gold za {price} zł: zdjęcia i wideo, {downloadDays} dni na pobranie, {guestAccessDays} dni dostępu dla gości i {qrTableCards} tabliczki z kodem QR na stół."
       }
     },
     "virtualGuestbook": {
@@ -133,9 +133,9 @@
         "features": {
           "1": "Klasyczny wygląd aplikacji",
           "2": "Galeria zdjęć w trakcie wesela",
-          "3": "14 dni na pobranie zdjęć i wideo",
+          "3": "{downloadDays} dni na pobranie zdjęć",
           "4": "Instrukcja z kodem QR do 48h po zakupie",
-          "5": "Dostęp przez 3 dni (goście mogą dodawać zdjęcia)"
+          "5": "Dostęp przez {guestAccessDays} dni (goście mogą dodawać zdjęcia)"
         }
       },
       "silver": {
@@ -144,9 +144,9 @@
         "features": {
           "1": "Zmiana koloru, zdjęcia i czcionki",
           "2": "Galeria zdjęć + harmonogram wesela",
-          "3": "30 dni na pobranie zdjęć i wideo",
+          "3": "{downloadDays} dni na pobranie zdjęć",
           "4": "Personalizowana instrukcja z kodem QR do 48h",
-          "5": "Dostęp przez 5 dni"
+          "5": "Dostęp przez {guestAccessDays} dni"
         }
       },
       "gold": {
@@ -155,9 +155,9 @@
         "features": {
           "1": "Wszystko z Silver",
           "2": "Galeria zdjęć i wideo",
-          "3": "60 dni na pobranie",
-          "4": "Dostęp przez 14 dni",
-          "5": "3 tabliczki z kodem QR na stół",
+          "3": "{downloadDays} dni na pobranie",
+          "4": "Dostęp przez {guestAccessDays} dni",
+          "5": "{qrTableCards} tabliczki z kodem QR na stół",
           "6": "Funkcja Znajdź Swój Stół"
         }
       }
@@ -211,7 +211,7 @@
       },
       "2": {
         "question": "Czy zdjęcia i filmy można później pobrać?",
-        "answer": "Oczywiście. W zależności od pakietu masz 14–60 dni po weselu na pobranie wszystkich materiałów."
+        "answer": "Oczywiście. W zależności od pakietu masz {minDownloadDays}–{maxDownloadDays} dni po weselu na pobranie wszystkich materiałów."
       },
       "3": {
         "question": "Czy galeria jest widoczna dla gości?",
@@ -219,11 +219,11 @@
       },
       "4": {
         "question": "Jaki jest limit zdjęć i filmów?",
-        "answer": "Brak ukrytych limitów. Twój pakiet obejmuje wystarczającą przestrzeń na wspomnienia."
+        "answer": "Każdy pakiet ma pulę miejsca na pliki — od {minStorage} do {maxStorage}, w zależności od wybranego pakietu."
       },
       "5": {
         "question": "Czy goście mogą przesyłać zdjęcia po weselu?",
-        "answer": "Tak. Goście mogą dodawać zdjęcia w okresie dostępu (3–14 dni w zależności od pakietu) od dnia wesela."
+        "answer": "Tak. Goście mogą dodawać zdjęcia w okresie dostępu ({minGuestAccessDays}–{maxGuestAccessDays} dni w zależności od pakietu) od dnia wesela."
       }
     },
     "demo": {
@@ -310,7 +310,7 @@
       },
       "2": {
         "question": "Czy da się pobrać wszystko po weselu?",
-        "answer": "Tak. W zależności od pakietu macie od 14 do 60 dni po weselu na pobranie zdjęć i filmów."
+        "answer": "Tak. W zależności od pakietu macie od {minDownloadDays} do {maxDownloadDays} dni po weselu na pobranie zdjęć i filmów."
       },
       "3": {
         "question": "Czy to działa na iPhonie i Androidzie?",
@@ -370,7 +370,7 @@
       "forWhom": "Dla par, które chcą, żeby księga wyglądała spójnie z resztą oprawy wesela, i którym zależy, żeby goście wiedzieli, co i o której się dzieje."
     },
     "gold": {
-      "intro": "Pakiet Gold to pełny zestaw: galeria zdjęć i wideo, najdłuższy dostęp dla gości, 60 dni na pobranie materiałów oraz trzy gotowe tabliczki z kodem QR na stoły. Dochodzi też funkcja Znajdź Swój Stół.",
+      "intro": "Pakiet Gold to pełny zestaw: galeria zdjęć i wideo, najdłuższy dostęp dla gości, {downloadDays} dni na pobranie materiałów oraz {qrTableCards} gotowe tabliczki z kodem QR na stoły. Dochodzi też funkcja Znajdź Swój Stół.",
       "forWhom": "Dla większych wesel i par, które chcą zebrać nie tylko zdjęcia, ale i krótkie filmiki, i nie chcą się martwić o przygotowanie materiałów do druku."
     }
   },
@@ -453,6 +453,24 @@
       "welcomeBack": "Witaj ponownie!",
       "manageDescription": "Zarządzaj wydarzeniami weselnymi i przeglądaj przesyłki gości.",
       "navHint": "Użyj nawigacji powyżej, aby uzyskać dostęp do różnych sekcji panelu."
+    },
+    "planLock": {
+      "title": "Ta funkcja jest zablokowana",
+      "availableIn": "Dostępna w pakiecie {plan}",
+      "comingSoon": "Wkrótce dostępna",
+      "cta": "Zobacz pakiety"
+    },
+    "plan": {
+      "title": "Twój pakiet",
+      "description": "Limity i terminy dla tego wesela",
+      "storage": "Wykorzystane miejsce",
+      "storageValue": "{used} z {total}",
+      "maxFileSize": "Maksymalny rozmiar pliku",
+      "guestUploadsUntil": "Goście dodają zdjęcia do",
+      "downloadUntil": "Materiały do pobrania do",
+      "closed": "Termin minął",
+      "qrTableCards": "Tabliczki QR na stół",
+      "noEvents": "Brak aktywnych wydarzeń."
     },
     "gallery": {
       "title": "Galeria",
@@ -546,6 +564,12 @@
       "save": "Zapisz",
       "saveSuccess": "Ustawienia zostały zapisane",
       "saveError": "Nie udało się zapisać",
+      "planSwitcher": {
+        "title": "Pakiet (tryb testowy)",
+        "description": "Widoczne tylko w środowisku deweloperskim. Zmienia pakiet wydarzenia bez płatności.",
+        "label": "Aktywny pakiet",
+        "updated": "Pakiet zmieniony na {plan}"
+      },
       "privacy": {
         "title": "Prywatność",
         "description": "Kontroluj kto może przeglądać i dodawać do wydarzenia",
@@ -584,6 +608,14 @@
       "title": "Dodaj wspomnienie",
       "description": "Podziel się zdjęciem lub filmem z uroczystości",
       "photoOrVideo": "Zdjęcie lub film",
+      "photoOnly": "Zdjęcie",
+      "maxFileSize": "Maksymalny rozmiar pliku: {size}",
+      "imagesOnly": "Ten pakiet pozwala przesyłać tylko zdjęcia (JPEG, PNG, WebP)",
+      "quotaExceeded": "Miejsce na pliki dla tego wesela zostało wykorzystane",
+      "windowClosed": "Czas na dodawanie wspomnień już minął",
+      "eventInactive": "To wydarzenie jest nieaktywne",
+      "closedTitle": "Dodawanie wspomnień zakończone",
+      "closedDescription": "Termin dodawania zdjęć minął {date}.",
       "yourName": "Twoje imię (opcjonalnie)",
       "yourNamePlaceholder": "Jan Kowalski",
       "message": "Wiadomość (opcjonalnie)",
@@ -594,7 +626,7 @@
       "cancel": "Anuluj",
       "selectFile": "Wybierz plik",
       "invalidFileType": "Wybierz zdjęcie (JPEG, PNG, WebP) lub film (MP4, MOV)",
-      "fileTooLarge": "Rozmiar pliku musi być mniejszy niż 50MB",
+      "fileTooLarge": "Maksymalny rozmiar pliku to {size}",
       "success": "Zdjęcie przesłane pomyślnie!",
       "error": "Wystąpił błąd podczas przesyłania"
     },

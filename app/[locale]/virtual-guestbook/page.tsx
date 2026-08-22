@@ -5,6 +5,7 @@ import type { AppLocale } from "@/i18n/routing";
 import { buildMetadata, localizedUrl } from "@/lib/seo/metadata";
 import { breadcrumbListNode, faqPageNode } from "@/lib/seo/json-ld";
 import { CURRENCY_SYMBOL, PLANS } from "@/lib/pricing";
+import { planRangeValues } from "@/lib/plan-features";
 import { JsonLd } from "@/components/json-ld";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
@@ -54,9 +55,10 @@ export default async function VirtualGuestbookPage({
     description: t(`why.${index}.description`),
   }));
 
+  const faqRange = planRangeValues();
   const faqItems = [1, 2, 3].map((index) => ({
     question: t(`faq.${index}.question`),
-    answer: t(`faq.${index}.answer`),
+    answer: t(`faq.${index}.answer`, faqRange),
   }));
 
   const relatedGuides = getGuidesForLocale(locale).slice(0, 3);

@@ -2,7 +2,11 @@ import { Suspense } from "react";
 import { redirect } from "@/i18n/navigation";
 import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { getDashboardStats, getUserEvents } from "@/app/actions/dashboard-actions";
+import {
+  getDashboardStats,
+  getEventPlanSummaries,
+  getUserEvents,
+} from "@/app/actions/dashboard-actions";
 import { OverviewTab } from "./components/overview-tab";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -30,12 +34,15 @@ async function OverviewContent() {
     return redirect({ href: "/login", locale: locale as "pl" | "en" });
   }
 
-  const [stats, events] = await Promise.all([
+  const [stats, events, planSummaries] = await Promise.all([
     getDashboardStats(user.id),
     getUserEvents(user.id),
+    getEventPlanSummaries(user.id),
   ]);
 
-  return <OverviewTab stats={stats} events={events} />;
+  return (
+    <OverviewTab stats={stats} events={events} planSummaries={planSummaries} />
+  );
 }
 
 export default function DashboardPage() {

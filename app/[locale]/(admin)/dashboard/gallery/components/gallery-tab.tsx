@@ -26,11 +26,21 @@ import type { DashboardUpload } from "@/app/actions/dashboard-actions";
 
 interface GalleryTabProps {
   uploads: DashboardUpload[];
+  /**
+   * Whether each event is still inside its plan's download window. Files sit on
+   * a public R2 domain, so this only hides the button — a private bucket with
+   * signed GETs is what would make the deadline real.
+   */
+  downloadOpenByEvent: Record<string, boolean>;
 }
 
-export function GalleryTab({ uploads: initialUploads }: GalleryTabProps) {
+export function GalleryTab({
+  uploads: initialUploads,
+  downloadOpenByEvent,
+}: GalleryTabProps) {
   const t = useTranslations("dashboard.gallery");
   const tCommon = useTranslations("common");
+  const tPlan = useTranslations("dashboard.plan");
   const [uploads, setUploads] = useState(initialUploads);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
@@ -92,10 +102,9 @@ export function GalleryTab({ uploads: initialUploads }: GalleryTabProps) {
 
   const handleDownload = (uploadId: string) => {
     const upload = uploads.find((u) => u.id === uploadId);
-    if (upload) {
-      // Open file in new tab for download
-      window.open(upload.file_url, "_blank");
-    }
+    if (!upload || downloadOpenByEvent[upload.event_id] === false) return;
+
+    window.open(upload.file_url, "_blank");
   };
 
   return (
@@ -190,9 +199,16 @@ export function GalleryTab({ uploads: initialUploads }: GalleryTabProps) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleDownload(upload.id)}>
+                        <DropdownMenuItem
+                          onClick={() => handleDownload(upload.id)}
+                          disabled={
+                            downloadOpenByEvent[upload.event_id] === false
+                          }
+                        >
                           <Download className="mr-2 size-4" />
-                          {tCommon("download")}
+                          {downloadOpenByEvent[upload.event_id] === false
+                            ? tPlan("closed")
+                            : tCommon("download")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDelete(upload.id)}

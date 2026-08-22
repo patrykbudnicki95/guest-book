@@ -44,6 +44,13 @@ export const PLANS: Record<PlanId, Plan> = {
 
 export const PLAN_LIST: Plan[] = PLAN_IDS.map((id) => PLANS[id]);
 
+/** Plan names are brand names, so they read the same in every locale. */
+export const PLAN_LABELS: Record<PlanId, string> = {
+  basic: "Basic",
+  silver: "Silver",
+  gold: "Gold",
+};
+
 export function isPlanId(value: string): value is PlanId {
   return PLAN_IDS.includes(value as PlanId);
 }

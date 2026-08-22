@@ -1,8 +1,29 @@
 import { z } from "zod";
+import { PLAN_IDS } from "@/lib/pricing";
+
+export const PlanIdSchema = z.enum(PLAN_IDS);
 
 // Event schemas
 export const EventIdSchema = z.object({
   id: z.string().uuid(),
+});
+
+/** Plan + usage for the dashboard plan card. */
+export const EventPlanSummarySchema = z.object({
+  id: z.string().uuid(),
+  names: z.string(),
+  date: z.string(),
+  plan_id: PlanIdSchema,
+  storage_used_bytes: z.coerce.number().int().nonnegative(),
+});
+
+/** Everything the permission layer needs to decide what an event may do. */
+export const EventPlanContextSchema = z.object({
+  id: z.string().uuid(),
+  plan_id: PlanIdSchema,
+  date: z.string(),
+  is_active: z.boolean(),
+  storage_used_bytes: z.coerce.number().int().nonnegative(),
 });
 
 export const EventIdWithNamesSchema = z.object({
@@ -15,6 +36,7 @@ export const EventForPdfSchema = z.object({
   names: z.string(),
   date: z.string(),
   location: z.string().nullable(),
+  plan_id: PlanIdSchema,
 });
 
 export const EventOwnerSchema = z.object({
@@ -33,6 +55,7 @@ export const EventSettingsSchema = z.object({
   date: z.string(),
   location: z.string().nullable(),
   theme_color: z.string().nullable(),
+  plan_id: PlanIdSchema,
 });
 
 export const EventSettingsUpdateSchema = z.object({
@@ -70,6 +93,8 @@ export const EventFullSchema = z.object({
   welcome_message: z.string().nullable(),
   schedule: z.array(ScheduleItemSchema).nullable(),
   menu: z.array(MenuSectionSchema).nullable(),
+  plan_id: PlanIdSchema,
+  storage_used_bytes: z.coerce.number().int().nonnegative(),
 });
 
 // Event page content update schema
@@ -91,6 +116,7 @@ export const UploadFullSchema = z.object({
   file_url: z.string().url(),
   thumbnail_url: z.string().url().nullable(),
   media_type: z.enum(["image", "video"]),
+  file_size_bytes: z.coerce.number().int().nonnegative(),
   guest_name: z.string().nullable(),
   caption: z.string().nullable(),
   created_at: z.string(),
@@ -118,12 +144,15 @@ export const UploadInsertSchema = z.object({
   file_url: z.string().url(),
   thumbnail_url: z.string().url().nullable(),
   media_type: z.enum(["image", "video"]),
+  file_size_bytes: z.number().int().positive(),
   guest_name: z.string().nullable(),
   caption: z.string().nullable(),
 });
 
 // Type exports
 export type EventId = z.infer<typeof EventIdSchema>;
+export type EventPlanContext = z.infer<typeof EventPlanContextSchema>;
+export type EventPlanSummaryRow = z.infer<typeof EventPlanSummarySchema>;
 export type EventIdWithNames = z.infer<typeof EventIdWithNamesSchema>;
 export type EventForPdf = z.infer<typeof EventForPdfSchema>;
 export type EventOwner = z.infer<typeof EventOwnerSchema>;

@@ -5,7 +5,7 @@ import type { AppLocale } from "@/i18n/routing";
 import { buildMetadata, localizedUrl } from "@/lib/seo/metadata";
 import { breadcrumbListNode, itemListNode } from "@/lib/seo/json-ld";
 import { PLANS, PLAN_LIST } from "@/lib/pricing";
-import { planFeatures } from "@/lib/plan-features";
+import { planFeatures, planRangeValues } from "@/lib/plan-features";
 import { JsonLd } from "@/components/json-ld";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
@@ -40,9 +40,10 @@ export default async function PricingPage({ params }: PricingPageProps) {
   const tLanding = await getTranslations("landing");
   const tFooter = await getTranslations("footer");
 
+  const faqRange = planRangeValues();
   const faqItems = [1, 2, 3, 4, 5].map((index) => ({
     question: tLanding(`faq.${index}.question`),
-    answer: tLanding(`faq.${index}.answer`),
+    answer: tLanding(`faq.${index}.answer`, faqRange),
   }));
 
   const jsonLd = [

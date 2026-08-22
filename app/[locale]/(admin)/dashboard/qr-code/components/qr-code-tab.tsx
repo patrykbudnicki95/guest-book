@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Download, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getLimits, hasFeature } from "@/lib/permissions";
+import { PlanLock } from "../../components/plan-lock";
 import type { UserEventForPdf } from "@/app/actions/dashboard-actions";
 import type { PdfTheme } from "./qr-code-pdf";
 
@@ -37,10 +39,16 @@ const THEMES: { id: PdfTheme; previewClass: string; accentClass: string }[] = [
 export function QRCodeTab({ events }: QRCodeTabProps) {
   const t = useTranslations("dashboard.qrCode");
   const tPdf = useTranslations("qrPdf");
+  const tPlan = useTranslations("dashboard.plan");
   const [qrCodes, setQrCodes] = useState<Record<string, string>>({});
   const [loadingQRCodes, setLoadingQRCodes] = useState<Set<string>>(new Set());
   const [generatingPDF, setGeneratingPDF] = useState<string | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<PdfTheme>("elegant");
+
+  // Every plan gets a QR card; only the paid tiers can restyle it.
+  const canPersonalizeCard = events.some((event) =>
+    hasFeature({ plan: event.plan_id, feature: "customBranding" }),
+  );
 
   useEffect(() => {
     const generateQRCodes = async () => {
@@ -128,7 +136,13 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
           <CardDescription>{t("theme.description")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-3">
+          {!canPersonalizeCard && <PlanLock feature="customBranding" />}
+          <div
+            className={cn(
+              "grid grid-cols-3 gap-3",
+              !canPersonalizeCard && "hidden",
+            )}
+          >
             {THEMES.map((theme) => {
               const isSelected = selectedTheme === theme.id;
               return (
@@ -212,6 +226,12 @@ export function QRCodeTab({ events }: QRCodeTabProps) {
                   </div>
                 )}
               </div>
+              {getLimits(event.plan_id).qrTableCards > 0 && (
+                <p className="text-center text-xs text-muted-foreground">
+                  {tPlan("qrTableCards")}:{" "}
+                  {getLimits(event.plan_id).qrTableCards}
+                </p>
+              )}
               <div className="flex justify-center">
                 <Button
                   onClick={() => handleGeneratePDF(event)}

@@ -7,19 +7,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Camera, HardDrive, Calendar, Upload, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
-import type { UserEvent } from "@/app/actions/dashboard-actions";
+import { PlanUsageCard } from "./plan-usage-card";
+import type {
+  DashboardStats,
+  EventPlanSummary,
+  UserEvent,
+} from "@/app/actions/dashboard-actions";
 
 interface OverviewTabProps {
-  stats: {
-    totalPhotos: number;
-    totalStorage: string;
-    activeEvents: number;
-    recentUploads: number;
-  };
+  stats: DashboardStats;
   events: UserEvent[];
+  planSummaries: EventPlanSummary[];
 }
 
-export function OverviewTab({ stats, events }: OverviewTabProps) {
+export function OverviewTab({
+  stats,
+  events,
+  planSummaries,
+}: OverviewTabProps) {
   const t = useTranslations("dashboard.overview");
   const tCommon = useTranslations("common");
   const [copiedEventId, setCopiedEventId] = useState<string | null>(null);
@@ -100,6 +105,8 @@ export function OverviewTab({ stats, events }: OverviewTabProps) {
           </CardContent>
         </Card>
       </div>
+
+      <PlanUsageCard summaries={planSummaries} />
 
       {events.length > 0 && (
         <Card className="rounded-xl border-0 shadow-sm">

@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { r2Client } from "@/lib/storage/r2";
+import { R2_BUCKET_NAME, buildPublicUrl, r2Client } from "@/lib/storage/r2";
 import { createClient } from "@/lib/supabase/server";
 import {
   EventFullSchema,
@@ -12,6 +12,8 @@ import {
   type EventFull,
   type EventPageContentUpdate,
 } from "@/lib/schemas/database";
+import { hasFeature } from "@/lib/permissions";
+import { getEventPlanContext } from "@/lib/permissions/server";
 import type { Database, Json } from "@/types/supabase";
 
 const ALLOWED_COVER_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -22,7 +24,7 @@ export async function getEventPageDataList(userId: string): Promise<EventFull[]>
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, names, date, location, theme_color, cover_photo_url, welcome_message, schedule, menu",
+      "id, names, date, location, theme_color, cover_photo_url, welcome_message, schedule, menu, plan_id, storage_used_bytes",
     )
     .eq("owner_id", userId)
     .eq("is_active", true)
@@ -54,7 +56,7 @@ export async function getEventPageData(
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, names, date, location, theme_color, cover_photo_url, welcome_message, schedule, menu",
+      "id, names, date, location, theme_color, cover_photo_url, welcome_message, schedule, menu, plan_id, storage_used_bytes",
     )
     .eq("id", eventId)
     .eq("is_active", true)
@@ -99,20 +101,35 @@ export async function updateEventPageContent(
     return { success: false, error: "Unauthorized" };
   }
 
+  const planContext = await getEventPlanContext(eventId);
+  if (!planContext) {
+    return { success: false, error: "Event not found" };
+  }
+
+  const plan = planContext.plan_id;
   const updateData: Database["public"]["Tables"]["events"]["Update"] = {
     updated_at: new Date().toISOString(),
   };
 
   if (parsed.data.cover_photo_url !== undefined) {
+    if (!hasFeature({ plan, feature: "customBranding" })) {
+      return { success: false, error: "planUpgradeRequired" };
+    }
     updateData.cover_photo_url = parsed.data.cover_photo_url;
   }
   if (parsed.data.welcome_message !== undefined) {
     updateData.welcome_message = parsed.data.welcome_message;
   }
   if (parsed.data.schedule !== undefined) {
+    if (!hasFeature({ plan, feature: "schedule" })) {
+      return { success: false, error: "planUpgradeRequired" };
+    }
     updateData.schedule = (parsed.data.schedule as Json) ?? null;
   }
   if (parsed.data.menu !== undefined) {
+    if (!hasFeature({ plan, feature: "menu" })) {
+      return { success: false, error: "planUpgradeRequired" };
+    }
     updateData.menu = (parsed.data.menu as Json) ?? null;
   }
 
@@ -162,12 +179,20 @@ export async function getPresignedUrlForCoverPhoto(
     throw new Error("Event not found or unauthorized");
   }
 
+  const planContext = await getEventPlanContext(eventId);
+  if (
+    !planContext ||
+    !hasFeature({ plan: planContext.plan_id, feature: "customBranding" })
+  ) {
+    throw new Error("Cover photos require a higher plan");
+  }
+
   const uuid = crypto.randomUUID();
   const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
   const fileKey = `events/${eventId}/cover/${uuid}-${sanitizedFileName}`;
 
   const command = new PutObjectCommand({
-    Bucket: process.env.R2_BUCKET_NAME,
+    Bucket: R2_BUCKET_NAME,
     Key: fileKey,
     ContentType: fileType,
   });
@@ -176,15 +201,10 @@ export async function getPresignedUrlForCoverPhoto(
     expiresIn: 900,
   });
 
-  const r2Domain = process.env.NEXT_PUBLIC_R2_DOMAIN;
-  if (!r2Domain) {
-    throw new Error("NEXT_PUBLIC_R2_DOMAIN environment variable is not set");
-  }
-
   return {
     uploadUrl,
     fileKey,
-    publicUrl: `${r2Domain}/${fileKey}`,
+    publicUrl: buildPublicUrl(fileKey),
   };
 }
 
@@ -193,7 +213,7 @@ export async function getEventsForOwner(userId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("events")
-    .select("id, names, date, location")
+    .select("id, names, date, location, plan_id")
     .eq("owner_id", userId)
     .eq("is_active", true)
     .order("created_at", { ascending: false });

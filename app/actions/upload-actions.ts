@@ -1,8 +1,16 @@
 "use server";
 
+import { z } from "zod";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { r2Client } from "@/lib/storage/r2";
+import {
+  R2_BUCKET_NAME,
+  buildPublicUrl,
+  deleteObject,
+  fileKeyFromPublicUrl,
+  getObjectInfo,
+  r2Client,
+} from "@/lib/storage/r2";
 import { createClient } from "@/lib/supabase/server";
 import {
   UploadInsertSchema,
@@ -11,113 +19,210 @@ import {
   EventOwnerSchema,
   type UploadInsert,
 } from "@/lib/schemas/database";
+import { getEventPlanContext } from "@/lib/permissions/server";
+import {
+  checkUploadAllowed,
+  type UploadRejectionReason,
+} from "@/lib/permissions";
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/quicktime"];
 const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES];
 
-export interface PresignedUrlResult {
-  uploadUrl: string;
-  fileKey: string;
+export type UploadFailureReason =
+  | UploadRejectionReason
+  | "invalidFileType"
+  | "eventNotFound"
+  | "objectMissing"
+  | "saveFailed";
+
+export type PresignedUrlResult =
+  | { ok: true; uploadUrl: string; fileKey: string }
+  | { ok: false; reason: UploadFailureReason };
+
+export type SaveUploadResult =
+  | {
+      ok: true;
+      id: string;
+      file_url: string;
+      thumbnail_url: string | null;
+      media_type: "image" | "video";
+    }
+  | { ok: false; reason: UploadFailureReason };
+
+function mediaTypeFor(fileType: string): "image" | "video" {
+  return ALLOWED_IMAGE_TYPES.includes(fileType) ? "image" : "video";
 }
 
-export interface UploadData {
+/**
+ * Signs a direct-to-R2 upload only if the event's plan allows it. `ContentLength`
+ * is part of the signature so R2 rejects a payload of a different size than the
+ * one we approved.
+ */
+export async function getPresignedUrl(input: {
+  fileName: string;
+  fileType: string;
+  fileSize: number;
   eventId: string;
-  fileKey: string;
-  mediaType: "image" | "video";
-  guestName?: string;
-  caption?: string;
-}
+}): Promise<PresignedUrlResult> {
+  const { fileName, fileType, fileSize, eventId } = input;
 
-export async function getPresignedUrl(
-  fileName: string,
-  fileType: string,
-  eventId: string
-): Promise<PresignedUrlResult> {
-  // Validate file type
   if (!ALLOWED_TYPES.includes(fileType)) {
-    throw new Error(`Invalid file type. Allowed types: ${ALLOWED_TYPES.join(", ")}`);
+    return { ok: false, reason: "invalidFileType" };
   }
 
-  // Generate unique file key
+  const context = await getEventPlanContext(eventId);
+
+  if (!context) {
+    return { ok: false, reason: "eventNotFound" };
+  }
+
+  const check = checkUploadAllowed({
+    plan: context.plan_id,
+    eventDate: context.date,
+    isActive: context.is_active,
+    usedBytes: context.storage_used_bytes,
+    fileBytes: fileSize,
+    mediaType: mediaTypeFor(fileType),
+  });
+
+  if (!check.allowed) {
+    return { ok: false, reason: check.reason };
+  }
+
   const uuid = crypto.randomUUID();
   const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
   const fileKey = `events/${eventId}/${uuid}-${sanitizedFileName}`;
 
-  // Create PutObjectCommand
   const command = new PutObjectCommand({
-    Bucket: process.env.R2_BUCKET_NAME,
+    Bucket: R2_BUCKET_NAME,
     Key: fileKey,
     ContentType: fileType,
+    ContentLength: fileSize,
   });
 
-  // Generate presigned URL (15 minutes expiry)
   const uploadUrl = await getSignedUrl(r2Client, command, {
-    expiresIn: 900, // 15 minutes
+    expiresIn: 900,
   });
 
-  return {
-    uploadUrl,
-    fileKey,
-  };
+  return { ok: true, uploadUrl, fileKey };
 }
 
-export async function saveUploadToDb(
-  uploadData: UploadData
-): Promise<{ id: string; file_url: string; thumbnail_url: string | null }> {
+/**
+ * Runs after the client has PUT the file. The size and media type are read back
+ * from R2 rather than taken from the request, and the quota is re-checked because
+ * another guest may have uploaded in the meantime.
+ */
+export async function saveUploadToDb(input: {
+  eventId: string;
+  fileKey: string;
+  guestName?: string;
+  caption?: string;
+}): Promise<SaveUploadResult> {
+  const { eventId, fileKey, guestName, caption } = input;
   const supabase = await createClient();
 
-  // Construct public URL
-  const r2Domain = process.env.NEXT_PUBLIC_R2_DOMAIN;
-  if (!r2Domain) {
-    throw new Error("NEXT_PUBLIC_R2_DOMAIN environment variable is not set");
+  const objectInfo = await getObjectInfo(fileKey);
+
+  if (!objectInfo) {
+    return { ok: false, reason: "objectMissing" };
   }
 
-  const fileUrl = `${r2Domain}/${uploadData.fileKey}`;
+  const context = await getEventPlanContext(eventId);
 
-  // For now, thumbnail_url is null (can be generated later)
-  // For images, we could use the same URL, for videos we'd need to generate thumbnails
-  const thumbnailUrl = uploadData.mediaType === "image" ? fileUrl : null;
+  if (!context) {
+    await deleteObject(fileKey);
+    return { ok: false, reason: "eventNotFound" };
+  }
 
-  // Prepare insert data and validate with Zod
+  const contentType = objectInfo.contentType ?? "";
+
+  if (!ALLOWED_TYPES.includes(contentType)) {
+    await deleteObject(fileKey);
+    return { ok: false, reason: "invalidFileType" };
+  }
+
+  const mediaType = mediaTypeFor(contentType);
+
+  const check = checkUploadAllowed({
+    plan: context.plan_id,
+    eventDate: context.date,
+    isActive: context.is_active,
+    usedBytes: context.storage_used_bytes,
+    fileBytes: objectInfo.sizeBytes,
+    mediaType,
+  });
+
+  if (!check.allowed) {
+    await deleteObject(fileKey);
+    return { ok: false, reason: check.reason };
+  }
+
+  const fileUrl = buildPublicUrl(fileKey);
+
   const insertData: UploadInsert = {
-    event_id: uploadData.eventId,
+    event_id: eventId,
     file_url: fileUrl,
-    thumbnail_url: thumbnailUrl,
-    media_type: uploadData.mediaType,
-    guest_name: uploadData.guestName || null,
-    caption: uploadData.caption || null,
+    thumbnail_url: mediaType === "image" ? fileUrl : null,
+    media_type: mediaType,
+    file_size_bytes: objectInfo.sizeBytes,
+    guest_name: guestName || null,
+    caption: caption || null,
   };
 
-  // Validate with Zod before inserting
-  const validatedData = UploadInsertSchema.parse(insertData);
+  const validated = UploadInsertSchema.safeParse(insertData);
 
-  // Insert into database (type assertion needed for Supabase client type inference)
+  if (!validated.success) {
+    console.error(
+      "[saveUploadToDb] Zod validation failed:",
+      z.prettifyError(validated.error),
+    );
+    console.error(
+      "[saveUploadToDb] Raw data:",
+      JSON.stringify(insertData, null, 2),
+    );
+    await deleteObject(fileKey);
+    return { ok: false, reason: "saveFailed" };
+  }
+
   const { data, error } = await supabase
     .from("uploads")
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .insert(validatedData as any)
+    .insert(validated.data as any)
     .select()
     .single();
 
   if (error || !data) {
-    throw new Error(`Failed to save upload to database: ${error?.message || "Unknown error"}`);
+    console.error("[saveUploadToDb] Supabase insert failed:", error);
+    await deleteObject(fileKey);
+    return { ok: false, reason: "saveFailed" };
   }
 
-  // Parse and validate response with Zod
-  const parsedUpload = UploadFullSchema.parse(data);
+  const parsedUpload = UploadFullSchema.safeParse(data);
+
+  if (!parsedUpload.success) {
+    console.error(
+      "[saveUploadToDb] Zod validation failed on inserted row:",
+      z.prettifyError(parsedUpload.error),
+    );
+    console.error("[saveUploadToDb] Raw data:", JSON.stringify(data, null, 2));
+    return { ok: false, reason: "saveFailed" };
+  }
 
   return {
-    id: parsedUpload.id,
-    file_url: parsedUpload.file_url,
-    thumbnail_url: parsedUpload.thumbnail_url,
+    ok: true,
+    id: parsedUpload.data.id,
+    file_url: parsedUpload.data.file_url,
+    thumbnail_url: parsedUpload.data.thumbnail_url,
+    media_type: parsedUpload.data.media_type,
   };
 }
 
-export async function deleteUpload(uploadId: string): Promise<{ success: boolean }> {
+export async function deleteUpload(
+  uploadId: string,
+): Promise<{ success: boolean }> {
   const supabase = await createClient();
 
-  // Get current user to verify ownership
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -126,10 +231,9 @@ export async function deleteUpload(uploadId: string): Promise<{ success: boolean
     throw new Error("Unauthorized");
   }
 
-  // Get the upload with its event
   const { data: upload, error: uploadError } = await supabase
     .from("uploads")
-    .select("event_id")
+    .select("event_id, file_url")
     .eq("id", uploadId)
     .single();
 
@@ -137,13 +241,19 @@ export async function deleteUpload(uploadId: string): Promise<{ success: boolean
     throw new Error("Upload not found");
   }
 
-  // Parse and validate with Zod
-  const parsedUpload = UploadEventIdSchema.safeParse(upload);
+  const parsedUpload = UploadEventIdSchema.extend({
+    file_url: z.string().url(),
+  }).safeParse(upload);
+
   if (!parsedUpload.success) {
+    console.error(
+      "[deleteUpload] Zod validation failed:",
+      z.prettifyError(parsedUpload.error),
+    );
+    console.error("[deleteUpload] Raw data:", JSON.stringify(upload, null, 2));
     throw new Error("Invalid upload data");
   }
 
-  // Verify the event belongs to the user
   const { data: event, error: eventError } = await supabase
     .from("events")
     .select("owner_id")
@@ -154,7 +264,6 @@ export async function deleteUpload(uploadId: string): Promise<{ success: boolean
     throw new Error("Event not found");
   }
 
-  // Parse and validate event with Zod
   const parsedEvent = EventOwnerSchema.safeParse(event);
   if (!parsedEvent.success) {
     throw new Error("Invalid event data");
@@ -164,11 +273,26 @@ export async function deleteUpload(uploadId: string): Promise<{ success: boolean
     throw new Error("Unauthorized: You don't own this event");
   }
 
-  // Delete the upload
-  const { error: deleteError } = await supabase.from("uploads").delete().eq("id", uploadId);
+  // Delete the row first: the trigger releases the quota, and a leftover R2
+  // object is cheaper to reconcile than a row pointing at a deleted file.
+  const { error: deleteError } = await supabase
+    .from("uploads")
+    .delete()
+    .eq("id", uploadId);
 
   if (deleteError) {
     throw new Error(`Failed to delete upload: ${deleteError.message}`);
+  }
+
+  const fileKey = fileKeyFromPublicUrl(parsedUpload.data.file_url);
+
+  if (fileKey) {
+    await deleteObject(fileKey);
+  } else {
+    console.error(
+      "[deleteUpload] Could not derive R2 key from url:",
+      parsedUpload.data.file_url,
+    );
   }
 
   return { success: true };

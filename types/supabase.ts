@@ -45,6 +45,8 @@ export interface Database {
           welcome_message: string | null;
           schedule: Json | null;
           menu: Json | null;
+          plan_id: string;
+          storage_used_bytes: number;
           is_active: boolean;
           created_at: string;
           updated_at: string;
@@ -61,6 +63,8 @@ export interface Database {
           welcome_message?: string | null;
           schedule?: Json | null;
           menu?: Json | null;
+          plan_id?: string;
+          storage_used_bytes?: number;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -77,6 +81,8 @@ export interface Database {
           welcome_message?: string | null;
           schedule?: Json | null;
           menu?: Json | null;
+          plan_id?: string;
+          storage_used_bytes?: number;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -89,6 +95,7 @@ export interface Database {
           file_url: string;
           thumbnail_url: string | null;
           media_type: "image" | "video";
+          file_size_bytes: number;
           guest_name: string | null;
           caption: string | null;
           created_at: string;
@@ -99,6 +106,7 @@ export interface Database {
           file_url: string;
           thumbnail_url?: string | null;
           media_type: "image" | "video";
+          file_size_bytes?: number;
           guest_name?: string | null;
           caption?: string | null;
           created_at?: string;
@@ -109,6 +117,7 @@ export interface Database {
           file_url?: string;
           thumbnail_url?: string | null;
           media_type?: "image" | "video";
+          file_size_bytes?: number;
           guest_name?: string | null;
           caption?: string | null;
           created_at?: string;
