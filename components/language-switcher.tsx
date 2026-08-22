@@ -1,5 +1,6 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import {
   Select,
@@ -19,10 +20,16 @@ const locales = [
 export function LanguageSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
+  const params = useParams();
   const locale = useLocale();
 
   const handleChange = (value: string) => {
-    router.replace(pathname, { locale: value as "pl" | "en" });
+    router.replace(
+      // @ts-expect-error -- params are validated against the pathname at the
+      // route level, and the current route always matches its own params.
+      { pathname, params },
+      { locale: value as "pl" | "en" },
+    );
   };
 
   return (

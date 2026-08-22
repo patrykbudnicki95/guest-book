@@ -12,6 +12,7 @@ DONE:
 
 TODO (sorted by priorites):
 
+- jak dodajesz zdjęcie jako gość ustawiasz widoczność public/private
 - pdf download with information about the event
 - main page content
   - pricing options (maybe display some fast shopping options like in vesti, but I'm not sure about that)

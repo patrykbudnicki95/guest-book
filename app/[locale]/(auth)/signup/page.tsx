@@ -1,6 +1,22 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { noindexMetadata } from "@/lib/seo/metadata";
+import type { AppLocale } from "@/i18n/routing";
 import { SignupForm } from "./signup-form";
 import { Sparkles } from "lucide-react";
+
+type SignupPageProps = {
+  params: Promise<{ locale: AppLocale }>;
+};
+
+export async function generateMetadata({
+  params,
+}: SignupPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "metadata.signup" });
+
+  return noindexMetadata(t("title"));
+}
 
 export default async function SignupPage() {
   const t = await getTranslations("auth.signup");

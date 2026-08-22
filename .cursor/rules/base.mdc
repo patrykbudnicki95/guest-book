@@ -53,7 +53,6 @@ You are a Senior Full Stack Developer and UI/UX Expert specializing in modern we
    - Always use Signed URLs for direct client-to-R2 uploads to save bandwidth costs.
    - Use `aws-sdk/client-s3` to generate presigned URLs on the server.
 2. **Database (Supabase)**:
-
    - Use Supabase SSR client helpers.
    - Row Level Security (RLS) is mandatory for all tables.
    - Guests do not authenticate via email/password. They access via event UUID/QR Code.
@@ -70,10 +69,25 @@ You are a Senior Full Stack Developer and UI/UX Expert specializing in modern we
 
 # File Organization
 
-- **Route-specific components**: Components used only in a specific route MUST be placed in a `components` folder within that route directory.  schemas in 'schemas' directory, and API calls in 'api' directory
+- **Route-specific components**: Components used only in a specific route MUST be placed in a `components` folder within that route directory. schemas in 'schemas' directory, and API calls in 'api' directory
   - Example: `app/(admin)/dashboard/gallery/components/gallery-tab.tsx` for a component only used in the gallery route
   - Example: `app/(admin)/dashboard/components/overview-tab.tsx` for a component used in the root dashboard route
 - **Shared components**: Components used across multiple routes should be in `components/` at the app root or in `lib/` if they're utilities.
 - **Layout components**: Components used in layouts (like navigation) can stay at the layout level if they're only used by that layout.
 - **Rule of thumb**: If a component/schema/action is used in only ONE route, it belongs in that route's `components` folder. If used in multiple routes, it belongs in a shared location.
 
+# Changelog
+
+Every branch gets exactly one changelog file: `changelog/<branch-name>.md`.
+
+- ALWAYS follow `changelog/TEMPLATE.md`. Do not invent a different structure.
+- Sections are `Added`, `Changed`, `Removed`, plus `Manual steps` when the reader
+  has to do something themselves (new env vars, SQL to run, dashboard settings).
+- Omit empty sections.
+- Keep it short: at most 8 bullets in total, only the most important changes.
+- Describe the change, not the files. No file-by-file listings.
+- When continuing work on a branch, update its existing file instead of adding a new one.
+
+# NOT PRODUCTION
+
+We re not in production yet, so you don't need to worry about breaking changes, we don't need backward compatibility for now

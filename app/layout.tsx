@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Playfair_Display } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { getLocale } from "next-intl/server";
+import { siteConfig } from "@/lib/seo/config";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,8 +25,13 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Wirtualna Księga Gości",
-  description: "Share your special moments - Upload photos and leave wishes",
+  metadataBase: new URL(siteConfig.url),
+  applicationName: siteConfig.name,
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
 };
 
 async function RootLayoutContent({

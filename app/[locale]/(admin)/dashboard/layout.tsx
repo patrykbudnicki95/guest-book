@@ -1,11 +1,20 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { redirect } from "@/i18n/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { noindexMetadata } from "@/lib/seo/metadata";
 import { DashboardNav } from "./dashboard-nav";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Heart } from "lucide-react";
+
+/** Inherited by every route under /dashboard. */
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata.dashboard");
+
+  return noindexMetadata(t("title"));
+}
 
 function HeaderSkeleton() {
   return (

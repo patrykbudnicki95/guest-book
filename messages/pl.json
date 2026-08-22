@@ -14,13 +14,89 @@
     "copy": "Kopiuj",
     "copied": "Skopiowano"
   },
+  "metadata": {
+    "home": {
+      "title": "Wirtualna Księga Gości Weselnych | Zdjęcia przez Kod QR",
+      "description": "Wirtualna księga gości na wesele. Goście dodają zdjęcia i życzenia przez kod QR, bez pobierania aplikacji. Pobierz wszystkie materiały po weselu."
+    },
+    "pricing": {
+      "title": "Cennik i pakiety",
+      "description": "Pakiety wirtualnej księgi gości od {price} zł. Porównaj Basic, Silver i Gold i wybierz ten dopasowany do Waszego wesela."
+    },
+    "packages": {
+      "basic": {
+        "title": "Pakiet Basic",
+        "description": "Pakiet Basic za {price} zł: klasyczna wirtualna księga gości, galeria zdjęć w trakcie wesela i 14 dni na pobranie materiałów."
+      },
+      "silver": {
+        "title": "Pakiet Silver",
+        "description": "Pakiet Silver za {price} zł: personalizacja wyglądu, galeria zdjęć i harmonogram wesela, 30 dni na pobranie zdjęć i wideo."
+      },
+      "gold": {
+        "title": "Pakiet Gold",
+        "description": "Pakiet Gold za {price} zł: zdjęcia i wideo, 60 dni na pobranie, 14 dni dostępu dla gości i 3 tabliczki z kodem QR na stół."
+      }
+    },
+    "virtualGuestbook": {
+      "title": "Wirtualna księga gości — jak działa",
+      "description": "Czym jest wirtualna księga gości i jak działa krok po kroku: kod QR na stołach, zdjęcia od gości bez aplikacji i pobieranie materiałów po weselu."
+    },
+    "guides": {
+      "title": "Poradnik ślubny",
+      "description": "Praktyczne poradniki o zbieraniu zdjęć od gości weselnych, kodach QR na weselu i wyborze księgi gości."
+    },
+    "about": {
+      "title": "O nas",
+      "description": "Kto stoi za Wirtualną Księgą Gości — polską aplikacją do zbierania zdjęć i życzeń od gości weselnych."
+    },
+    "contact": {
+      "title": "Kontakt",
+      "description": "Masz pytanie o wirtualną księgę gości? Napisz do nas — pomożemy wybrać pakiet i skonfigurować aplikację."
+    },
+    "login": {
+      "title": "Logowanie"
+    },
+    "signup": {
+      "title": "Rejestracja"
+    },
+    "dashboard": {
+      "title": "Panel"
+    },
+    "event": {
+      "title": "Księga gości {names}",
+      "fallbackTitle": "Księga gości",
+      "description": "Dodaj zdjęcie i życzenia do księgi gości."
+    }
+  },
   "landing": {
     "nav": {
       "howItWorks": "Jak to działa",
       "pricing": "Cennik",
+      "guides": "Poradnik",
       "faq": "FAQ",
       "login": "Zaloguj się",
       "getStarted": "Rozpocznij"
+    },
+    "definition": {
+      "title": "Czym jest wirtualna księga gości?",
+      "body": "Wirtualna księga gości to aplikacja działająca w przeglądarce, w której goście weselni dodają zdjęcia, filmy i życzenia po zeskanowaniu kodu QR — bez zakładania konta i bez instalowania czegokolwiek. Wszystkie materiały trafiają do jednej galerii w oryginalnej jakości, a po weselu pobieracie je jednym kliknięciem.",
+      "link": "Zobacz, jak to działa krok po kroku"
+    },
+    "problem": {
+      "title": "Jaki problem rozwiązujemy?",
+      "subtitle": "Najlepsze kadry z wesela robią goście telefonami. Problem zaczyna się wtedy, gdy trzeba je od nich zebrać.",
+      "1": {
+        "title": "Koniec z proszeniem o zdjęcia po weselu",
+        "description": "Nie musisz wyłapywać materiałów z kilkunastu rozmów na Messengerze i WhatsAppie. Goście wrzucają je w trakcie imprezy, do jednego miejsca."
+      },
+      "2": {
+        "title": "Zdjęcia bez utraty jakości",
+        "description": "Komunikatory mocno kompresują zdjęcia i filmy. Tutaj pliki trafiają do galerii w takiej rozdzielczości, w jakiej zostały zrobione."
+      },
+      "3": {
+        "title": "Zero instrukcji dla gości",
+        "description": "Bez logowania, bez zakładania konta, bez pobierania aplikacji. Wystarczy aparat w telefonie i kod QR postawiony na stole."
+      }
     },
     "hero": {
       "badge": "Podziel się wyjątkowymi chwilami",
@@ -49,11 +125,11 @@
       "title": "Wybierz pakiet",
       "subtitle": "Dopasuj ofertę do swojego wesela",
       "choosePlan": "Wybierz pakiet",
+      "seeDetails": "Zobacz szczegóły pakietu",
+      "comparePlans": "Porównaj wszystkie pakiety w cenniku",
       "basic": {
         "title": "Basic",
         "description": "Klasyczna księga gości",
-        "price": "299",
-        "originalPrice": "399",
         "features": {
           "1": "Klasyczny wygląd aplikacji",
           "2": "Galeria zdjęć w trakcie wesela",
@@ -65,8 +141,6 @@
       "silver": {
         "title": "Silver",
         "description": "Najczęściej wybierany",
-        "price": "399",
-        "originalPrice": "499",
         "features": {
           "1": "Zmiana koloru, zdjęcia i czcionki",
           "2": "Galeria zdjęć + harmonogram wesela",
@@ -78,8 +152,6 @@
       "gold": {
         "title": "Gold",
         "description": "Pełny pakiet",
-        "price": "499",
-        "originalPrice": "599",
         "features": {
           "1": "Wszystko z Silver",
           "2": "Galeria zdjęć i wideo",
@@ -159,6 +231,159 @@
       "description": "Zeskanuj kod QR lub kliknij poniżej, aby zobaczyć przykładową księgę.",
       "button": "Przetestuj"
     }
+  },
+  "aboutPage": {
+    "breadcrumb": "O nas",
+    "heading": "O Wirtualnej Księdze Gości",
+    "lead": "Wirtualna Księga Gości to aplikacja webowa, w której goście weselni dodają zdjęcia, filmy i życzenia po zeskanowaniu kodu QR — bez instalowania czegokolwiek i bez zakładania konta.",
+    "whyTitle": "Dlaczego to zrobiliśmy",
+    "whyBody": "Po każdym weselu powtarza się ten sam scenariusz: najlepsze kadry siedzą w telefonach gości, a zebranie ich zajmuje tygodnie proszenia i przeklikiwania czatów. Chcieliśmy, żeby wystarczyło postawić kod QR na stole.",
+    "howTitle": "Jak działamy",
+    "howBody": "Materiały gości trafiają na nasz serwer w takiej jakości, w jakiej zostały wysłane. Para młoda decyduje, co zostaje w galerii, i pobiera wszystko po weselu w czasie zależnym od wybranego pakietu.",
+    "companyTitle": "Dane firmy",
+    "companyPlaceholder": "Dane rejestrowe firmy uzupełnimy tutaj wkrótce.",
+    "contactCta": "Napisz do nas"
+  },
+  "contactPage": {
+    "breadcrumb": "Kontakt",
+    "heading": "Kontakt",
+    "lead": "Macie pytanie o pakiety, kod QR albo o to, jak księga zadziała na Waszej sali? Piszcie — odpowiadamy zwykle w ciągu jednego dnia roboczego.",
+    "emailTitle": "E-mail",
+    "emailPlaceholder": "Adres e-mail uzupełnimy tutaj wkrótce.",
+    "faqTitle": "Może odpowiedź jest już w FAQ",
+    "faqBody": "Zanim napiszecie, warto zajrzeć do najczęstszych pytań w cenniku — sporo rzeczy jest tam wyjaśnionych.",
+    "faqLink": "Przejdź do cennika i FAQ",
+    "guidesLink": "Zobacz poradnik ślubny"
+  },
+  "guestbookPage": {
+    "breadcrumb": "Wirtualna księga gości",
+    "heading": "Wirtualna księga gości na wesele — jak działa i czy warto?",
+    "lead": "Tradycyjna księga gości ma swój urok, ale często kończy jako kilka podpisów i krótkie „Wszystkiego najlepszego”. Wirtualna księga działa inaczej: pozwala zebrać prawdziwe wspomnienia — zdjęcia, filmy i wiadomości od gości — dokładnie wtedy, kiedy powstają.",
+    "whatIsTitle": "Co to jest wirtualna księga gości?",
+    "whatIsBody": "To strona działająca w przeglądarce, do której goście dołączają przez link lub kod QR. Mogą dodać zdjęcie albo film z telefonu, dopisać życzenia i zobaczyć galerię wspomnień z wesela. Najważniejsze: bez instalowania aplikacji i bez zakładania konta. Gość skanuje kod aparatem i od razu może działać.",
+    "howTitle": "Jak to działa w praktyce",
+    "how": {
+      "1": {
+        "title": "Tworzycie księgę",
+        "description": "Wybieracie pakiet i zakładacie księgę gości dla swojego wesela."
+      },
+      "2": {
+        "title": "Dostajecie kod QR",
+        "description": "Kod udostępniacie gościom — na tabliczkach na stołach, plakacie przy wejściu albo na ekranie."
+      },
+      "3": {
+        "title": "Goście dodają materiały",
+        "description": "W trakcie wesela wrzucają zdjęcia, filmiki i życzenia bezpośrednio z telefonu."
+      },
+      "4": {
+        "title": "Pobieracie wspomnienia",
+        "description": "Po weselu ściągacie wszystkie materiały w jakości, w jakiej zostały zrobione."
+      }
+    },
+    "whyTitle": "Dlaczego pary wybierają wersję online",
+    "why": {
+      "1": {
+        "title": "Zdjęcia od wszystkich, nie tylko od fotografa",
+        "description": "Goście robią mnóstwo ujęć z boku: przygotowania, parkiet, śmieszne momenty przy stole. Galeria zbiera to wszystko w jednym miejscu."
+      },
+      "2": {
+        "title": "Wszystko dzieje się od razu",
+        "description": "Nie musicie po weselu prosić „wyślijcie zdjęcia”. Goście wrzucają je jeszcze w trakcie imprezy, kiedy mają je świeżo w telefonie."
+      },
+      "3": {
+        "title": "Prościej dla gości",
+        "description": "Kod QR i przeglądarka to najmniejszy możliwy opór — również dla osób, które nie lubią instalować aplikacji."
+      },
+      "4": {
+        "title": "Porządek i wygodne pobieranie",
+        "description": "Zamiast kilkunastu czatów i linków do dysków macie jedną galerię, z której pobieracie wszystko naraz."
+      }
+    },
+    "planTitle": "Jak wybrać pakiet?",
+    "planBody": "Pakiety różnią się zakresem personalizacji, długością dostępu dla gości i czasem na pobranie materiałów. Basic wystarczy, jeśli chcecie po prostu zebrać zdjęcia. Silver dodaje personalizację wyglądu i harmonogram wesela. Gold to komplet ze wideo i tabliczkami z kodem QR na stoły.",
+    "planLink": "Zobacz pełny cennik",
+    "faqTitle": "Najczęstsze pytania",
+    "faq": {
+      "1": {
+        "question": "Czy goście muszą zakładać konto?",
+        "answer": "Nie. Gość wchodzi przez kod QR albo link i od razu może dodać zdjęcie. Nie ma rejestracji ani logowania."
+      },
+      "2": {
+        "question": "Czy da się pobrać wszystko po weselu?",
+        "answer": "Tak. W zależności od pakietu macie od 14 do 60 dni po weselu na pobranie zdjęć i filmów."
+      },
+      "3": {
+        "question": "Czy to działa na iPhonie i Androidzie?",
+        "answer": "Tak. Wystarczy przeglądarka i aparat do zeskanowania kodu QR — księga otwiera się jak każda inna strona internetowa."
+      }
+    },
+    "guidesTitle": "Przeczytaj też",
+    "ctaTitle": "Stwórzcie swoją księgę gości",
+    "ctaSubtitle": "Konfiguracja zajmuje kilka minut, a kod QR macie od razu po utworzeniu księgi.",
+    "ctaButton": "Rozpocznij"
+  },
+  "guidesPage": {
+    "breadcrumb": "Poradnik",
+    "heading": "Poradnik ślubny",
+    "intro": "Praktyczne teksty o zbieraniu zdjęć od gości weselnych, kodach QR na sali i wyborze księgi gości. Bez lania wody — tylko rzeczy, które da się wykorzystać przy planowaniu wesela.",
+    "readingTime": "{minutes} min czytania",
+    "readMore": "Czytaj dalej",
+    "relatedTitle": "Przeczytaj też",
+    "faqTitle": "Najczęstsze pytania",
+    "backToGuides": "Wszystkie poradniki",
+    "ctaTitle": "Zbierzcie zdjęcia od gości w jednym miejscu",
+    "ctaSubtitle": "Kod QR na stołach, galeria bez instalowania aplikacji i wszystkie materiały do pobrania po weselu.",
+    "ctaButton": "Zobacz pakiety"
+  },
+  "pricingPage": {
+    "breadcrumb": "Cennik",
+    "heading": "Cennik wirtualnej księgi gości",
+    "intro": "Trzy pakiety i jedna opłata za wesele — bez abonamentu i bez ukrytych limitów zdjęć. Pakiety różnią się zakresem personalizacji, długością dostępu dla gości i czasem, jaki macie na pobranie materiałów po weselu.",
+    "chooseTitle": "Który pakiet wybrać?",
+    "chooseSubtitle": "Krótka ściąga, jeśli nie chcecie porównywać wszystkiego punkt po punkcie.",
+    "choose": {
+      "basic": "Wybierzcie, jeśli zależy Wam głównie na tym, żeby zebrać zdjęcia od gości i mieć je w jednej galerii. Bez dodatków, w najniższej cenie.",
+      "silver": "Ma wszystko to, co Basic, ale dochodzi personalizacja wyglądu księgi i harmonogram wesela, który goście widzą w telefonie.",
+      "gold": "Dla par, które chcą komplet: zdjęcia i wideo, najdłuższy dostęp dla gości, najwięcej czasu na pobranie materiałów i gotowe tabliczki z kodem QR na stoły."
+    },
+    "faqTitle": "Pytania o pakiety",
+    "guideLink": "Nie wiecie jeszcze, czy wirtualna księga gości jest dla Was? Zobacz, jak działa",
+    "ctaTitle": "Gotowi zebrać wspomnienia z Waszego wesela?",
+    "ctaSubtitle": "Konfiguracja zajmuje kilka minut, a kod QR dostajecie zaraz po utworzeniu księgi.",
+    "ctaButton": "Rozpocznij"
+  },
+  "packagePage": {
+    "breadcrumb": "Pakiety",
+    "includedTitle": "Co zawiera ten pakiet",
+    "forWhomTitle": "Dla kogo jest ten pakiet",
+    "otherTitle": "Pozostałe pakiety",
+    "productName": "Wirtualna Księga Gości — pakiet {name}",
+    "priceNote": "Cena promocyjna zamiast {originalPrice} {currency}. Jednorazowa opłata za jedno wesele.",
+    "cta": "Wybieram pakiet {name}",
+    "backToPricing": "Wróć do pełnego cennika",
+    "basic": {
+      "intro": "Pakiet Basic to wirtualna księga gości w klasycznej odsłonie. Goście skanują kod QR, dodają zdjęcia i życzenia, a Wy macie wszystko w jednej galerii — bez instalowania aplikacji i bez zakładania kont.",
+      "forWhom": "Dobry wybór, jeśli chcecie po prostu zebrać zdjęcia od gości i nie potrzebujecie personalizacji wyglądu ani harmonogramu wesela w aplikacji."
+    },
+    "silver": {
+      "intro": "Pakiet Silver to najczęściej wybierana wersja księgi. Poza galerią zdjęć dostajecie personalizację wyglądu — kolor, zdjęcie i czcionkę — oraz harmonogram wesela, który goście mają pod ręką w telefonie.",
+      "forWhom": "Dla par, które chcą, żeby księga wyglądała spójnie z resztą oprawy wesela, i którym zależy, żeby goście wiedzieli, co i o której się dzieje."
+    },
+    "gold": {
+      "intro": "Pakiet Gold to pełny zestaw: galeria zdjęć i wideo, najdłuższy dostęp dla gości, 60 dni na pobranie materiałów oraz trzy gotowe tabliczki z kodem QR na stoły. Dochodzi też funkcja Znajdź Swój Stół.",
+      "forWhom": "Dla większych wesel i par, które chcą zebrać nie tylko zdjęcia, ale i krótkie filmiki, i nie chcą się martwić o przygotowanie materiałów do druku."
+    }
+  },
+  "footer": {
+    "tagline": "Wirtualna Księga Gości to aplikacja webowa, w której goście weselni dodają zdjęcia, filmy i życzenia przez kod QR — bez instalowania aplikacji.",
+    "product": "Produkt",
+    "company": "Firma",
+    "howItWorks": "Jak to działa",
+    "pricing": "Cennik",
+    "guides": "Poradnik ślubny",
+    "about": "O nas",
+    "contact": "Kontakt",
+    "rights": "Wszelkie prawa zastrzeżone."
   },
   "auth": {
     "login": {

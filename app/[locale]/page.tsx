@@ -1,23 +1,59 @@
-import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import type { AppLocale } from "@/i18n/routing";
+import { buildMetadata, localizedUrl } from "@/lib/seo/metadata";
+import {
+  faqPageNode,
+  organizationNode,
+  softwareApplicationNode,
+  webSiteNode,
+} from "@/lib/seo/json-ld";
+import { PLAN_LIST } from "@/lib/pricing";
+import { planFeatures } from "@/lib/plan-features";
+import { JsonLd } from "@/components/json-ld";
+import { MarketingShell } from "@/components/marketing/marketing-shell";
+import { PricingCard } from "@/components/marketing/pricing-card";
+import { FAQ } from "@/components/marketing/faq";
 import { Button } from "@/components/ui/button";
 import {
+  ArrowRight,
   Camera,
   Download,
-  Heart,
+  HeartHandshake,
+  ImageOff,
+  MessagesSquare,
   QrCode,
   Smartphone,
   Sparkles,
 } from "lucide-react";
 import { HeroSection } from "./components/hero-section";
-import { PricingCard } from "./components/pricing-card";
 import { HowItWorks } from "./components/how-it-works";
 import { Testimonials } from "./components/testimonials";
-import { FAQ } from "./components/faq";
-import { LandingHeader } from "./components/landing-header";
-import { LandingFooter } from "./components/landing-footer";
 
-export default async function LandingPage() {
+type LandingPageProps = {
+  params: Promise<{ locale: AppLocale }>;
+};
+
+export async function generateMetadata({
+  params,
+}: LandingPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "metadata.home" });
+
+  return buildMetadata({
+    href: "/",
+    locale,
+    title: t("title"),
+    description: t("description"),
+    absoluteTitle: true,
+  });
+}
+
+export default async function LandingPage({ params }: LandingPageProps) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   const t = await getTranslations("landing");
 
   const howItWorksSteps = [
@@ -49,42 +85,51 @@ export default async function LandingPage() {
     { quote: t("testimonials.3.quote"), author: t("testimonials.3.author") },
   ];
 
-  const faqItems = [
-    { question: t("faq.1.question"), answer: t("faq.1.answer") },
-    { question: t("faq.2.question"), answer: t("faq.2.answer") },
-    { question: t("faq.3.question"), answer: t("faq.3.answer") },
-    { question: t("faq.4.question"), answer: t("faq.4.answer") },
-    { question: t("faq.5.question"), answer: t("faq.5.answer") },
+  const faqItems = [1, 2, 3, 4, 5].map((index) => ({
+    question: t(`faq.${index}.question`),
+    answer: t(`faq.${index}.answer`),
+  }));
+
+  const problems = [
+    {
+      title: t("problem.1.title"),
+      description: t("problem.1.description"),
+      icon: <MessagesSquare className="size-6 text-primary" />,
+    },
+    {
+      title: t("problem.2.title"),
+      description: t("problem.2.description"),
+      icon: <ImageOff className="size-6 text-primary" />,
+    },
+    {
+      title: t("problem.3.title"),
+      description: t("problem.3.description"),
+      icon: <HeartHandshake className="size-6 text-primary" />,
+    },
   ];
 
-  const basicFeatures = [
-    t("pricing.basic.features.1"),
-    t("pricing.basic.features.2"),
-    t("pricing.basic.features.3"),
-    t("pricing.basic.features.4"),
-    t("pricing.basic.features.5"),
-  ];
-
-  const silverFeatures = [
-    t("pricing.silver.features.1"),
-    t("pricing.silver.features.2"),
-    t("pricing.silver.features.3"),
-    t("pricing.silver.features.4"),
-    t("pricing.silver.features.5"),
-  ];
-
-  const goldFeatures = [
-    t("pricing.gold.features.1"),
-    t("pricing.gold.features.2"),
-    t("pricing.gold.features.3"),
-    t("pricing.gold.features.4"),
-    t("pricing.gold.features.5"),
-    t("pricing.gold.features.6"),
+  const jsonLd = [
+    organizationNode(),
+    webSiteNode(locale),
+    softwareApplicationNode({
+      description: t("definition.body"),
+      url: localizedUrl("/", locale),
+      locale,
+      offers: PLAN_LIST.map((plan) => ({
+        plan,
+        name: t(`pricing.${plan.id}.title`),
+        url: localizedUrl(
+          { pathname: "/packages/[plan]", params: { plan: plan.id } },
+          locale,
+        ),
+      })),
+    }),
+    faqPageNode(faqItems),
   ];
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <LandingHeader />
+    <MarketingShell>
+      <JsonLd data={jsonLd} />
 
       <HeroSection
         badge={t("hero.badge")}
@@ -95,7 +140,26 @@ export default async function LandingPage() {
         demoText={t("hero.viewDemo")}
       />
 
-      {/* How it works */}
+      {/* Definition — states plainly what the product is, for readers and for
+          search engines building an entity around the brand. */}
+      <section className="border-y bg-white py-16">
+        <div className="container mx-auto max-w-3xl px-4">
+          <h2 className="mb-4 text-2xl font-bold md:text-3xl">
+            {t("definition.title")}
+          </h2>
+          <p className="text-lg leading-relaxed text-muted-foreground">
+            {t("definition.body")}
+          </p>
+          <Link
+            href="/virtual-guestbook"
+            className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+          >
+            {t("definition.link")}
+            <ArrowRight className="size-4" />
+          </Link>
+        </div>
+      </section>
+
       <div id="how-it-works">
         <HowItWorks
           title={t("howItWorks.title")}
@@ -104,8 +168,38 @@ export default async function LandingPage() {
         />
       </div>
 
-      {/* Features / Benefits */}
+      {/* Problem / solution */}
       <section className="bg-muted/30 py-20 md:py-28">
+        <div className="container mx-auto px-4">
+          <div className="mb-14 text-center">
+            <h2 className="mb-3 text-3xl font-bold md:text-4xl">
+              {t("problem.title")}
+            </h2>
+            <p className="mx-auto max-w-2xl text-muted-foreground">
+              {t("problem.subtitle")}
+            </p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {problems.map((problem) => (
+              <div
+                key={problem.title}
+                className="rounded-2xl border bg-white p-8 shadow-sm"
+              >
+                <div className="mb-5 flex size-12 items-center justify-center rounded-xl bg-primary/10">
+                  {problem.icon}
+                </div>
+                <h3 className="mb-2 text-lg font-semibold">{problem.title}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {problem.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features / Benefits */}
+      <section className="py-20 md:py-28">
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
             <h2 className="mb-3 text-3xl font-bold md:text-4xl">
@@ -129,7 +223,7 @@ export default async function LandingPage() {
             </div>
             <div className="group rounded-2xl border bg-white p-8 shadow-sm transition-all hover:shadow-md">
               <div className="mb-5 flex size-14 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/15">
-                <Heart className="size-7 text-primary" />
+                <Sparkles className="size-7 text-primary" />
               </div>
               <h3 className="mb-2 text-lg font-semibold">
                 {t("features.gallery.title")}
@@ -140,7 +234,7 @@ export default async function LandingPage() {
             </div>
             <div className="group rounded-2xl border bg-white p-8 shadow-sm transition-all hover:shadow-md">
               <div className="mb-5 flex size-14 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/15">
-                <Sparkles className="size-7 text-primary" />
+                <Download className="size-7 text-primary" />
               </div>
               <h3 className="mb-2 text-lg font-semibold">
                 {t("features.management.title")}
@@ -154,7 +248,7 @@ export default async function LandingPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-20 md:py-28">
+      <section id="pricing" className="bg-muted/30 py-20 md:py-28">
         <div className="container mx-auto px-4">
           <div className="mb-16 text-center">
             <h2 className="mb-3 text-3xl font-bold md:text-4xl">
@@ -163,46 +257,36 @@ export default async function LandingPage() {
             <p className="text-muted-foreground">{t("pricing.subtitle")}</p>
           </div>
           <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-3">
-            <PricingCard
-              planId="basic"
-              title={t("pricing.basic.title")}
-              description={t("pricing.basic.description")}
-              price={t("pricing.basic.price")}
-              originalPrice={t("pricing.basic.originalPrice")}
-              features={basicFeatures}
-              cta={t("pricing.choosePlan")}
-            />
-            <PricingCard
-              planId="silver"
-              title={t("pricing.silver.title")}
-              description={t("pricing.silver.description")}
-              price={t("pricing.silver.price")}
-              originalPrice={t("pricing.silver.originalPrice")}
-              features={silverFeatures}
-              cta={t("pricing.choosePlan")}
-              highlighted
-            />
-            <PricingCard
-              planId="gold"
-              title={t("pricing.gold.title")}
-              description={t("pricing.gold.description")}
-              price={t("pricing.gold.price")}
-              originalPrice={t("pricing.gold.originalPrice")}
-              features={goldFeatures}
-              cta={t("pricing.choosePlan")}
-            />
+            {PLAN_LIST.map((plan) => (
+              <PricingCard
+                key={plan.id}
+                plan={plan}
+                title={t(`pricing.${plan.id}.title`)}
+                description={t(`pricing.${plan.id}.description`)}
+                features={planFeatures(t, plan.id)}
+                cta={t("pricing.choosePlan")}
+                detailsLabel={t("pricing.seeDetails")}
+              />
+            ))}
+          </div>
+          <div className="mt-10 text-center">
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              {t("pricing.comparePlans")}
+              <ArrowRight className="size-4" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
       <Testimonials
         title={t("testimonials.title")}
         subtitle={t("testimonials.subtitle")}
         items={testimonials}
       />
 
-      {/* FAQ */}
       <div id="faq">
         <FAQ title={t("faq.title")} items={faqItems} />
       </div>
@@ -228,8 +312,6 @@ export default async function LandingPage() {
           </Button>
         </div>
       </section>
-
-      <LandingFooter />
-    </div>
+    </MarketingShell>
   );
 }

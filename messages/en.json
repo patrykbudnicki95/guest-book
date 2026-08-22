@@ -14,13 +14,89 @@
     "copy": "Copy",
     "copied": "Copied"
   },
+  "metadata": {
+    "home": {
+      "title": "Virtual Wedding Guestbook | Guest Photos via QR Code",
+      "description": "A virtual wedding guestbook. Guests add photos and wishes through a QR code, with no app to install. Download everything after the wedding."
+    },
+    "pricing": {
+      "title": "Pricing and packages",
+      "description": "Virtual guestbook packages from {price} PLN. Compare Basic, Silver and Gold and pick the one that fits your wedding."
+    },
+    "packages": {
+      "basic": {
+        "title": "Basic package",
+        "description": "Basic package for {price} PLN: a classic virtual guestbook, a live photo gallery during the wedding and 14 days to download everything."
+      },
+      "silver": {
+        "title": "Silver package",
+        "description": "Silver package for {price} PLN: custom styling, photo gallery plus wedding schedule and 30 days to download photos and video."
+      },
+      "gold": {
+        "title": "Gold package",
+        "description": "Gold package for {price} PLN: photos and video, 60 days to download, 14 days of guest access and 3 printed QR table cards."
+      }
+    },
+    "virtualGuestbook": {
+      "title": "Virtual guestbook — how it works",
+      "description": "What a virtual wedding guestbook is and how it works step by step: a QR code on the tables, guest photos without an app and downloads after the wedding."
+    },
+    "guides": {
+      "title": "Wedding guides",
+      "description": "Practical guides on collecting photos from wedding guests, using QR codes at a wedding and choosing a guestbook."
+    },
+    "about": {
+      "title": "About us",
+      "description": "The people behind Wirtualna Księga Gości — an app for collecting photos and wishes from wedding guests."
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Questions about the virtual guestbook? Write to us and we will help you pick a package and set the app up."
+    },
+    "login": {
+      "title": "Log in"
+    },
+    "signup": {
+      "title": "Sign up"
+    },
+    "dashboard": {
+      "title": "Dashboard"
+    },
+    "event": {
+      "title": "{names} guestbook",
+      "fallbackTitle": "Guestbook",
+      "description": "Add a photo and your wishes to the guestbook."
+    }
+  },
   "landing": {
     "nav": {
       "howItWorks": "How it works",
       "pricing": "Pricing",
+      "guides": "Guides",
       "faq": "FAQ",
       "login": "Log in",
       "getStarted": "Get Started"
+    },
+    "definition": {
+      "title": "What is a virtual guestbook?",
+      "body": "A virtual guestbook is a browser-based app where wedding guests add photos, videos and wishes after scanning a QR code — no account and nothing to install. Everything lands in one gallery at original quality, and after the wedding you download it all in one go.",
+      "link": "See how it works step by step"
+    },
+    "problem": {
+      "title": "What problem does this solve?",
+      "subtitle": "The best shots from a wedding are taken by guests on their phones. The hard part is collecting them afterwards.",
+      "1": {
+        "title": "No more chasing photos after the wedding",
+        "description": "You no longer have to dig through a dozen chats on Messenger and WhatsApp. Guests upload during the party, into a single place."
+      },
+      "2": {
+        "title": "Photos without quality loss",
+        "description": "Messaging apps compress photos and video heavily. Here files reach the gallery at the resolution they were shot in."
+      },
+      "3": {
+        "title": "Nothing to explain to guests",
+        "description": "No login, no account, no app download. All they need is a phone camera and a QR code on the table."
+      }
     },
     "hero": {
       "badge": "Share your special moments",
@@ -49,11 +125,11 @@
       "title": "Choose your plan",
       "subtitle": "Select the package that fits your wedding",
       "choosePlan": "Choose plan",
+      "seeDetails": "See package details",
+      "comparePlans": "Compare all packages in the pricing table",
       "basic": {
         "title": "Basic",
         "description": "Classic wedding guestbook",
-        "price": "299",
-        "originalPrice": "399",
         "features": {
           "1": "Classic app look",
           "2": "Photo gallery during the wedding",
@@ -65,8 +141,6 @@
       "silver": {
         "title": "Silver",
         "description": "Most popular",
-        "price": "399",
-        "originalPrice": "499",
         "features": {
           "1": "Custom colors, photo and font",
           "2": "Photo gallery + wedding schedule",
@@ -78,8 +152,6 @@
       "gold": {
         "title": "Gold",
         "description": "Complete package",
-        "price": "499",
-        "originalPrice": "599",
         "features": {
           "1": "All Silver features",
           "2": "Photo and video gallery",
@@ -159,6 +231,159 @@
       "description": "Scan the QR code or click below to see a sample guestbook.",
       "button": "Try Demo"
     }
+  },
+  "aboutPage": {
+    "breadcrumb": "About us",
+    "heading": "About Wirtualna Księga Gości",
+    "lead": "Wirtualna Księga Gości is a web app where wedding guests add photos, videos and wishes after scanning a QR code — with nothing to install and no account to create.",
+    "whyTitle": "Why we built it",
+    "whyBody": "After every wedding the same thing happens: the best shots sit on guests' phones, and collecting them takes weeks of asking and scrolling through chats. We wanted a QR code on the table to be enough.",
+    "howTitle": "How it works",
+    "howBody": "Guest uploads reach our server at the quality they were sent in. The couple decides what stays in the gallery and downloads everything after the wedding, within the window their package allows.",
+    "companyTitle": "Company details",
+    "companyPlaceholder": "Company registration details will be added here shortly.",
+    "contactCta": "Get in touch"
+  },
+  "contactPage": {
+    "breadcrumb": "Contact",
+    "heading": "Contact",
+    "lead": "Questions about the packages, the QR code or how the guestbook will work at your venue? Write to us — we usually reply within one business day.",
+    "emailTitle": "Email",
+    "emailPlaceholder": "The email address will be added here shortly.",
+    "faqTitle": "The answer may already be in the FAQ",
+    "faqBody": "Before writing, it is worth checking the frequently asked questions on the pricing page — quite a few things are covered there.",
+    "faqLink": "Go to pricing and FAQ",
+    "guidesLink": "Browse the wedding guides"
+  },
+  "guestbookPage": {
+    "breadcrumb": "Virtual guestbook",
+    "heading": "A virtual wedding guestbook — how it works and is it worth it?",
+    "lead": "A traditional guestbook has its charm, but it often ends up as a handful of signatures and a short \"all the best\". A virtual guestbook works differently: it collects real memories — photos, videos and messages from guests — exactly when they happen.",
+    "whatIsTitle": "What is a virtual guestbook?",
+    "whatIsBody": "It is a page running in the browser that guests join through a link or a QR code. They can add a photo or video from their phone, write a message and browse the gallery of memories. Most importantly: nothing to install and no account to create. A guest scans the code with their camera and can start straight away.",
+    "howTitle": "How it works in practice",
+    "how": {
+      "1": {
+        "title": "You create the guestbook",
+        "description": "Pick a package and set up a guestbook for your wedding."
+      },
+      "2": {
+        "title": "You get a QR code",
+        "description": "Share the code with guests — on table cards, a poster at the entrance or on a screen."
+      },
+      "3": {
+        "title": "Guests add content",
+        "description": "During the wedding they upload photos, short videos and wishes straight from their phones."
+      },
+      "4": {
+        "title": "You download the memories",
+        "description": "After the wedding you download everything at the quality it was captured in."
+      }
+    },
+    "whyTitle": "Why couples choose the online version",
+    "why": {
+      "1": {
+        "title": "Photos from everyone, not just the photographer",
+        "description": "Guests capture plenty of moments from the side: preparations, the dance floor, funny moments at the table. The gallery collects all of it in one place."
+      },
+      "2": {
+        "title": "Everything happens immediately",
+        "description": "You do not have to ask for photos after the wedding. Guests upload them during the party, while they are still fresh on their phones."
+      },
+      "3": {
+        "title": "Easier for guests",
+        "description": "A QR code and a browser are the lowest possible barrier — including for people who dislike installing apps."
+      },
+      "4": {
+        "title": "Order and easy downloads",
+        "description": "Instead of a dozen chats and cloud links you get one gallery you download in a single go."
+      }
+    },
+    "planTitle": "Which package should you pick?",
+    "planBody": "The packages differ in how much you can customise, how long guests keep access and how much time you have to download. Basic is enough if you simply want to collect photos. Silver adds custom styling and the wedding schedule. Gold is the full set with video and printed QR table cards.",
+    "planLink": "See the full pricing",
+    "faqTitle": "Frequently asked questions",
+    "faq": {
+      "1": {
+        "question": "Do guests need to create an account?",
+        "answer": "No. A guest opens the QR code or link and can add a photo right away. There is no sign-up and no login."
+      },
+      "2": {
+        "question": "Can we download everything after the wedding?",
+        "answer": "Yes. Depending on the package you have between 14 and 60 days after the wedding to download photos and videos."
+      },
+      "3": {
+        "question": "Does it work on iPhone and Android?",
+        "answer": "Yes. All you need is a browser and a camera to scan the QR code — the guestbook opens like any other website."
+      }
+    },
+    "guidesTitle": "Read next",
+    "ctaTitle": "Create your guestbook",
+    "ctaSubtitle": "Setup takes a few minutes and your QR code is ready as soon as the guestbook is created.",
+    "ctaButton": "Get started"
+  },
+  "guidesPage": {
+    "breadcrumb": "Guides",
+    "heading": "Wedding guides",
+    "intro": "Practical articles about collecting photos from wedding guests, using QR codes at the venue and choosing a guestbook. No filler — only things you can act on while planning.",
+    "readingTime": "{minutes} min read",
+    "readMore": "Read more",
+    "relatedTitle": "Read next",
+    "faqTitle": "Frequently asked questions",
+    "backToGuides": "All guides",
+    "ctaTitle": "Collect guest photos in one place",
+    "ctaSubtitle": "A QR code on the tables, a gallery with no app to install and everything ready to download after the wedding.",
+    "ctaButton": "See packages"
+  },
+  "pricingPage": {
+    "breadcrumb": "Pricing",
+    "heading": "Virtual guestbook pricing",
+    "intro": "Three packages and a single payment per wedding — no subscription and no hidden photo limits. The packages differ in how much you can customise, how long guests keep access and how much time you have to download everything afterwards.",
+    "chooseTitle": "Which package should you pick?",
+    "chooseSubtitle": "A short cheat sheet if you would rather not compare every line.",
+    "choose": {
+      "basic": "Pick this if you mainly want to collect guest photos and keep them in one gallery. No extras, lowest price.",
+      "silver": "Everything in Basic, plus custom styling for the guestbook and a wedding schedule your guests can check on their phones.",
+      "gold": "For couples who want the full set: photos and video, the longest guest access, the most time to download and printed QR table cards."
+    },
+    "faqTitle": "Questions about the packages",
+    "guideLink": "Not sure a virtual guestbook is right for you? See how it works",
+    "ctaTitle": "Ready to collect the memories from your wedding?",
+    "ctaSubtitle": "Setup takes a few minutes and your QR code is ready as soon as the guestbook is created.",
+    "ctaButton": "Get started"
+  },
+  "packagePage": {
+    "breadcrumb": "Packages",
+    "includedTitle": "What this package includes",
+    "forWhomTitle": "Who it is for",
+    "otherTitle": "Other packages",
+    "productName": "Wirtualna Księga Gości — {name} package",
+    "priceNote": "Promotional price instead of {originalPrice} {currency}. One payment for one wedding.",
+    "cta": "Choose the {name} package",
+    "backToPricing": "Back to the full pricing table",
+    "basic": {
+      "intro": "The Basic package is the classic version of the virtual guestbook. Guests scan a QR code, add photos and wishes, and you get everything in a single gallery — with no app to install and no accounts to create.",
+      "forWhom": "A good fit if you simply want to collect guest photos and do not need custom styling or the wedding schedule inside the app."
+    },
+    "silver": {
+      "intro": "The Silver package is the most popular version. On top of the photo gallery you get custom styling — colour, photo and font — plus a wedding schedule your guests can check on their phones.",
+      "forWhom": "For couples who want the guestbook to match the rest of the wedding styling, and who want guests to know what happens when."
+    },
+    "gold": {
+      "intro": "The Gold package is the full set: a photo and video gallery, the longest guest access, 60 days to download everything and three printed QR table cards. It also includes the Find Your Table feature.",
+      "forWhom": "For larger weddings and couples who want short videos as well as photos, without preparing print material themselves."
+    }
+  },
+  "footer": {
+    "tagline": "Wirtualna Księga Gości is a web app where wedding guests add photos, videos and wishes through a QR code — with no app to install.",
+    "product": "Product",
+    "company": "Company",
+    "howItWorks": "How it works",
+    "pricing": "Pricing",
+    "guides": "Wedding guides",
+    "about": "About us",
+    "contact": "Contact",
+    "rights": "All rights reserved."
   },
   "auth": {
     "login": {

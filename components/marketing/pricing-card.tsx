@@ -4,30 +4,27 @@ import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
-
-type PlanId = "basic" | "silver" | "gold";
+import { CURRENCY_SYMBOL, type Plan } from "@/lib/pricing";
 
 type PricingCardProps = {
-  planId: PlanId;
+  plan: Plan;
   title: string;
   description: string;
-  price: string;
-  originalPrice: string;
   features: string[];
   cta: string;
-  highlighted?: boolean;
+  detailsLabel?: string;
 };
 
 export function PricingCard({
-  planId,
+  plan,
   title,
   description,
-  price,
-  originalPrice,
   features,
   cta,
-  highlighted = false,
+  detailsLabel,
 }: PricingCardProps) {
+  const { highlighted } = plan;
+
   return (
     <div
       className={`relative flex h-full flex-col rounded-2xl border bg-white p-6 transition-all ${
@@ -52,10 +49,10 @@ export function PricingCard({
       </div>
 
       <div className="mb-6 flex items-baseline gap-2">
-        <span className="text-4xl font-bold">{price}</span>
-        <span className="text-lg text-muted-foreground">zł</span>
+        <span className="text-4xl font-bold">{plan.price}</span>
+        <span className="text-lg text-muted-foreground">{CURRENCY_SYMBOL}</span>
         <span className="ml-1 text-sm text-muted-foreground line-through">
-          {originalPrice} zł
+          {plan.originalPrice} {CURRENCY_SYMBOL}
         </span>
       </div>
 
@@ -70,18 +67,31 @@ export function PricingCard({
         ))}
       </ul>
 
-      <Button
-        asChild
-        className={`w-full rounded-full ${
-          highlighted
-            ? "bg-primary shadow-lg shadow-primary/25 hover:bg-primary/90"
-            : "border-primary/20 text-primary hover:bg-primary/5"
-        }`}
-        variant={highlighted ? "default" : "outline"}
-        size="lg"
-      >
-        <Link href={`/signup?plan=${planId}`}>{cta}</Link>
-      </Button>
+      <div className="space-y-3">
+        <Button
+          asChild
+          className={`w-full rounded-full ${
+            highlighted
+              ? "bg-primary shadow-lg shadow-primary/25 hover:bg-primary/90"
+              : "border-primary/20 text-primary hover:bg-primary/5"
+          }`}
+          variant={highlighted ? "default" : "outline"}
+          size="lg"
+        >
+          <Link href={{ pathname: "/signup", query: { plan: plan.id } }}>
+            {cta}
+          </Link>
+        </Button>
+
+        {detailsLabel && (
+          <Link
+            href={{ pathname: "/packages/[plan]", params: { plan: plan.id } }}
+            className="block text-center text-sm font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+          >
+            {detailsLabel}
+          </Link>
+        )}
+      </div>
     </div>
   );
 }

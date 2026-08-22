@@ -45,7 +45,14 @@ export function HeroSection({
                 size="lg"
                 className="rounded-full px-8 text-base"
               >
-                <Link href="/e/demo-event-123">{demoText}</Link>
+                <Link
+                  href={{
+                    pathname: "/e/[eventId]",
+                    params: { eventId: "demo-event-123" },
+                  }}
+                >
+                  {demoText}
+                </Link>
               </Button>
             </div>
           </div>
