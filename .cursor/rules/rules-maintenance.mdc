@@ -1,0 +1,17 @@
+---
+description: After editing Cursor rules, verify the project still follows them
+globs: ".cursor/rules/**"
+alwaysApply: false
+---
+
+# Rules maintenance
+
+When you **add, edit, split, merge, or delete** anything under `.cursor/rules/`:
+
+1. **Inventory** — list every `.mdc` in `.cursor/rules/` and note `alwaysApply` vs `globs`.
+2. **No silent drops** — do not remove or weaken a MUST/MUST NOT unless the user explicitly asked. If a rule moves to docs, keep a short enforceable pointer in a rule.
+3. **Coverage check** — confirm each rule still maps to real paths/patterns in the repo (globs match files that exist; always-on rules are still needed).
+4. **Consistency** — update `docs/README.md` (rules map) and this branch’s `changelog/<branch>.md` when the rule set changes.
+5. **Spot-validate the codebase** — sample the areas each rule governs (e.g. Zod `safeParse` on Supabase reads, R2 presign-only uploads, `PLAN_ENTITLEMENTS` as SoT, colocated route components, Cache Components patterns). Report gaps; fix them if they are caused by this rules change, otherwise call them out.
+
+Do not treat a rules-only PR as done until steps 1–5 are done (or explicitly waived by the user).

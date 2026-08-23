@@ -1,0 +1,18 @@
+---
+description: UI and React/Next coding standards
+alwaysApply: true
+---
+
+# Coding standards
+
+- TypeScript everywhere; strict typing
+- Prefer **Server Components** for data fetching
+- Use **Server Actions** for mutations
+- **Mobile-first**: guests use phones; touch-friendly UI
+- Use `shadcn/ui` from `components/ui` — do not invent parallel patterns
+- Mobile modals: prefer `Drawer` over `Dialog`
+- Toasts: `sonner`
+- Validate file types and sizes on upload paths
+- Functional components with **named exports**
+- Tailwind 4 syntax
+- Routes: guest event under `app/[locale]/e/...`; couple dashboard under `app/[locale]/(admin)/...`

@@ -1,0 +1,19 @@
+---
+description: Next.js 16.3 Cache Components patterns for this repo
+globs: "app/**/*.{ts,tsx},next.config.*"
+alwaysApply: false
+---
+
+# Cache Components (Next 16.3.2)
+
+`cacheComponents: true` in `next.config.ts`. Dynamic by default; opt in to cache explicitly.
+
+- Uncached async / runtime APIs → `<Suspense>` with fallback (blocking-route insight if missing)
+- Cacheable work → `'use cache'` + **`cacheLife`** + optional `cacheTag`
+- Runtime values into cache → read outside cache scope; pass as **function args** (or `'use cache: private'` only when necessary)
+- Mutations → `updateTag` or `revalidateTag`
+- Do **not** use: `dynamic`, `revalidate`, `fetchCache`, Edge `runtime`
+- Not ready to migrate a route → `export const instant = false` (temporary)
+
+Cheatsheet: `docs/reference/next-cache-cheatsheet.md`  
+Official URLs (do not rely on stale local paste): `docs/reference/next-cache-components.md` or https://nextjs.org/docs/llms.txt

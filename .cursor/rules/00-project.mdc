@@ -1,0 +1,33 @@
+---
+description: Project identity, stack, agent workflow, changelog
+alwaysApply: true
+---
+
+# Virtual Wedding Guestbook
+
+Senior full-stack work on a QR-based wedding guestbook SaaS. Guests upload photos/videos and wishes via event UUID/QR — no guest accounts.
+
+## Tech stack
+
+- Next.js 16 App Router, React 19 (RSC + Server Actions), TypeScript
+- Tailwind 4, shadcn/ui, Lucide, sonner
+- Supabase (Auth, Postgres, RLS), Cloudflare R2 (presigned client uploads)
+- Resend (email), Stripe (payments — not fully wired yet)
+- next-intl (`pl` default, `en`)
+
+## Agent workflow
+
+- Do **not** run the dev server. Verify with `npm run build` and `npm run lint` only.
+- Not in production: no backward-compatibility requirements.
+
+## Changelog
+
+Every branch: exactly one `changelog/<branch-name>.md` following `changelog/TEMPLATE.md`.
+
+- Sections: `Added`, `Changed`, `Removed`, plus `Manual steps` when needed
+- Omit empty sections; max 8 bullets; describe behaviour, not files
+- Continuing a branch: update the existing file
+
+## Docs
+
+Human + agent context lives under `docs/`. Start at `docs/README.md`.
