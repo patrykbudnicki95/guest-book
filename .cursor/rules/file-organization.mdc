@@ -1,0 +1,13 @@
+---
+description: Colocate route-only code under the route directory
+globs: "app/**/*.{ts,tsx},components/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# File organization
+
+- **Route-only** components → `components/` inside that route; schemas → `schemas/`; API helpers → `api/`
+  - e.g. `app/[locale]/(admin)/dashboard/gallery/components/gallery-tab.tsx`
+- **Shared** across routes → root `components/` or `lib/`
+- Layout-only chrome may stay next to the layout
+- Rule of thumb: one route → colocate; two or more → shared location

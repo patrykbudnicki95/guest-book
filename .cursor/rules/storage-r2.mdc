@@ -1,0 +1,14 @@
+---
+description: Cloudflare R2 uploads via presigned URLs only
+globs: "**/upload*/**,**/r2*/**,**/storage*/**,**/presign*/**,lib/storage/**/*,app/actions/upload*.ts"
+alwaysApply: false
+---
+
+# Storage (Cloudflare R2)
+
+- NEVER upload files through the Next.js/Vercel server
+- Client uploads directly to R2 with **presigned PUT** URLs
+- Generate URLs server-side with `@aws-sdk/client-s3` + `@aws-sdk/s3-request-presigner` (`lib/storage/r2.ts`, `app/actions/upload-actions.ts`)
+- Use optimistic UI for guest photo uploads
+- Re-check plan limits with `checkUploadAllowed` before presign and after save
+- Details: `docs/architecture/storage.md`

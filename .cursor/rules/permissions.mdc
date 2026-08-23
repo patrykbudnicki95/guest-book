@@ -1,0 +1,27 @@
+---
+description: Plan entitlements — PLAN_ENTITLEMENTS is the source of truth
+globs: "lib/permissions/**/*,lib/pricing.ts,lib/plan-features.ts,app/**/(admin)/**/*,app/**/e/**/*,app/**/demo/**/*,app/**/pricing/**/*,app/**/packages/**/*,app/actions/**/*"
+alwaysApply: false
+---
+
+# Permissions
+
+Plans live on the **event** (`events.plan_id`), not the profile.
+
+- Source of truth: `PLAN_ENTITLEMENTS` in `lib/permissions/entitlements.ts`
+- Prices: `lib/pricing.ts` only
+- Marketing bullets: `lib/plan-features.ts` (ICU placeholders from entitlements)
+- Never hardcode days, GB, or `plan === "gold"` checks elsewhere
+
+```typescript
+hasFeature({ plan, feature: "schedule" });
+getLimits(plan).storageBytes;
+const context = await getEventPlanContext(eventId);
+```
+
+- UI (`hasFeature`, `PlanLock`): UX only
+- Server actions must re-check (`checkUploadAllowed`, `getEventPlanContext` / `requireOwnedEventFeature`)
+- Download window is UI-only until R2 is private + signed GET
+- `setEventPlan` only when `NEXT_PUBLIC_ENABLE_PLAN_SWITCHER=true` — leave off in production
+
+Full detail: `docs/architecture/permissions.md`

@@ -1,0 +1,22 @@
+---
+description: Zod validation for all Supabase query results
+alwaysApply: true
+---
+
+# Data validation
+
+ALWAYS validate Supabase query results with Zod before use.
+
+- Schemas live in `lib/schemas/database.ts` (match the selected columns)
+- Use `safeParse()`, never bare `parse()`
+- On failure: `console.error` with `[functionName]`, `z.prettifyError`, and raw JSON; return a safe default or fail the action
+
+```typescript
+const parsed = Schema.safeParse(data);
+if (!parsed.success) {
+  console.error("[functionName] Zod validation failed:", z.prettifyError(parsed.error));
+  console.error("[functionName] Raw data:", JSON.stringify(data, null, 2));
+  return defaultValue;
+}
+return parsed.data;
+```
