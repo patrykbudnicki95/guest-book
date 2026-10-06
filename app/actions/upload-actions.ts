@@ -14,7 +14,6 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import {
   UploadInsertSchema,
-  UploadFullSchema,
   UploadEventIdSchema,
   EventOwnerSchema,
   type UploadInsert,
@@ -118,8 +117,9 @@ export async function saveUploadToDb(input: {
   fileKey: string;
   guestName?: string;
   caption?: string;
+  isPrivate: boolean;
 }): Promise<SaveUploadResult> {
-  const { eventId, fileKey, guestName, caption } = input;
+  const { eventId, fileKey, guestName, caption, isPrivate } = input;
   const supabase = await createClient();
 
   const objectInfo = await getObjectInfo(fileKey);
@@ -160,7 +160,10 @@ export async function saveUploadToDb(input: {
 
   const fileUrl = buildPublicUrl(fileKey);
 
+  // The id is generated here because the insert can't return the row: a guest
+  // (anon) is not allowed to read back an upload they marked private.
   const insertData: UploadInsert = {
+    id: crypto.randomUUID(),
     event_id: eventId,
     file_url: fileUrl,
     thumbnail_url: mediaType === "image" ? fileUrl : null,
@@ -168,6 +171,7 @@ export async function saveUploadToDb(input: {
     file_size_bytes: objectInfo.sizeBytes,
     guest_name: guestName || null,
     caption: caption || null,
+    is_private: isPrivate,
   };
 
   const validated = UploadInsertSchema.safeParse(insertData);
@@ -185,36 +189,23 @@ export async function saveUploadToDb(input: {
     return { ok: false, reason: "saveFailed" };
   }
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("uploads")
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .insert(validated.data as any)
-    .select()
-    .single();
+    .insert(validated.data as any);
 
-  if (error || !data) {
+  if (error) {
     console.error("[saveUploadToDb] Supabase insert failed:", error);
     await deleteObject(fileKey);
     return { ok: false, reason: "saveFailed" };
   }
 
-  const parsedUpload = UploadFullSchema.safeParse(data);
-
-  if (!parsedUpload.success) {
-    console.error(
-      "[saveUploadToDb] Zod validation failed on inserted row:",
-      z.prettifyError(parsedUpload.error),
-    );
-    console.error("[saveUploadToDb] Raw data:", JSON.stringify(data, null, 2));
-    return { ok: false, reason: "saveFailed" };
-  }
-
   return {
     ok: true,
-    id: parsedUpload.data.id,
-    file_url: parsedUpload.data.file_url,
-    thumbnail_url: parsedUpload.data.thumbnail_url,
-    media_type: parsedUpload.data.media_type,
+    id: validated.data.id,
+    file_url: validated.data.file_url,
+    thumbnail_url: validated.data.thumbnail_url,
+    media_type: validated.data.media_type,
   };
 }
 

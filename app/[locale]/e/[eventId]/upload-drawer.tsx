@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
   getPresignedUrl,
@@ -32,6 +33,7 @@ export interface Upload {
   media_type: "image" | "video";
   guest_name: string | null;
   caption: string | null;
+  is_private: boolean;
   created_at: string;
 }
 
@@ -42,6 +44,7 @@ export type LocalUploadInput = {
   file: File;
   guestName?: string;
   caption?: string;
+  isPrivate: boolean;
 };
 
 export type LocalUploadResult =
@@ -71,6 +74,7 @@ export function UploadDrawer({
   const [file, setFile] = useState<File | null>(null);
   const [caption, setCaption] = useState("");
   const [guestName, setGuestName] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isPending, startTransition] = useTransition();
 
@@ -134,6 +138,7 @@ export function UploadDrawer({
             file,
             guestName: guestName || undefined,
             caption: caption || undefined,
+            isPrivate,
           });
 
           if (!result.ok) {
@@ -143,11 +148,12 @@ export function UploadDrawer({
           }
 
           setUploadProgress(100);
-          toast.success(t("success"));
+          toast.success(isPrivate ? t("successPrivate") : t("success"));
           onUploadSuccess(result.upload);
           setFile(null);
           setCaption("");
           setGuestName("");
+          setIsPrivate(false);
           setUploadProgress(0);
           return;
         }
@@ -203,6 +209,7 @@ export function UploadDrawer({
           fileKey: presigned.fileKey,
           guestName: guestName || undefined,
           caption: caption || undefined,
+          isPrivate,
         });
 
         if (!result.ok) {
@@ -211,7 +218,7 @@ export function UploadDrawer({
           return;
         }
 
-        toast.success(t("success"));
+        toast.success(isPrivate ? t("successPrivate") : t("success"));
 
         onUploadSuccess({
           id: result.id,
@@ -220,12 +227,14 @@ export function UploadDrawer({
           media_type: result.media_type,
           guest_name: guestName || null,
           caption: caption || null,
+          is_private: isPrivate,
           created_at: new Date().toISOString(),
         });
 
         setFile(null);
         setCaption("");
         setGuestName("");
+        setIsPrivate(false);
         setUploadProgress(0);
       } catch (error) {
         toast.error(t("error"));
@@ -288,6 +297,22 @@ export function UploadDrawer({
               onChange={(e) => setCaption(e.target.value)}
               disabled={isPending}
               rows={4}
+            />
+          </div>
+
+          {/* Visibility */}
+          <div className="flex items-start justify-between gap-4 rounded-xl border p-3">
+            <div className="space-y-1">
+              <Label htmlFor="isPrivate">{t("privateLabel")}</Label>
+              <p className="text-xs text-muted-foreground">
+                {isPrivate ? t("privateOnHint") : t("privateOffHint")}
+              </p>
+            </div>
+            <Switch
+              id="isPrivate"
+              checked={isPrivate}
+              onCheckedChange={setIsPrivate}
+              disabled={isPending}
             />
           </div>
 

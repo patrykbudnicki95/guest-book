@@ -59,6 +59,7 @@ function toDashboardUpload(
     media_type: meta.media_type,
     guest_name: meta.guest_name,
     caption: meta.caption,
+    is_private: meta.is_private === true,
     created_at: meta.created_at,
     event_id: event.id,
     event_names: event.names,
@@ -201,6 +202,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       file: File;
       guestName?: string;
       caption?: string;
+      isPrivate: boolean;
     }): Promise<DemoUploadResult> => {
       if (!event) {
         return { ok: false, reason: "eventNotFound" };
@@ -231,6 +233,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         media_type: mediaType,
         guest_name: input.guestName || null,
         caption: input.caption || null,
+        is_private: input.isPrivate,
         created_at: new Date().toISOString(),
         file_size_bytes: input.file.size,
       };
@@ -259,6 +262,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         media_type: mediaType,
         guest_name: meta.guest_name,
         caption: meta.caption,
+        is_private: input.isPrivate,
         created_at: meta.created_at,
       };
 

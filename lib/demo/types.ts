@@ -23,6 +23,7 @@ export type DemoWorkspace = {
     file: File;
     guestName?: string;
     caption?: string;
+    isPrivate: boolean;
   }) => Promise<DemoUploadResult>;
   deleteUpload: (uploadId: string) => Promise<{ success: boolean }>;
   reset: () => Promise<void>;

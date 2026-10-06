@@ -45,12 +45,14 @@ export function GuestViewContentClient({
   }, [initialUploads]);
 
   const handleUploadSuccess = (newUpload: Upload) => {
+    setIsDrawerOpen(false);
+    // Private uploads go to the couple only, so they never join the guest grid.
+    if (newUpload.is_private) return;
     setUploads((prev) =>
       prev.some((upload) => upload.id === newUpload.id)
         ? prev
         : [newUpload, ...prev],
     );
-    setIsDrawerOpen(false);
   };
 
   return (

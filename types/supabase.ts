@@ -98,6 +98,7 @@ export interface Database {
           file_size_bytes: number;
           guest_name: string | null;
           caption: string | null;
+          is_private: boolean;
           created_at: string;
         };
         Insert: {
@@ -109,6 +110,7 @@ export interface Database {
           file_size_bytes?: number;
           guest_name?: string | null;
           caption?: string | null;
+          is_private?: boolean;
           created_at?: string;
         };
         Update: {
@@ -120,6 +122,7 @@ export interface Database {
           file_size_bytes?: number;
           guest_name?: string | null;
           caption?: string | null;
+          is_private?: boolean;
           created_at?: string;
         };
       };

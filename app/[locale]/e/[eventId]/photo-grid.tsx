@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { MediaImage } from "@/components/media-image";
-import { Play } from "lucide-react";
+import { Lock, Play } from "lucide-react";
 import type { Upload } from "./upload-drawer";
 
 interface PhotoGridProps {
@@ -59,6 +59,15 @@ export function PhotoGrid({ uploads }: PhotoGridProps) {
                   <Play className="size-6 fill-white text-white" />
                 </div>
               </div>
+            </div>
+          )}
+          {/* RLS only returns private uploads to the couple, so only they see this. */}
+          {upload.is_private && (
+            <div
+              className="absolute top-2 right-2 rounded-full bg-black/60 p-1.5"
+              title={t("privateBadge")}
+            >
+              <Lock className="size-3.5 text-white" aria-label={t("privateBadge")} />
             </div>
           )}
           {upload.caption && (
