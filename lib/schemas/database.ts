@@ -111,46 +111,53 @@ export const UploadFileUrlSchema = z.object({
   created_at: z.string(),
 });
 
-export const UploadFullSchema = z.object({
+// One file of an entry, as nested under `entries.select("..., uploads(...)")`
+export const EntryMediaSchema = z.object({
   id: z.string().uuid(),
   file_url: z.string().url(),
   thumbnail_url: z.string().url().nullable(),
   media_type: z.enum(["image", "video"]),
-  file_size_bytes: z.coerce.number().int().nonnegative(),
-  guest_name: z.string().nullable(),
-  caption: z.string().nullable(),
-  is_private: z.boolean(),
-  created_at: z.string(),
-  event_id: z.string().uuid(),
 });
 
-// Schema for upload query without event_id (used in guest view)
-export const UploadGuestSchema = z.object({
+// Entry with its files (guest view)
+export const EntryWithMediaSchema = z.object({
   id: z.string().uuid(),
-  file_url: z.string().url(),
-  thumbnail_url: z.string().url().nullable(),
-  media_type: z.enum(["image", "video"]),
   guest_name: z.string().nullable(),
-  caption: z.string().nullable(),
+  message: z.string().nullable(),
   is_private: z.boolean(),
   created_at: z.string(),
+  uploads: z.array(EntryMediaSchema),
 });
 
-export const UploadEventIdSchema = z.object({
+// Entry with its files and event (dashboard gallery)
+export const EntryWithMediaAndEventSchema = EntryWithMediaSchema.extend({
   event_id: z.string().uuid(),
+});
+
+// Entry lookup before deleting it and its R2 objects
+export const EntryForDeleteSchema = z.object({
+  event_id: z.string().uuid(),
+  uploads: z.array(UploadFileUrlSchema.pick({ file_url: true })),
 });
 
 // Insert schemas
+export const EntryInsertSchema = z.object({
+  id: z.string().uuid(),
+  event_id: z.string().uuid(),
+  guest_name: z.string().nullable(),
+  message: z.string().nullable(),
+  is_private: z.boolean(),
+});
+
 export const UploadInsertSchema = z.object({
   id: z.string().uuid(),
   event_id: z.string().uuid(),
+  entry_id: z.string().uuid(),
   file_url: z.string().url(),
   thumbnail_url: z.string().url().nullable(),
   media_type: z.enum(["image", "video"]),
   file_size_bytes: z.number().int().positive(),
-  guest_name: z.string().nullable(),
-  caption: z.string().nullable(),
-  is_private: z.boolean(),
+  sort_order: z.number().int().nonnegative(),
 });
 
 // Type exports
@@ -168,8 +175,8 @@ export type MenuSection = z.infer<typeof MenuSectionSchema>;
 export type EventFull = z.infer<typeof EventFullSchema>;
 export type EventPageContentUpdate = z.infer<typeof EventPageContentUpdateSchema>;
 export type UploadFileUrl = z.infer<typeof UploadFileUrlSchema>;
-export type UploadFull = z.infer<typeof UploadFullSchema>;
-export type UploadGuest = z.infer<typeof UploadGuestSchema>;
-export type UploadEventId = z.infer<typeof UploadEventIdSchema>;
+export type EntryMedia = z.infer<typeof EntryMediaSchema>;
+export type Entry = z.infer<typeof EntryWithMediaSchema>;
+export type EntryInsert = z.infer<typeof EntryInsertSchema>;
 export type UploadInsert = z.infer<typeof UploadInsertSchema>;
 

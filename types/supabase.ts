@@ -88,43 +88,72 @@ export interface Database {
           updated_at?: string;
         };
       };
-      uploads: {
+      entries: {
         Row: {
           id: string;
           event_id: string;
-          file_url: string;
-          thumbnail_url: string | null;
-          media_type: "image" | "video";
-          file_size_bytes: number;
           guest_name: string | null;
-          caption: string | null;
+          message: string | null;
           is_private: boolean;
           created_at: string;
         };
         Insert: {
           id?: string;
           event_id: string;
-          file_url: string;
-          thumbnail_url?: string | null;
-          media_type: "image" | "video";
-          file_size_bytes?: number;
           guest_name?: string | null;
-          caption?: string | null;
+          message?: string | null;
           is_private?: boolean;
           created_at?: string;
         };
         Update: {
           id?: string;
           event_id?: string;
+          guest_name?: string | null;
+          message?: string | null;
+          is_private?: boolean;
+          created_at?: string;
+        };
+      };
+      uploads: {
+        Row: {
+          id: string;
+          event_id: string;
+          entry_id: string;
+          file_url: string;
+          thumbnail_url: string | null;
+          media_type: "image" | "video";
+          file_size_bytes: number;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          event_id: string;
+          entry_id: string;
+          file_url: string;
+          thumbnail_url?: string | null;
+          media_type: "image" | "video";
+          file_size_bytes?: number;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          event_id?: string;
+          entry_id?: string;
           file_url?: string;
           thumbnail_url?: string | null;
           media_type?: "image" | "video";
           file_size_bytes?: number;
-          guest_name?: string | null;
-          caption?: string | null;
-          is_private?: boolean;
+          sort_order?: number;
           created_at?: string;
         };
+      };
+    };
+    Functions: {
+      create_entry: {
+        Args: { p_entry: Json; p_uploads: Json };
+        Returns: undefined;
       };
     };
   };

@@ -10,9 +10,9 @@ A QR-code web app where wedding guests upload photos/videos and leave wishes in 
 
 1. Scans QR → lands on `/e/[eventId]` (locale-aware).
 2. No account; access is the event UUID.
-3. Opens **Add Memory** drawer → selects media → client gets a presigned URL → uploads to Cloudflare R2.
-4. Optional caption / guest name.
-5. Sees a feed of other guests' photos.
+3. Opens **Add Memory** drawer → selects up to 10 photos/videos → client gets presigned URLs → uploads to Cloudflare R2.
+4. Optional wish / guest name; one entry = one name + one wish + its files. A wish alone (no files) is fine too.
+5. Sees a grid of other guests' entries and can open one to swipe through its files.
 
 ### Couple (authenticated admin)
 

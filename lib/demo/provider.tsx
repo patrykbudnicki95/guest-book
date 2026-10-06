@@ -9,8 +9,11 @@ import {
   useState,
 } from "react";
 import type { EventFull, EventPageContentUpdate, EventSettingsUpdate } from "@/lib/schemas/database";
-import type { DashboardUpload } from "@/app/actions/dashboard-actions";
-import type { Upload } from "@/app/[locale]/e/[eventId]/upload-drawer";
+import type { DashboardEntry } from "@/app/actions/dashboard-actions";
+import type {
+  LocalEntryInput,
+  LocalEntryResult,
+} from "@/app/[locale]/e/[eventId]/upload-drawer";
 import {
   DEMO_COVER_KEY,
   DEMO_COVER_FALLBACK,
@@ -25,20 +28,20 @@ import {
   putDemoFile,
   resetDemoRecord,
   saveDemoEvent,
-  saveDemoUploads,
-  type StoredUploadMeta,
+  saveDemoEntries,
+  type StoredEntryMeta,
 } from "./store";
-import { hasFeature } from "@/lib/permissions";
+import { MAX_FILES_PER_ENTRY, hasFeature } from "@/lib/permissions";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { DemoUploadResult, DemoWorkspace } from "./types";
+import type { DemoWorkspace } from "./types";
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const VIDEO_TYPES = ["video/mp4", "video/quicktime"];
 
 type Hydrated = {
   event: EventFull;
-  uploads: DashboardUpload[];
-  metas: StoredUploadMeta[];
+  entries: DashboardEntry[];
+  metas: StoredEntryMeta[];
 };
 
 const DemoContext = createContext<DemoWorkspace | null>(null);
@@ -47,29 +50,52 @@ function mediaTypeFor(fileType: string): "image" | "video" {
   return IMAGE_TYPES.includes(fileType) ? "image" : "video";
 }
 
-function toDashboardUpload(
+function usedBytesOf(metas: StoredEntryMeta[]): number {
+  return metas
+    .flatMap((meta) => meta.files)
+    .reduce((sum, file) => sum + file.file_size_bytes, 0);
+}
+
+function fileCountOf(metas: StoredEntryMeta[]): number {
+  return metas.reduce((sum, meta) => sum + meta.files.length, 0);
+}
+
+/** `objectUrls` maps a file id to its blob URL; files without one are left out. */
+function toDashboardEntry(
   event: EventFull,
-  meta: StoredUploadMeta,
-  objectUrl: string,
-): DashboardUpload {
+  meta: StoredEntryMeta,
+  objectUrls: Record<string, string>,
+): DashboardEntry {
   return {
     id: meta.id,
-    file_url: objectUrl,
-    thumbnail_url: meta.media_type === "image" ? objectUrl : null,
-    media_type: meta.media_type,
     guest_name: meta.guest_name,
-    caption: meta.caption,
-    is_private: meta.is_private === true,
+    message: meta.message,
+    is_private: meta.is_private,
     created_at: meta.created_at,
     event_id: event.id,
     event_names: event.names,
+    uploads: meta.files.flatMap((file) => {
+      const url = objectUrls[file.id];
+      if (!url) {
+        return [];
+      }
+
+      return [
+        {
+          id: file.id,
+          file_url: url,
+          thumbnail_url: file.media_type === "image" ? url : null,
+          media_type: file.media_type,
+        },
+      ];
+    }),
   };
 }
 
 export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [event, setEvent] = useState<EventFull | null>(null);
-  const [uploads, setUploads] = useState<DashboardUpload[]>([]);
-  const [metas, setMetas] = useState<StoredUploadMeta[]>([]);
+  const [entries, setEntries] = useState<DashboardEntry[]>([]);
+  const [metas, setMetas] = useState<StoredEntryMeta[]>([]);
   const objectUrls = useRef<string[]>([]);
 
   const revokeAll = useCallback(() => {
@@ -95,27 +121,24 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       const eventWithCover: EventFull = {
         ...record.event,
         cover_photo_url: coverUrl,
-        storage_used_bytes: record.uploads.reduce(
-          (sum, item) => sum + item.file_size_bytes,
-          0,
-        ),
+        storage_used_bytes: usedBytesOf(record.entries),
       };
 
-      const mapped = record.uploads.flatMap((meta) => {
-        const blob = record.files[meta.id];
-        if (!blob) {
-          return [];
-        }
-
-        const url = rememberUrl(URL.createObjectURL(blob));
-        return [toDashboardUpload(eventWithCover, meta, url)];
-      });
+      const objectUrls = Object.fromEntries(
+        Object.entries(record.files).map(([id, blob]) => [
+          id,
+          rememberUrl(URL.createObjectURL(blob)),
+        ]),
+      );
+      const mapped = record.entries.map((meta) =>
+        toDashboardEntry(eventWithCover, meta, objectUrls),
+      );
 
       setEvent(eventWithCover);
-      setUploads(mapped);
-      setMetas(record.uploads);
+      setEntries(mapped);
+      setMetas(record.entries);
 
-      return { event: eventWithCover, uploads: mapped, metas: record.uploads };
+      return { event: eventWithCover, entries: mapped, metas: record.entries };
     },
     [rememberUrl, revokeAll],
   );
@@ -153,8 +176,8 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         cover_photo_url: event.cover_photo_url,
       };
       setEvent(withCover);
-      setUploads((prev) =>
-        prev.map((upload) => ({ ...upload, event_names: withCover.names })),
+      setEntries((prev) =>
+        prev.map((entry) => ({ ...entry, event_names: withCover.names })),
       );
       return { success: true };
     },
@@ -197,94 +220,99 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     [event, rememberUrl],
   );
 
-  const addUpload = useCallback(
-    async (input: {
-      file: File;
-      guestName?: string;
-      caption?: string;
-      isPrivate: boolean;
-    }): Promise<DemoUploadResult> => {
+  const addEntry = useCallback(
+    async (input: LocalEntryInput): Promise<LocalEntryResult> => {
       if (!event) {
         return { ok: false, reason: "eventNotFound" };
       }
 
-      if (metas.length >= DEMO_MAX_UPLOADS) {
+      const message = input.message?.trim() || null;
+
+      if (input.files.length > MAX_FILES_PER_ENTRY) {
+        return { ok: false, reason: "tooManyFiles" };
+      }
+
+      if (!message && input.files.length === 0) {
+        return { ok: false, reason: "emptyEntry" };
+      }
+
+      if (fileCountOf(metas) + input.files.length > DEMO_MAX_UPLOADS) {
         return { ok: false, reason: "quotaExceeded" };
       }
 
-      if (input.file.size <= 0 || input.file.size > DEMO_MAX_FILE_BYTES) {
-        return { ok: false, reason: "fileTooLarge" };
+      for (const file of input.files) {
+        if (file.size <= 0 || file.size > DEMO_MAX_FILE_BYTES) {
+          return { ok: false, reason: "fileTooLarge" };
+        }
+
+        if (!IMAGE_TYPES.includes(file.type) && !VIDEO_TYPES.includes(file.type)) {
+          return { ok: false, reason: "invalidFileType" };
+        }
+
+        if (
+          VIDEO_TYPES.includes(file.type) &&
+          !hasFeature({ plan: event.plan_id, feature: "videoUploads" })
+        ) {
+          return { ok: false, reason: "mediaTypeNotAllowed" };
+        }
       }
 
-      if (!IMAGE_TYPES.includes(input.file.type) && !VIDEO_TYPES.includes(input.file.type)) {
-        return { ok: false, reason: "invalidFileType" };
-      }
+      const files = input.files.map((file) => ({
+        file,
+        meta: {
+          id: crypto.randomUUID(),
+          media_type: mediaTypeFor(file.type),
+          file_size_bytes: file.size,
+        },
+      }));
 
-      if (
-        VIDEO_TYPES.includes(input.file.type) &&
-        !hasFeature({ plan: event.plan_id, feature: "videoUploads" })
-      ) {
-        return { ok: false, reason: "mediaTypeNotAllowed" };
-      }
-
-      const mediaType = mediaTypeFor(input.file.type);
-      const meta: StoredUploadMeta = {
+      const meta: StoredEntryMeta = {
         id: crypto.randomUUID(),
-        media_type: mediaType,
-        guest_name: input.guestName || null,
-        caption: input.caption || null,
+        guest_name: input.guestName?.trim() || null,
+        message,
         is_private: input.isPrivate,
         created_at: new Date().toISOString(),
-        file_size_bytes: input.file.size,
+        files: files.map((item) => item.meta),
       };
 
-      await putDemoFile(meta.id, input.file);
+      for (const item of files) {
+        await putDemoFile(item.meta.id, item.file);
+      }
       const nextMetas = [meta, ...metas];
-      await saveDemoUploads(nextMetas);
+      await saveDemoEntries(nextMetas);
 
-      const objectUrl = rememberUrl(URL.createObjectURL(input.file));
-      const dashboardRow = toDashboardUpload(event, meta, objectUrl);
-      const usedBytes = nextMetas.reduce(
-        (sum, item) => sum + item.file_size_bytes,
-        0,
+      const objectUrls = Object.fromEntries(
+        files.map((item) => [
+          item.meta.id,
+          rememberUrl(URL.createObjectURL(item.file)),
+        ]),
       );
+      const entry = toDashboardEntry(event, meta, objectUrls);
 
       setMetas(nextMetas);
-      setUploads((prev) => [dashboardRow, ...prev]);
+      setEntries((prev) => [entry, ...prev]);
       setEvent((prev) =>
-        prev ? { ...prev, storage_used_bytes: usedBytes } : prev,
+        prev ? { ...prev, storage_used_bytes: usedBytesOf(nextMetas) } : prev,
       );
 
-      const upload: Upload = {
-        id: meta.id,
-        file_url: objectUrl,
-        thumbnail_url: mediaType === "image" ? objectUrl : null,
-        media_type: mediaType,
-        guest_name: meta.guest_name,
-        caption: meta.caption,
-        is_private: input.isPrivate,
-        created_at: meta.created_at,
-      };
-
-      return { ok: true, upload };
+      return { ok: true, entry, skipped: 0 };
     },
     [event, metas, rememberUrl],
   );
 
-  const deleteUpload = useCallback(
-    async (uploadId: string) => {
-      await deleteDemoFile(uploadId);
-      const nextMetas = metas.filter((item) => item.id !== uploadId);
-      await saveDemoUploads(nextMetas);
-      const usedBytes = nextMetas.reduce(
-        (sum, item) => sum + item.file_size_bytes,
-        0,
-      );
+  const deleteEntry = useCallback(
+    async (entryId: string) => {
+      const meta = metas.find((item) => item.id === entryId);
+      for (const file of meta?.files ?? []) {
+        await deleteDemoFile(file.id);
+      }
+      const nextMetas = metas.filter((item) => item.id !== entryId);
+      await saveDemoEntries(nextMetas);
 
       setMetas(nextMetas);
-      setUploads((prev) => prev.filter((item) => item.id !== uploadId));
+      setEntries((prev) => prev.filter((item) => item.id !== entryId));
       setEvent((prev) =>
-        prev ? { ...prev, storage_used_bytes: usedBytes } : prev,
+        prev ? { ...prev, storage_used_bytes: usedBytesOf(nextMetas) } : prev,
       );
 
       return { success: true };
@@ -310,13 +338,13 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     <DemoContext.Provider
       value={{
         event,
-        uploads,
+        entries,
         isReady: true,
         updateSettings,
         updatePageContent,
         uploadCover,
-        addUpload,
-        deleteUpload,
+        addEntry,
+        deleteEntry,
         reset,
       }}
     >

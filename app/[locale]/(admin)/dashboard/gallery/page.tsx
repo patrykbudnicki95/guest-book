@@ -4,7 +4,7 @@ import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import {
   getEventPlanSummaries,
-  getUserUploads,
+  getUserEntries,
 } from "@/app/actions/dashboard-actions";
 import { GalleryTab } from "./components/gallery-tab";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,8 +34,8 @@ async function GalleryContent() {
     return redirect({ href: "/login", locale: locale as "pl" | "en" });
   }
 
-  const [uploads, planSummaries] = await Promise.all([
-    getUserUploads(user.id),
+  const [entries, planSummaries] = await Promise.all([
+    getUserEntries(user.id),
     getEventPlanSummaries(user.id),
   ]);
 
@@ -44,7 +44,7 @@ async function GalleryContent() {
   );
 
   return (
-    <GalleryTab uploads={uploads} downloadOpenByEvent={downloadOpenByEvent} />
+    <GalleryTab entries={entries} downloadOpenByEvent={downloadOpenByEvent} />
   );
 }
 

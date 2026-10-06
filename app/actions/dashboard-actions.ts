@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { EventIdWithNamesSchema, EventForPdfSchema, EventPlanSummarySchema, UploadFileUrlSchema, UploadFullSchema } from "@/lib/schemas/database";
+import { EventIdWithNamesSchema, EventForPdfSchema, EventPlanSummarySchema, UploadFileUrlSchema, EntryWithMediaAndEventSchema, type Entry } from "@/lib/schemas/database";
 import {
   formatBytes,
   getDownloadWindowEnd,
@@ -34,18 +34,10 @@ export interface EventPlanSummary {
   isDownloadOpen: boolean;
 }
 
-export interface DashboardUpload {
-  id: string;
-  file_url: string;
-  thumbnail_url: string | null;
-  media_type: "image" | "video";
-  guest_name: string | null;
-  caption: string | null;
-  is_private: boolean;
-  created_at: string;
+export type DashboardEntry = Entry & {
   event_id: string;
   event_names: string | null;
-}
+};
 
 export interface UserEvent {
   id: string;
@@ -178,7 +170,7 @@ export async function getEventPlanSummaries(userId: string): Promise<EventPlanSu
   });
 }
 
-export async function getUserUploads(userId: string): Promise<DashboardUpload[]> {
+export async function getUserEntries(userId: string): Promise<DashboardEntry[]> {
   const supabase = await createClient();
 
   // Get user's events
@@ -205,34 +197,32 @@ export async function getUserUploads(userId: string): Promise<DashboardUpload[]>
     return [];
   }
 
-  // Get all uploads for user's events
-  const { data: uploads, error } = await supabase
-    .from("uploads")
-    .select("id, file_url, thumbnail_url, media_type, file_size_bytes, guest_name, caption, is_private, created_at, event_id")
+  // Get all entries (with their files) for user's events
+  const { data: entries, error } = await supabase
+    .from("entries")
+    .select("id, guest_name, message, is_private, created_at, event_id, uploads(id, file_url, thumbnail_url, media_type)")
     .in("event_id", eventIds)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .order("sort_order", { referencedTable: "uploads" });
 
-  if (error || !uploads) {
+  if (error || !entries) {
     return [];
   }
 
   // Parse and validate with Zod
-  const parsedUploads = z.array(UploadFullSchema).safeParse(uploads);
-  if (!parsedUploads.success) {
+  const parsedEntries = z.array(EntryWithMediaAndEventSchema).safeParse(entries);
+  if (!parsedEntries.success) {
+    console.error(
+      "[getUserEntries] Zod validation failed:",
+      z.prettifyError(parsedEntries.error),
+    );
+    console.error("[getUserEntries] Raw data:", JSON.stringify(entries, null, 2));
     return [];
   }
 
-  return parsedUploads.data.map((upload) => ({
-    id: upload.id,
-    file_url: upload.file_url,
-    thumbnail_url: upload.thumbnail_url,
-    media_type: upload.media_type,
-    guest_name: upload.guest_name,
-    caption: upload.caption,
-    is_private: upload.is_private,
-    created_at: upload.created_at,
-    event_id: upload.event_id,
-    event_names: eventMap.get(upload.event_id) || null,
+  return parsedEntries.data.map((entry) => ({
+    ...entry,
+    event_names: eventMap.get(entry.event_id) || null,
   }));
 }
 

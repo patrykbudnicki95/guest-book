@@ -483,15 +483,17 @@
         "preview": "Preview",
         "event": "Event",
         "guest": "Guest",
-        "caption": "Caption",
-        "date": "Date"
+        "date": "Date",
+        "message": "Message",
+        "files": "Files"
       },
-      "deleteSuccess": "Upload deleted successfully",
-      "deleteError": "Failed to delete upload",
+      "deleteSuccess": "Entry deleted",
+      "deleteError": "Failed to delete entry",
       "bulkDeleteError": "An error occurred during bulk delete",
-      "deleteSelected": "Delete selected",
       "download": "Download",
-      "delete": "Delete"
+      "delete": "Delete",
+      "open": "Open",
+      "textOnly": "Wish without photos"
     },
     "qrCode": {
       "title": "QR Code Generator",
@@ -600,7 +602,7 @@
     }
   },
   "guestView": {
-    "addPhoto": "Add Photo",
+    "addPhoto": "Add photos & wishes",
     "galleryTitle": "Memory Gallery",
     "noPhotos": "No photos yet",
     "noPhotosSubtitle": "Be the first to share a memory!",
@@ -614,10 +616,9 @@
     },
     "upload": {
       "title": "Add a Memory",
-      "description": "Share a photo or video from the celebration",
-      "photoOrVideo": "Photo or Video",
-      "photoOnly": "Photo",
-      "maxFileSize": "Maximum file size: {size}",
+      "description": "Share photos, videos and your wishes",
+      "photoOrVideo": "Photos or videos (optional)",
+      "photoOnly": "Photos (optional)",
       "imagesOnly": "This package only allows photo uploads (JPEG, PNG, WebP)",
       "quotaExceeded": "The storage for this wedding is full",
       "windowClosed": "The time for adding memories has passed",
@@ -631,20 +632,25 @@
       "privateLabel": "Only for the couple",
       "privateOffHint": "All guests will see this memory in the gallery.",
       "privateOnHint": "Only the couple will see this memory. It won't appear in the guest gallery.",
-      "selected": "Selected",
       "uploading": "Uploading...",
       "uploadButton": "Upload",
       "cancel": "Cancel",
-      "selectFile": "Please select a file",
       "invalidFileType": "Please select an image (JPEG, PNG, WebP) or video (MP4, MOV)",
       "fileTooLarge": "Maximum file size is {size}",
-      "success": "Photo uploaded successfully!",
+      "success": "Memory added!",
       "successPrivate": "Sent! Only the couple will see it.",
-      "error": "An error occurred during upload"
+      "error": "An error occurred during upload",
+      "filesHint": "Up to {count} files, max {size} each",
+      "addFiles": "Add",
+      "removeFile": "Remove file",
+      "tooManyFiles": "You can add up to {count} files at once",
+      "emptyEntry": "Add a photo or write a wish",
+      "someFilesFailed": "Saved, but {failed} of {total} files didn't upload"
     },
     "memory": "Wedding memory",
     "privateBadge": "Private: visible only to you",
-    "videoAlt": "Wedding video"
+    "videoAlt": "Wedding video",
+    "filesCount": "{count, plural, one {# file} other {# files}}"
   },
   "demo": {
     "metaTitle": "Try the guestbook",
@@ -668,5 +674,12 @@
   },
   "qrPdf": {
     "instruction": "Scan the QR code below with your phone camera\nto open our guestbook.\nShare your wishes and photos with us!"
+  },
+  "entryViewer": {
+    "counter": "{current} / {total}",
+    "previous": "Previous",
+    "next": "Next",
+    "mediaAlt": "Wedding memory {current} of {total}",
+    "private": "Private"
   }
 }

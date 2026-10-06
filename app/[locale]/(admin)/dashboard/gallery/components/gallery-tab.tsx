@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { MediaImage } from "@/components/media-image";
+import { EntryViewer } from "@/components/entry-viewer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,56 +21,57 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { deleteUpload } from "@/app/actions/upload-actions";
+import { deleteEntry } from "@/app/actions/upload-actions";
 import { toast } from "sonner";
-import { MoreVertical, Trash2, Download, Lock } from "lucide-react";
-import type { DashboardUpload } from "@/app/actions/dashboard-actions";
+import { MoreVertical, Trash2, Eye, Lock, MessageSquare } from "lucide-react";
+import type { DashboardEntry } from "@/app/actions/dashboard-actions";
+import type { EntryMedia } from "@/lib/schemas/database";
 
 interface GalleryTabProps {
-  uploads: DashboardUpload[];
+  entries: DashboardEntry[];
   /**
    * Whether each event is still inside its plan's download window. Files sit on
    * a public R2 domain, so this only hides the button — a private bucket with
    * signed GETs is what would make the deadline real.
    */
   downloadOpenByEvent: Record<string, boolean>;
-  onDelete?: (uploadId: string) => Promise<{ success: boolean }>;
+  onDelete?: (entryId: string) => Promise<{ success: boolean }>;
 }
 
 export function GalleryTab({
-  uploads: initialUploads,
+  entries: initialEntries,
   downloadOpenByEvent,
   onDelete,
 }: GalleryTabProps) {
   const t = useTranslations("dashboard.gallery");
   const tCommon = useTranslations("common");
-  const tPlan = useTranslations("dashboard.plan");
-  const [uploads, setUploads] = useState(initialUploads);
+  const [entries, setEntries] = useState(initialEntries);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [openEntry, setOpenEntry] = useState<DashboardEntry | null>(null);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    setUploads(initialUploads);
-  }, [initialUploads]);
+    setEntries(initialEntries);
+  }, [initialEntries]);
 
-  const removeUpload = async (uploadId: string) => {
+  const removeEntry = async (entryId: string) => {
     if (onDelete) {
-      await onDelete(uploadId);
+      await onDelete(entryId);
       return;
     }
 
-    await deleteUpload(uploadId);
+    await deleteEntry(entryId);
   };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedIds(new Set(uploads.map((u) => u.id)));
+      setSelectedIds(new Set(entries.map((e) => e.id)));
     } else {
       setSelectedIds(new Set());
     }
   };
 
-  const handleSelectUpload = (id: string, checked: boolean) => {
+  const handleSelectEntry = (id: string, checked: boolean) => {
     const newSelected = new Set(selectedIds);
     if (checked) {
       newSelected.add(id);
@@ -79,14 +81,14 @@ export function GalleryTab({
     setSelectedIds(newSelected);
   };
 
-  const handleDelete = (uploadId: string) => {
+  const handleDelete = (entryId: string) => {
     startTransition(async () => {
       try {
-        await removeUpload(uploadId);
-        setUploads((prev) => prev.filter((u) => u.id !== uploadId));
+        await removeEntry(entryId);
+        setEntries((prev) => prev.filter((e) => e.id !== entryId));
         setSelectedIds((prev) => {
           const newSet = new Set(prev);
-          newSet.delete(uploadId);
+          newSet.delete(entryId);
           return newSet;
         });
         toast.success(t("deleteSuccess"));
@@ -105,8 +107,8 @@ export function GalleryTab({
     startTransition(async () => {
       const ids = Array.from(selectedIds);
       try {
-        await Promise.all(ids.map((id) => removeUpload(id)));
-        setUploads((prev) => prev.filter((u) => !selectedIds.has(u.id)));
+        await Promise.all(ids.map((id) => removeEntry(id)));
+        setEntries((prev) => prev.filter((e) => !selectedIds.has(e.id)));
         setSelectedIds(new Set());
         toast.success(t("deleteSuccess"));
       } catch (error) {
@@ -116,11 +118,8 @@ export function GalleryTab({
     });
   };
 
-  const handleDownload = (uploadId: string) => {
-    const upload = uploads.find((u) => u.id === uploadId);
-    if (!upload || downloadOpenByEvent[upload.event_id] === false) return;
-
-    window.open(upload.file_url, "_blank");
+  const handleDownload = (media: EntryMedia) => {
+    window.open(media.file_url, "_blank");
   };
 
   return (
@@ -148,60 +147,90 @@ export function GalleryTab({
             <TableRow>
               <TableHead className="w-12">
                 <Checkbox
-                  checked={selectedIds.size === uploads.length && uploads.length > 0}
+                  checked={selectedIds.size === entries.length && entries.length > 0}
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
               <TableHead>{t("columns.preview")}</TableHead>
               <TableHead>{t("columns.event")}</TableHead>
               <TableHead>{t("columns.guest")}</TableHead>
-              <TableHead>{t("columns.caption")}</TableHead>
+              <TableHead>{t("columns.message")}</TableHead>
+              <TableHead>{t("columns.files")}</TableHead>
               <TableHead>{t("columns.date")}</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {uploads.length === 0 ? (
+            {entries.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                <TableCell colSpan={8} className="text-center text-muted-foreground">
                   {t("noUploads")}
                 </TableCell>
               </TableRow>
             ) : (
-              uploads.map((upload) => (
-                <TableRow key={upload.id}>
+              entries.map((entry) => (
+                <TableRow key={entry.id}>
                   <TableCell>
                     <Checkbox
-                      checked={selectedIds.has(upload.id)}
+                      checked={selectedIds.has(entry.id)}
                       onCheckedChange={(checked) =>
-                        handleSelectUpload(upload.id, checked as boolean)
+                        handleSelectEntry(entry.id, checked as boolean)
                       }
                     />
                   </TableCell>
                   <TableCell>
-                    <div className="relative size-16 overflow-hidden rounded-lg">
-                      {upload.thumbnail_url ? (
-                        <MediaImage
-                          src={upload.thumbnail_url}
-                          alt={upload.caption || "Upload"}
-                          fill
-                          className="object-cover"
-                          sizes="64px"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground">
-                          {upload.media_type === "video" ? tCommon("video") : tCommon("image")}
+                    <button
+                      type="button"
+                      onClick={() => setOpenEntry(entry)}
+                      className="flex items-center"
+                      aria-label={t("open")}
+                    >
+                      {entry.uploads.length === 0 ? (
+                        <div
+                          className="flex size-16 items-center justify-center rounded-lg bg-primary/10"
+                          title={t("textOnly")}
+                        >
+                          <MessageSquare className="size-5 text-primary" />
                         </div>
+                      ) : (
+                        <>
+                          {entry.uploads.slice(0, 3).map((media, index) => (
+                            <div
+                              key={media.id}
+                              className="relative size-16 overflow-hidden rounded-lg border-2 border-white not-first:-ml-10"
+                              style={{ zIndex: 3 - index }}
+                            >
+                              {media.thumbnail_url ? (
+                                <MediaImage
+                                  src={media.thumbnail_url}
+                                  alt={entry.message || "Upload"}
+                                  fill
+                                  className="object-cover"
+                                  sizes="64px"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground">
+                                  {media.media_type === "video" ? tCommon("video") : tCommon("image")}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                          {entry.uploads.length > 3 && (
+                            <span className="ml-1 text-xs text-muted-foreground">
+                              +{entry.uploads.length - 3}
+                            </span>
+                          )}
+                        </>
                       )}
-                    </div>
+                    </button>
                   </TableCell>
                   <TableCell className="text-sm">
-                    {upload.event_names || tCommon("unknownEvent")}
+                    {entry.event_names || tCommon("unknownEvent")}
                   </TableCell>
                   <TableCell className="font-medium">
                     <div className="flex flex-col items-start gap-1">
-                      {upload.guest_name || tCommon("anonymous")}
-                      {upload.is_private && (
+                      {entry.guest_name || tCommon("anonymous")}
+                      {entry.is_private && (
                         <Badge variant="secondary">
                           <Lock />
                           {t("private")}
@@ -210,10 +239,13 @@ export function GalleryTab({
                     </div>
                   </TableCell>
                   <TableCell className="max-w-xs truncate">
-                    {upload.caption || "-"}
+                    {entry.message || "-"}
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {new Date(upload.created_at).toLocaleDateString()}
+                    {entry.uploads.length}
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {new Date(entry.created_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
@@ -223,19 +255,12 @@ export function GalleryTab({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => handleDownload(upload.id)}
-                          disabled={
-                            downloadOpenByEvent[upload.event_id] === false
-                          }
-                        >
-                          <Download className="mr-2 size-4" />
-                          {downloadOpenByEvent[upload.event_id] === false
-                            ? tPlan("closed")
-                            : tCommon("download")}
+                        <DropdownMenuItem onClick={() => setOpenEntry(entry)}>
+                          <Eye className="mr-2 size-4" />
+                          {t("open")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => handleDelete(upload.id)}
+                          onClick={() => handleDelete(entry.id)}
                           className="text-destructive"
                         >
                           <Trash2 className="mr-2 size-4" />
@@ -250,6 +275,16 @@ export function GalleryTab({
           </TableBody>
         </Table>
       </div>
+
+      <EntryViewer
+        entry={openEntry}
+        onOpenChange={(open) => !open && setOpenEntry(null)}
+        onDownload={
+          openEntry && downloadOpenByEvent[openEntry.event_id] !== false
+            ? handleDownload
+            : undefined
+        }
+      />
     </div>
   );
 }

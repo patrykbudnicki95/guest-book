@@ -124,6 +124,9 @@ export function getStorageState({
   };
 }
 
+/** Files a guest can attach to one entry. The same on every plan. */
+export const MAX_FILES_PER_ENTRY = 10;
+
 export type UploadRejectionReason =
   | "eventInactive"
   | "windowClosed"
