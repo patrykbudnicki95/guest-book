@@ -41,6 +41,7 @@ export interface DashboardUpload {
   media_type: "image" | "video";
   guest_name: string | null;
   caption: string | null;
+  is_private: boolean;
   created_at: string;
   event_id: string;
   event_names: string | null;
@@ -207,7 +208,7 @@ export async function getUserUploads(userId: string): Promise<DashboardUpload[]>
   // Get all uploads for user's events
   const { data: uploads, error } = await supabase
     .from("uploads")
-    .select("id, file_url, thumbnail_url, media_type, file_size_bytes, guest_name, caption, created_at, event_id")
+    .select("id, file_url, thumbnail_url, media_type, file_size_bytes, guest_name, caption, is_private, created_at, event_id")
     .in("event_id", eventIds)
     .order("created_at", { ascending: false });
 
@@ -228,6 +229,7 @@ export async function getUserUploads(userId: string): Promise<DashboardUpload[]>
     media_type: upload.media_type,
     guest_name: upload.guest_name,
     caption: upload.caption,
+    is_private: upload.is_private,
     created_at: upload.created_at,
     event_id: upload.event_id,
     event_names: eventMap.get(upload.event_id) || null,

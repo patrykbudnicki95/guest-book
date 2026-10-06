@@ -119,6 +119,7 @@ export const UploadFullSchema = z.object({
   file_size_bytes: z.coerce.number().int().nonnegative(),
   guest_name: z.string().nullable(),
   caption: z.string().nullable(),
+  is_private: z.boolean(),
   created_at: z.string(),
   event_id: z.string().uuid(),
 });
@@ -131,6 +132,7 @@ export const UploadGuestSchema = z.object({
   media_type: z.enum(["image", "video"]),
   guest_name: z.string().nullable(),
   caption: z.string().nullable(),
+  is_private: z.boolean(),
   created_at: z.string(),
 });
 
@@ -140,6 +142,7 @@ export const UploadEventIdSchema = z.object({
 
 // Insert schemas
 export const UploadInsertSchema = z.object({
+  id: z.string().uuid(),
   event_id: z.string().uuid(),
   file_url: z.string().url(),
   thumbnail_url: z.string().url().nullable(),
@@ -147,6 +150,7 @@ export const UploadInsertSchema = z.object({
   file_size_bytes: z.number().int().positive(),
   guest_name: z.string().nullable(),
   caption: z.string().nullable(),
+  is_private: z.boolean(),
 });
 
 // Type exports

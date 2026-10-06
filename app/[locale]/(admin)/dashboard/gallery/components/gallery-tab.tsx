@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { MediaImage } from "@/components/media-image";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -21,7 +22,7 @@ import {
 } from "@/components/ui/table";
 import { deleteUpload } from "@/app/actions/upload-actions";
 import { toast } from "sonner";
-import { MoreVertical, Trash2, Download } from "lucide-react";
+import { MoreVertical, Trash2, Download, Lock } from "lucide-react";
 import type { DashboardUpload } from "@/app/actions/dashboard-actions";
 
 interface GalleryTabProps {
@@ -151,11 +152,11 @@ export function GalleryTab({
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
-              <TableHead>Preview</TableHead>
-              <TableHead>Event</TableHead>
-              <TableHead>Guest</TableHead>
-              <TableHead>Caption</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>{t("columns.preview")}</TableHead>
+              <TableHead>{t("columns.event")}</TableHead>
+              <TableHead>{t("columns.guest")}</TableHead>
+              <TableHead>{t("columns.caption")}</TableHead>
+              <TableHead>{t("columns.date")}</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
@@ -198,7 +199,15 @@ export function GalleryTab({
                     {upload.event_names || tCommon("unknownEvent")}
                   </TableCell>
                   <TableCell className="font-medium">
-                    {upload.guest_name || tCommon("anonymous")}
+                    <div className="flex flex-col items-start gap-1">
+                      {upload.guest_name || tCommon("anonymous")}
+                      {upload.is_private && (
+                        <Badge variant="secondary">
+                          <Lock />
+                          {t("private")}
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="max-w-xs truncate">
                     {upload.caption || "-"}

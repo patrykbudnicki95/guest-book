@@ -40,7 +40,7 @@ async function getEventUploads(eventId: string): Promise<Upload[]> {
   const { data, error } = await supabase
     .from("uploads")
     .select(
-      "id, file_url, thumbnail_url, media_type, guest_name, caption, created_at",
+      "id, file_url, thumbnail_url, media_type, guest_name, caption, is_private, created_at",
     )
     .eq("event_id", eventId)
     .order("created_at", { ascending: false });
@@ -73,6 +73,7 @@ async function getEventUploads(eventId: string): Promise<Upload[]> {
     media_type: upload.media_type,
     guest_name: upload.guest_name,
     caption: upload.caption,
+    is_private: upload.is_private,
     created_at: upload.created_at,
   }));
 }

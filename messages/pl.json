@@ -478,6 +478,14 @@
       "deleteSelected": "Usuń zaznaczone",
       "noUploads": "Brak przesyłek",
       "noUploadsDescription": "Zdjęcia i filmy pojawią się tutaj, gdy goście zaczną przesyłać.",
+      "private": "Prywatne",
+      "columns": {
+        "preview": "Podgląd",
+        "event": "Wydarzenie",
+        "guest": "Gość",
+        "caption": "Wiadomość",
+        "date": "Data"
+      },
       "deleteSuccess": "Przesyłka usunięta pomyślnie",
       "deleteError": "Nie udało się usunąć przesyłki",
       "bulkDeleteError": "Wystąpił błąd podczas usuwania",
@@ -620,6 +628,9 @@
       "yourNamePlaceholder": "Jan Kowalski",
       "message": "Wiadomość (opcjonalnie)",
       "messagePlaceholder": "Podziel się życzeniami...",
+      "privateLabel": "Tylko dla Pary Młodej",
+      "privateOffHint": "Wspomnienie zobaczą wszyscy goście w galerii.",
+      "privateOnHint": "Wspomnienie zobaczy tylko Para Młoda. Nie pojawi się w galerii gości.",
       "selected": "Wybrano",
       "uploading": "Przesyłanie...",
       "uploadButton": "Prześlij",
@@ -628,9 +639,11 @@
       "invalidFileType": "Wybierz zdjęcie (JPEG, PNG, WebP) lub film (MP4, MOV)",
       "fileTooLarge": "Maksymalny rozmiar pliku to {size}",
       "success": "Zdjęcie przesłane pomyślnie!",
+      "successPrivate": "Wysłane! Zobaczy je tylko Para Młoda.",
       "error": "Wystąpił błąd podczas przesyłania"
     },
     "memory": "Wspomnienie z wesela",
+    "privateBadge": "Prywatne: widoczne tylko dla Was",
     "videoAlt": "Film z wesela"
   },
   "demo": {

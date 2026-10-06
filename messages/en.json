@@ -478,6 +478,14 @@
       "deleteSelected": "Delete selected",
       "noUploads": "No uploads",
       "noUploadsDescription": "Photos and videos will appear here when guests start uploading.",
+      "private": "Private",
+      "columns": {
+        "preview": "Preview",
+        "event": "Event",
+        "guest": "Guest",
+        "caption": "Caption",
+        "date": "Date"
+      },
       "deleteSuccess": "Upload deleted successfully",
       "deleteError": "Failed to delete upload",
       "bulkDeleteError": "An error occurred during bulk delete",
@@ -620,6 +628,9 @@
       "yourNamePlaceholder": "John Doe",
       "message": "Message (Optional)",
       "messagePlaceholder": "Share your wishes...",
+      "privateLabel": "Only for the couple",
+      "privateOffHint": "All guests will see this memory in the gallery.",
+      "privateOnHint": "Only the couple will see this memory. It won't appear in the guest gallery.",
       "selected": "Selected",
       "uploading": "Uploading...",
       "uploadButton": "Upload",
@@ -628,9 +639,11 @@
       "invalidFileType": "Please select an image (JPEG, PNG, WebP) or video (MP4, MOV)",
       "fileTooLarge": "Maximum file size is {size}",
       "success": "Photo uploaded successfully!",
+      "successPrivate": "Sent! Only the couple will see it.",
       "error": "An error occurred during upload"
     },
     "memory": "Wedding memory",
+    "privateBadge": "Private: visible only to you",
     "videoAlt": "Wedding video"
   },
   "demo": {

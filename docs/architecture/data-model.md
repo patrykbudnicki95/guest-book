@@ -38,6 +38,7 @@ Source of truth: `supabase/schema.sql` (includes migration-era columns). Apply i
 | `media_type` | `image` \| `video` |
 | `file_size_bytes` | Used for quota |
 | `guest_name`, `caption` | |
+| `is_private` | Guest's choice on upload. Private rows are readable only by the event owner (RLS) |
 | `created_at` | |
 
 ## RLS (summary)
@@ -46,7 +47,7 @@ Source of truth: `supabase/schema.sql` (includes migration-era columns). Apply i
 |-------|------|--------|
 | `profiles` | Own row | Own update |
 | `events` | Everyone | Owner insert/update/delete |
-| `uploads` | Everyone | Anyone insert; owner delete |
+| `uploads` | Everyone for public rows; owner only for `is_private` rows | Anyone insert; owner delete |
 
 Also: table `GRANT`s for `anon` / `authenticated` (see schema).
 

@@ -24,6 +24,8 @@ export type StoredUploadMeta = {
   media_type: "image" | "video";
   guest_name: string | null;
   caption: string | null;
+  /** Optional: metas saved before private uploads existed don't have it. */
+  is_private?: boolean;
   created_at: string;
   file_size_bytes: number;
 };

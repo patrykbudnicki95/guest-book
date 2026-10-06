@@ -34,7 +34,7 @@ export function LanguageSwitcher() {
 
   return (
     <Select value={locale} onValueChange={handleChange}>
-      <SelectTrigger className="h-9 w-[72px] gap-1.5 rounded-full border-border/50 text-xs">
+      <SelectTrigger className="h-9 gap-1.5 rounded-full border-border/50 text-xs">
         <Globe className="size-3.5 text-muted-foreground" />
         <SelectValue />
       </SelectTrigger>

@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS uploads (
   file_size_bytes BIGINT NOT NULL DEFAULT 0,
   guest_name TEXT,
   caption TEXT,
+  is_private BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -81,10 +82,18 @@ CREATE POLICY "Users can delete own events"
   USING (auth.uid() = owner_id);
 
 -- RLS Policies for uploads
--- Public read access (for guest gallery viewing)
-CREATE POLICY "Uploads are viewable by everyone"
+-- Public uploads are readable by everyone (guest gallery); private ones only
+-- by the event owner
+CREATE POLICY "Public uploads are viewable by everyone, private by the owner"
   ON uploads FOR SELECT
-  USING (true);
+  USING (
+    NOT is_private
+    OR EXISTS (
+      SELECT 1 FROM events
+      WHERE events.id = uploads.event_id
+      AND events.owner_id = auth.uid()
+    )
+  );
 
 -- Anyone (including anonymous) can insert uploads (for guest uploads)
 CREATE POLICY "Anyone can insert uploads"
