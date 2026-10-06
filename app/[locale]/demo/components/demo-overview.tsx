@@ -20,7 +20,8 @@ import {
 
 export function DemoOverview() {
   const t = useTranslations("demo");
-  const { event, uploads } = useDemoWorkspace();
+  const { event, entries } = useDemoWorkspace();
+  const fileCount = entries.reduce((sum, entry) => sum + entry.uploads.length, 0);
   const usedBytes = event.storage_used_bytes;
 
   return (
@@ -40,7 +41,7 @@ export function DemoOverview() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">
-              {uploads.length}
+              {fileCount}
               <span className="text-lg font-normal text-muted-foreground">
                 /{DEMO_MAX_UPLOADS}
               </span>

@@ -8,50 +8,49 @@ import { Camera } from "lucide-react";
 import { PhotoGrid } from "./photo-grid";
 import {
   UploadDrawer,
-  type LocalUploadInput,
-  type LocalUploadResult,
-  type Upload,
+  type LocalEntryInput,
+  type LocalEntryResult,
 } from "./upload-drawer";
 import { EventHero } from "./components/event-hero";
 import { EventInfo } from "./components/event-info";
 import { EventSchedule } from "./components/event-schedule";
 import { EventMenu } from "./components/event-menu";
 import { hasFeature } from "@/lib/permissions";
-import type { EventFull } from "@/lib/schemas/database";
+import type { Entry, EventFull } from "@/lib/schemas/database";
 import { cn } from "@/lib/utils";
 
 export function GuestViewContentClient({
   event,
-  initialUploads,
+  initialEntries,
   uploadWindow,
   onUpload,
   maxFileBytes,
   headerClassName,
 }: {
   event: EventFull;
-  initialUploads: Upload[];
+  initialEntries: Entry[];
   uploadWindow: { isOpen: boolean; closesAt: string };
-  onUpload?: (input: LocalUploadInput) => Promise<LocalUploadResult>;
+  onUpload?: (input: LocalEntryInput) => Promise<LocalEntryResult>;
   maxFileBytes?: number;
   headerClassName?: string;
 }) {
   const t = useTranslations("guestView");
   const format = useFormatter();
-  const [uploads, setUploads] = useState(initialUploads);
+  const [entries, setEntries] = useState(initialEntries);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
-    setUploads(initialUploads);
-  }, [initialUploads]);
+    setEntries(initialEntries);
+  }, [initialEntries]);
 
-  const handleUploadSuccess = (newUpload: Upload) => {
+  const handleUploadSuccess = (newEntry: Entry) => {
     setIsDrawerOpen(false);
-    // Private uploads go to the couple only, so they never join the guest grid.
-    if (newUpload.is_private) return;
-    setUploads((prev) =>
-      prev.some((upload) => upload.id === newUpload.id)
+    // Private entries go to the couple only, so they never join the guest grid.
+    if (newEntry.is_private) return;
+    setEntries((prev) =>
+      prev.some((entry) => entry.id === newEntry.id)
         ? prev
-        : [newUpload, ...prev],
+        : [newEntry, ...prev],
     );
   };
 
@@ -98,7 +97,7 @@ export function GuestViewContentClient({
         <h2 className="mb-4 px-4 text-center text-2xl font-bold">
           {t("galleryTitle")}
         </h2>
-        <PhotoGrid uploads={uploads} />
+        <PhotoGrid entries={entries} />
       </section>
 
       {/* Floating Add Photo button */}

@@ -9,10 +9,11 @@
 
 ## Flow
 
-1. Guest picks file → client asks server for a presigned URL (type, size, event id).
-2. Server loads event plan context → `checkUploadAllowed` → returns URL + public object URL.
-3. Client PUTs to R2; UI can be optimistic.
-4. Client calls save action; server `HeadObject`s for authoritative size, re-checks quota, inserts `uploads` row (trigger updates `storage_used_bytes`).
+1. Guest picks up to `MAX_FILES_PER_ENTRY` files → client asks `getPresignedUrls` for the batch (type, size, event id).
+2. Server loads event plan context → `checkUploadAllowed` per file with a running total, so the **whole batch** must fit the quota → returns one URL + key per file, or one rejection reason.
+3. Client PUTs to R2, 3 files at a time. A failed file doesn't stop the others.
+4. Client calls `saveEntry` with the keys that made it (or none, for a text-only wish). Server `HeadObject`s each for authoritative size, re-checks quota, deletes and skips files that fail, then calls the `create_entry` RPC to insert the entry and its `uploads` rows atomically (trigger updates `storage_used_bytes`).
+5. `deleteEntry` deletes the entry row (cascade + trigger release the quota), then the R2 objects.
 
 ## Env vars
 

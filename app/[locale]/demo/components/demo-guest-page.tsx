@@ -2,33 +2,21 @@
 
 import { GuestViewContentClient } from "@/app/[locale]/e/[eventId]/guest-view-content-client";
 import { DEMO_MAX_FILE_BYTES, useDemoWorkspace } from "@/lib/demo/provider";
-import type { Upload } from "@/app/[locale]/e/[eventId]/upload-drawer";
 
 export function DemoGuestPage() {
-  const { event, uploads, addUpload } = useDemoWorkspace();
+  const { event, entries, addEntry } = useDemoWorkspace();
 
-  // The demo guest page shows what a guest sees, so private uploads stay in
+  // The demo guest page shows what a guest sees, so private entries stay in
   // the demo dashboard only.
-  const guestUploads: Upload[] = uploads
-    .filter((upload) => !upload.is_private)
-    .map((upload) => ({
-      id: upload.id,
-      file_url: upload.file_url,
-      thumbnail_url: upload.thumbnail_url,
-      media_type: upload.media_type,
-      guest_name: upload.guest_name,
-      caption: upload.caption,
-      is_private: upload.is_private,
-      created_at: upload.created_at,
-    }));
+  const guestEntries = entries.filter((entry) => !entry.is_private);
 
   return (
     <div className="min-h-screen bg-muted/20">
       <GuestViewContentClient
         event={event}
-        initialUploads={guestUploads}
+        initialEntries={guestEntries}
         uploadWindow={{ isOpen: true, closesAt: event.date }}
-        onUpload={addUpload}
+        onUpload={addEntry}
         maxFileBytes={DEMO_MAX_FILE_BYTES}
         headerClassName="top-12"
       />

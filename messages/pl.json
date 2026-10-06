@@ -483,15 +483,17 @@
         "preview": "Podgląd",
         "event": "Wydarzenie",
         "guest": "Gość",
-        "caption": "Wiadomość",
-        "date": "Data"
+        "date": "Data",
+        "message": "Wiadomość",
+        "files": "Pliki"
       },
-      "deleteSuccess": "Przesyłka usunięta pomyślnie",
-      "deleteError": "Nie udało się usunąć przesyłki",
+      "deleteSuccess": "Wpis usunięty",
+      "deleteError": "Nie udało się usunąć wpisu",
       "bulkDeleteError": "Wystąpił błąd podczas usuwania",
-      "deleteSelected": "Usuń zaznaczone",
       "download": "Pobierz",
-      "delete": "Usuń"
+      "delete": "Usuń",
+      "open": "Otwórz",
+      "textOnly": "Życzenia bez zdjęć"
     },
     "qrCode": {
       "title": "Generator kodów QR",
@@ -600,7 +602,7 @@
     }
   },
   "guestView": {
-    "addPhoto": "Dodaj zdjęcie",
+    "addPhoto": "Dodaj zdjęcia i życzenia",
     "galleryTitle": "Galeria wspomnień",
     "noPhotos": "Brak zdjęć",
     "noPhotosSubtitle": "Bądź pierwszy, który podzieli się wspomnieniem!",
@@ -614,10 +616,9 @@
     },
     "upload": {
       "title": "Dodaj wspomnienie",
-      "description": "Podziel się zdjęciem lub filmem z uroczystości",
-      "photoOrVideo": "Zdjęcie lub film",
-      "photoOnly": "Zdjęcie",
-      "maxFileSize": "Maksymalny rozmiar pliku: {size}",
+      "description": "Podziel się zdjęciami, filmami i życzeniami",
+      "photoOrVideo": "Zdjęcia lub filmy (opcjonalnie)",
+      "photoOnly": "Zdjęcia (opcjonalnie)",
       "imagesOnly": "Ten pakiet pozwala przesyłać tylko zdjęcia (JPEG, PNG, WebP)",
       "quotaExceeded": "Miejsce na pliki dla tego wesela zostało wykorzystane",
       "windowClosed": "Czas na dodawanie wspomnień już minął",
@@ -631,20 +632,25 @@
       "privateLabel": "Tylko dla Pary Młodej",
       "privateOffHint": "Wspomnienie zobaczą wszyscy goście w galerii.",
       "privateOnHint": "Wspomnienie zobaczy tylko Para Młoda. Nie pojawi się w galerii gości.",
-      "selected": "Wybrano",
       "uploading": "Przesyłanie...",
       "uploadButton": "Prześlij",
       "cancel": "Anuluj",
-      "selectFile": "Wybierz plik",
       "invalidFileType": "Wybierz zdjęcie (JPEG, PNG, WebP) lub film (MP4, MOV)",
       "fileTooLarge": "Maksymalny rozmiar pliku to {size}",
-      "success": "Zdjęcie przesłane pomyślnie!",
+      "success": "Wspomnienie dodane!",
       "successPrivate": "Wysłane! Zobaczy je tylko Para Młoda.",
-      "error": "Wystąpił błąd podczas przesyłania"
+      "error": "Wystąpił błąd podczas przesyłania",
+      "filesHint": "Do {count} plików, maks. {size} każdy",
+      "addFiles": "Dodaj",
+      "removeFile": "Usuń plik",
+      "tooManyFiles": "Możesz dodać maksymalnie {count} plików naraz",
+      "emptyEntry": "Dodaj zdjęcie lub napisz życzenia",
+      "someFilesFailed": "Zapisano, ale {failed} z {total} plików nie udało się przesłać"
     },
     "memory": "Wspomnienie z wesela",
     "privateBadge": "Prywatne: widoczne tylko dla Was",
-    "videoAlt": "Film z wesela"
+    "videoAlt": "Film z wesela",
+    "filesCount": "{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}"
   },
   "demo": {
     "metaTitle": "Wypróbuj księgę gości",
@@ -668,5 +674,12 @@
   },
   "qrPdf": {
     "instruction": "Zeskanuj poniższy kod QR aparatem telefonu,\naby otworzyć naszą księgę gości.\nPodziel się z nami swoimi życzeniami i zdjęciami!"
+  },
+  "entryViewer": {
+    "counter": "{current} / {total}",
+    "previous": "Poprzednie",
+    "next": "Następne",
+    "mediaAlt": "Wspomnienie z wesela {current} z {total}",
+    "private": "Prywatne"
   }
 }

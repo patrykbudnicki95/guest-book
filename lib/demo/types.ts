@@ -3,14 +3,15 @@ import type {
   EventPageContentUpdate,
   EventSettingsUpdate,
 } from "@/lib/schemas/database";
-import type { DashboardUpload } from "@/app/actions/dashboard-actions";
-import type { LocalUploadResult } from "@/app/[locale]/e/[eventId]/upload-drawer";
-
-export type DemoUploadResult = LocalUploadResult;
+import type { DashboardEntry } from "@/app/actions/dashboard-actions";
+import type {
+  LocalEntryInput,
+  LocalEntryResult,
+} from "@/app/[locale]/e/[eventId]/upload-drawer";
 
 export type DemoWorkspace = {
   event: EventFull;
-  uploads: DashboardUpload[];
+  entries: DashboardEntry[];
   isReady: boolean;
   updateSettings: (
     data: EventSettingsUpdate,
@@ -19,12 +20,7 @@ export type DemoWorkspace = {
     data: EventPageContentUpdate,
   ) => Promise<{ success: boolean; error?: string }>;
   uploadCover: (file: File) => Promise<{ publicUrl: string }>;
-  addUpload: (input: {
-    file: File;
-    guestName?: string;
-    caption?: string;
-    isPrivate: boolean;
-  }) => Promise<DemoUploadResult>;
-  deleteUpload: (uploadId: string) => Promise<{ success: boolean }>;
+  addEntry: (input: LocalEntryInput) => Promise<LocalEntryResult>;
+  deleteEntry: (entryId: string) => Promise<{ success: boolean }>;
   reset: () => Promise<void>;
 };

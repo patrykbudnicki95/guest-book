@@ -17,17 +17,22 @@ import { createDemoSeed } from "./seed";
 const KV_STORE = "kv";
 const FILES_STORE = "files";
 const EVENT_KEY = "event";
-const UPLOADS_KEY = "uploads";
+const ENTRIES_KEY = "entries";
 
-export type StoredUploadMeta = {
+/** One file of an entry; its blob lives in the files store under `id`. */
+export type StoredFileMeta = {
   id: string;
   media_type: "image" | "video";
-  guest_name: string | null;
-  caption: string | null;
-  /** Optional: metas saved before private uploads existed don't have it. */
-  is_private?: boolean;
-  created_at: string;
   file_size_bytes: number;
+};
+
+export type StoredEntryMeta = {
+  id: string;
+  guest_name: string | null;
+  message: string | null;
+  is_private: boolean;
+  created_at: string;
+  files: StoredFileMeta[];
 };
 
 function openDb(): Promise<IDBDatabase> {
@@ -114,40 +119,42 @@ async function fileDelete(key: string): Promise<void> {
 
 async function persistSeed(): Promise<{
   event: EventFull;
-  uploads: StoredUploadMeta[];
+  entries: StoredEntryMeta[];
 }> {
   const event = createDemoSeed();
   await kvPut(EVENT_KEY, event);
-  await kvPut(UPLOADS_KEY, [] satisfies StoredUploadMeta[]);
+  await kvPut(ENTRIES_KEY, [] satisfies StoredEntryMeta[]);
   await fileDelete(DEMO_COVER_KEY);
-  return { event, uploads: [] };
+  return { event, entries: [] };
 }
 
 export async function loadDemoRecord(): Promise<{
   event: EventFull;
-  uploads: StoredUploadMeta[];
+  entries: StoredEntryMeta[];
   cover: Blob | null;
   files: Record<string, Blob>;
 }> {
   const event = await kvGet<EventFull>(EVENT_KEY);
+  const entries = await kvGet<StoredEntryMeta[]>(ENTRIES_KEY);
 
-  if (!event || event.id !== DEMO_EVENT_ID) {
-    const seeded = await persistSeed();
+  // No entries key means a fresh browser or a demo saved before entries
+  // existed; start over so stale per-upload blobs don't linger.
+  if (!event || event.id !== DEMO_EVENT_ID || !entries) {
+    const seeded = await resetDemoRecord();
     return { ...seeded, cover: null, files: {} };
   }
 
-  const uploads = (await kvGet<StoredUploadMeta[]>(UPLOADS_KEY)) ?? [];
   const cover = (await fileGet(DEMO_COVER_KEY)) ?? null;
   const files: Record<string, Blob> = {};
 
-  for (const upload of uploads) {
-    const blob = await fileGet(upload.id);
+  for (const file of entries.flatMap((entry) => entry.files)) {
+    const blob = await fileGet(file.id);
     if (blob) {
-      files[upload.id] = blob;
+      files[file.id] = blob;
     }
   }
 
-  return { event, uploads, cover, files };
+  return { event, entries, cover, files };
 }
 
 export function serializeEvent(event: EventFull): EventFull {
@@ -163,10 +170,10 @@ export async function saveDemoEvent(event: EventFull): Promise<void> {
   await kvPut(EVENT_KEY, serializeEvent(event));
 }
 
-export async function saveDemoUploads(
-  uploads: StoredUploadMeta[],
+export async function saveDemoEntries(
+  entries: StoredEntryMeta[],
 ): Promise<void> {
-  await kvPut(UPLOADS_KEY, uploads);
+  await kvPut(ENTRIES_KEY, entries);
 }
 
 export async function putDemoFile(key: string, blob: Blob): Promise<void> {
@@ -226,7 +233,7 @@ export async function applyPageContent(
 
 export async function resetDemoRecord(): Promise<{
   event: EventFull;
-  uploads: StoredUploadMeta[];
+  entries: StoredEntryMeta[];
 }> {
   const db = await openDb();
   try {

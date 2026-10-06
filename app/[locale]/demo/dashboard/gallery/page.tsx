@@ -4,13 +4,13 @@ import { GalleryTab } from "@/app/[locale]/(admin)/dashboard/gallery/components/
 import { useDemoWorkspace } from "@/lib/demo/provider";
 
 export default function DemoGalleryPage() {
-  const { event, uploads, deleteUpload } = useDemoWorkspace();
+  const { event, entries, deleteEntry } = useDemoWorkspace();
 
   return (
     <GalleryTab
-      uploads={uploads}
+      entries={entries}
       downloadOpenByEvent={{ [event.id]: true }}
-      onDelete={deleteUpload}
+      onDelete={deleteEntry}
     />
   );
 }

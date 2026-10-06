@@ -30,23 +30,34 @@ CREATE TABLE IF NOT EXISTS events (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Create uploads table
+-- Create entries table: one guest submission = one name + one wish + 0..10 files
+CREATE TABLE IF NOT EXISTS entries (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  guest_name TEXT,
+  message TEXT,
+  is_private BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Create uploads table: the files of an entry
 CREATE TABLE IF NOT EXISTS uploads (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  entry_id UUID NOT NULL REFERENCES entries(id) ON DELETE CASCADE,
   file_url TEXT NOT NULL,
   thumbnail_url TEXT,
   media_type TEXT NOT NULL CHECK (media_type IN ('image', 'video')),
   file_size_bytes BIGINT NOT NULL DEFAULT 0,
-  guest_name TEXT,
-  caption TEXT,
-  is_private BOOLEAN NOT NULL DEFAULT false,
+  -- Carousel order inside an entry; created_at is identical within one insert
+  sort_order SMALLINT NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Enable Row Level Security
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE uploads ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for profiles
@@ -81,17 +92,46 @@ CREATE POLICY "Users can delete own events"
   ON events FOR DELETE
   USING (auth.uid() = owner_id);
 
--- RLS Policies for uploads
--- Public uploads are readable by everyone (guest gallery); private ones only
+-- RLS Policies for entries
+-- Public entries are readable by everyone (guest gallery); private ones only
 -- by the event owner
-CREATE POLICY "Public uploads are viewable by everyone, private by the owner"
-  ON uploads FOR SELECT
+CREATE POLICY "Public entries are viewable by everyone, private by the owner"
+  ON entries FOR SELECT
   USING (
     NOT is_private
     OR EXISTS (
       SELECT 1 FROM events
-      WHERE events.id = uploads.event_id
+      WHERE events.id = entries.event_id
       AND events.owner_id = auth.uid()
+    )
+  );
+
+-- Anyone (including anonymous) can insert entries (for guest uploads)
+CREATE POLICY "Anyone can insert entries"
+  ON entries FOR INSERT
+  WITH CHECK (true);
+
+-- Only event owners can delete entries (moderation); cascades to uploads
+CREATE POLICY "Event owners can delete entries"
+  ON entries FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM events
+      WHERE events.id = entries.event_id
+      AND events.owner_id = auth.uid()
+    )
+  );
+
+-- RLS Policies for uploads
+-- Files follow their entry's visibility
+CREATE POLICY "Uploads are viewable when their entry is"
+  ON uploads FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM entries
+      JOIN events ON events.id = entries.event_id
+      WHERE entries.id = uploads.entry_id
+      AND (NOT entries.is_private OR events.owner_id = auth.uid())
     )
   );
 
@@ -184,14 +224,36 @@ CREATE TRIGGER update_events_updated_at
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_events_owner_id ON events(owner_id);
 CREATE INDEX IF NOT EXISTS idx_events_is_active ON events(is_active);
+CREATE INDEX IF NOT EXISTS idx_entries_event_id_created_at ON entries(event_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_uploads_event_id ON uploads(event_id);
+CREATE INDEX IF NOT EXISTS idx_uploads_entry_id ON uploads(entry_id);
 CREATE INDEX IF NOT EXISTS idx_uploads_created_at ON uploads(created_at DESC);
+
+-- Inserts an entry and its files in one transaction. Guests (anon) can't
+-- delete, so two separate inserts could leave a half-saved entry behind.
+-- SECURITY INVOKER keeps RLS and GRANTs in force.
+CREATE OR REPLACE FUNCTION create_entry(p_entry JSONB, p_uploads JSONB)
+RETURNS VOID
+LANGUAGE sql
+SECURITY INVOKER
+AS $$
+  INSERT INTO entries (id, event_id, guest_name, message, is_private)
+  SELECT id, event_id, guest_name, message, is_private
+  FROM jsonb_populate_record(NULL::entries, p_entry);
+
+  INSERT INTO uploads (id, entry_id, event_id, file_url, thumbnail_url, media_type, file_size_bytes, sort_order)
+  SELECT id, entry_id, event_id, file_url, thumbnail_url, media_type, file_size_bytes, sort_order
+  FROM jsonb_populate_recordset(NULL::uploads, p_uploads);
+$$;
 
 -- Table privileges. RLS decides which rows a role sees; these GRANTs decide
 -- whether the role may touch the table at all, and both are required.
 GRANT SELECT ON public.events TO anon, authenticated;
 GRANT INSERT, UPDATE, DELETE ON public.events TO authenticated;
+GRANT SELECT, INSERT ON public.entries TO anon, authenticated;
+GRANT DELETE ON public.entries TO authenticated;
 GRANT SELECT, INSERT ON public.uploads TO anon, authenticated;
 GRANT DELETE ON public.uploads TO authenticated;
 GRANT SELECT, UPDATE ON public.profiles TO authenticated;
 
+GRANT EXECUTE ON FUNCTION create_entry(JSONB, JSONB) TO anon, authenticated;

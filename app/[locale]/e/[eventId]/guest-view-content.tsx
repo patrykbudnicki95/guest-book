@@ -2,9 +2,12 @@ import { z } from "zod";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { GuestViewContentClient } from "./guest-view-content-client";
-import { EventFullSchema, UploadGuestSchema } from "@/lib/schemas/database";
+import {
+  EntryWithMediaSchema,
+  EventFullSchema,
+  type Entry,
+} from "@/lib/schemas/database";
 import { getUploadWindowEnd, isGuestUploadOpen } from "@/lib/permissions";
-import type { Upload } from "./upload-drawer";
 
 async function getEvent(eventId: string) {
   const supabase = await createClient();
@@ -35,53 +38,44 @@ async function getEvent(eventId: string) {
   return parsed.data;
 }
 
-async function getEventUploads(eventId: string): Promise<Upload[]> {
+async function getEventEntries(eventId: string): Promise<Entry[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("uploads")
+    .from("entries")
     .select(
-      "id, file_url, thumbnail_url, media_type, guest_name, caption, is_private, created_at",
+      "id, guest_name, message, is_private, created_at, uploads(id, file_url, thumbnail_url, media_type)",
     )
     .eq("event_id", eventId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .order("sort_order", { referencedTable: "uploads" });
 
   if (error) {
-    console.error("[getEventUploads] Supabase error:", error);
+    console.error("[getEventEntries] Supabase error:", error);
     return [];
   }
 
   if (!data) {
-    console.warn("[getEventUploads] No data returned from Supabase");
+    console.warn("[getEventEntries] No data returned from Supabase");
     return [];
   }
 
-  const parsed = z.array(UploadGuestSchema).safeParse(data);
+  const parsed = z.array(EntryWithMediaSchema).safeParse(data);
   if (!parsed.success) {
-    console.error("[getEventUploads] Zod validation failed:");
     console.error(
-      "Validation errors:",
-      JSON.stringify(parsed.error.format(), null, 2),
+      "[getEventEntries] Zod validation failed:",
+      z.prettifyError(parsed.error),
     );
-    console.error("Raw data:", JSON.stringify(data, null, 2));
+    console.error("[getEventEntries] Raw data:", JSON.stringify(data, null, 2));
     return [];
   }
 
-  return parsed.data.map((upload) => ({
-    id: upload.id,
-    file_url: upload.file_url,
-    thumbnail_url: upload.thumbnail_url,
-    media_type: upload.media_type,
-    guest_name: upload.guest_name,
-    caption: upload.caption,
-    is_private: upload.is_private,
-    created_at: upload.created_at,
-  }));
+  return parsed.data;
 }
 
 export async function GuestViewContent({ eventId }: { eventId: string }) {
-  const [event, uploads] = await Promise.all([
+  const [event, entries] = await Promise.all([
     getEvent(eventId),
-    getEventUploads(eventId),
+    getEventEntries(eventId),
   ]);
 
   if (!event) {
@@ -111,7 +105,7 @@ export async function GuestViewContent({ eventId }: { eventId: string }) {
   return (
     <GuestViewContentClient
       event={event}
-      initialUploads={uploads}
+      initialEntries={entries}
       uploadWindow={uploadWindow}
     />
   );

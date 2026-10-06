@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { ImagePlus, Play, X } from "lucide-react";
+import { MediaImage } from "@/components/media-image";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -18,47 +20,117 @@ import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  getPresignedUrl,
-  saveUploadToDb,
+  getPresignedUrls,
+  saveEntry,
+  type SaveEntryResult,
   type UploadFailureReason,
 } from "@/app/actions/upload-actions";
-import { formatBytes, getLimits, hasFeature } from "@/lib/permissions";
+import {
+  MAX_FILES_PER_ENTRY,
+  formatBytes,
+  getLimits,
+  hasFeature,
+} from "@/lib/permissions";
 import type { PlanId } from "@/lib/pricing";
+import type { Entry } from "@/lib/schemas/database";
 import { toast } from "sonner";
-
-export interface Upload {
-  id: string;
-  file_url: string;
-  thumbnail_url: string | null;
-  media_type: "image" | "video";
-  guest_name: string | null;
-  caption: string | null;
-  is_private: boolean;
-  created_at: string;
-}
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const VIDEO_TYPES = ["video/mp4", "video/quicktime"];
+/** Parallel PUTs to R2; more than this mostly fights over venue Wi-Fi. */
+const PARALLEL_UPLOADS = 3;
 
-export type LocalUploadInput = {
-  file: File;
+export type LocalEntryInput = {
+  files: File[];
   guestName?: string;
-  caption?: string;
+  message?: string;
   isPrivate: boolean;
 };
 
-export type LocalUploadResult =
-  | { ok: true; upload: Upload }
-  | { ok: false; reason: UploadFailureReason };
+export type LocalEntryResult = SaveEntryResult;
 
 interface UploadDrawerProps {
   eventId: string;
   plan: PlanId;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onUploadSuccess: (upload: Upload) => void;
-  onUpload?: (input: LocalUploadInput) => Promise<LocalUploadResult>;
+  onUploadSuccess: (entry: Entry) => void;
+  onUpload?: (input: LocalEntryInput) => Promise<LocalEntryResult>;
   maxFileBytes?: number;
+}
+
+function putFile(
+  url: string,
+  file: File,
+  onProgress: (loadedBytes: number) => void,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener("progress", (e) => {
+      if (e.lengthComputable) {
+        onProgress(e.loaded);
+      }
+    });
+
+    xhr.addEventListener("load", () => {
+      if (xhr.status === 200 || xhr.status === 204) {
+        resolve();
+      } else {
+        reject(new Error(`Upload failed with status ${xhr.status}`));
+      }
+    });
+
+    xhr.addEventListener("error", () => {
+      reject(new Error("Network error during upload"));
+    });
+
+    xhr.addEventListener("abort", () => {
+      reject(new Error("Upload aborted"));
+    });
+
+    xhr.open("PUT", url);
+    xhr.setRequestHeader("Content-Type", file.type);
+    xhr.send(file);
+  });
+}
+
+/**
+ * PUTs every file to its presigned URL, a few at a time, and returns the keys
+ * that made it. A failed file doesn't stop the others.
+ */
+async function uploadFiles(
+  files: File[],
+  items: { uploadUrl: string; fileKey: string }[],
+  onProgress: (percent: number) => void,
+): Promise<string[]> {
+  const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+  const loaded = files.map(() => 0);
+  const succeeded = files.map(() => false);
+  let next = 0;
+
+  const worker = async () => {
+    while (next < files.length) {
+      const index = next++;
+
+      try {
+        await putFile(items[index].uploadUrl, files[index], (bytes) => {
+          loaded[index] = bytes;
+          const sum = loaded.reduce((a, b) => a + b, 0);
+          onProgress(Math.round((sum / totalBytes) * 100));
+        });
+        succeeded[index] = true;
+      } catch (error) {
+        console.error("[UploadDrawer] File upload failed:", error);
+      }
+    }
+  };
+
+  await Promise.all(
+    Array.from({ length: Math.min(PARALLEL_UPLOADS, files.length) }, worker),
+  );
+
+  return items.filter((_, index) => succeeded[index]).map((item) => item.fileKey);
 }
 
 export function UploadDrawer({
@@ -71,12 +143,18 @@ export function UploadDrawer({
   maxFileBytes,
 }: UploadDrawerProps) {
   const t = useTranslations("guestView.upload");
-  const [file, setFile] = useState<File | null>(null);
-  const [caption, setCaption] = useState("");
+  // Each preview URL is created once, when the file is picked, so removing
+  // one file doesn't re-create (and reload) the others.
+  const [selected, setSelected] = useState<{ file: File; previewUrl: string }[]>(
+    [],
+  );
+  const [message, setMessage] = useState("");
   const [guestName, setGuestName] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isPending, startTransition] = useTransition();
+
+  const files = selected.map((item) => item.file);
 
   const limits = getLimits(plan);
   const videoAllowed = hasFeature({ plan, feature: "videoUploads" });
@@ -85,6 +163,7 @@ export function UploadDrawer({
     : IMAGE_TYPES;
   const fileSizeLimit = maxFileBytes ?? limits.maxFileBytes;
   const maxFileLabel = formatBytes(fileSizeLimit);
+  const canSubmit = files.length > 0 || message.trim().length > 0;
 
   const messageForReason = (reason: UploadFailureReason) => {
     switch (reason) {
@@ -100,31 +179,84 @@ export function UploadDrawer({
         return t("windowClosed");
       case "eventInactive":
         return t("eventInactive");
+      case "tooManyFiles":
+        return t("tooManyFiles", { count: MAX_FILES_PER_ENTRY });
+      case "emptyEntry":
+        return t("emptyEntry");
       default:
         return t("error");
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (!selectedFile) return;
+    const picked = Array.from(e.target.files ?? []);
+    // Let the guest pick the same file again after removing it.
+    e.target.value = "";
 
-    if (!acceptedTypes.includes(selectedFile.type)) {
+    const ofAcceptedType = picked.filter((file) =>
+      acceptedTypes.includes(file.type),
+    );
+    const valid = ofAcceptedType.filter((file) => file.size <= fileSizeLimit);
+
+    if (ofAcceptedType.length < picked.length) {
       toast.error(videoAllowed ? t("invalidFileType") : t("imagesOnly"));
-      return;
     }
 
-    if (selectedFile.size > fileSizeLimit) {
+    if (valid.length < ofAcceptedType.length) {
       toast.error(t("fileTooLarge", { size: maxFileLabel }));
+    }
+
+    const room = MAX_FILES_PER_ENTRY - files.length;
+
+    if (valid.length > room) {
+      toast.error(t("tooManyFiles", { count: MAX_FILES_PER_ENTRY }));
+    }
+
+    if (valid.length > 0 && room > 0) {
+      const added = valid.slice(0, room).map((file) => ({
+        file,
+        previewUrl: URL.createObjectURL(file),
+      }));
+      setSelected((prev) => [...prev, ...added]);
+    }
+  };
+
+  const removeFile = (previewUrl: string) => {
+    URL.revokeObjectURL(previewUrl);
+    setSelected((prev) => prev.filter((item) => item.previewUrl !== previewUrl));
+  };
+
+  const reset = () => {
+    selected.forEach((item) => URL.revokeObjectURL(item.previewUrl));
+    setSelected([]);
+    setMessage("");
+    setGuestName("");
+    setIsPrivate(false);
+    setUploadProgress(0);
+  };
+
+  const finish = (result: SaveEntryResult, failedUploads: number) => {
+    if (!result.ok) {
+      toast.error(messageForReason(result.reason));
+      setUploadProgress(0);
       return;
     }
 
-    setFile(selectedFile);
+    const missing = failedUploads + result.skipped;
+
+    if (missing > 0) {
+      toast.warning(t("someFilesFailed", { failed: missing, total: files.length }));
+    } else {
+      toast.success(isPrivate ? t("successPrivate") : t("success"));
+    }
+
+    onUploadSuccess(result.entry);
+    reset();
   };
 
   const handleSubmit = () => {
-    if (!file) {
-      toast.error(t("selectFile"));
+    if (!canSubmit) {
+      toast.error(t("emptyEntry"));
       return;
     }
 
@@ -135,107 +267,54 @@ export function UploadDrawer({
         if (onUpload) {
           setUploadProgress(40);
           const result = await onUpload({
-            file,
+            files,
             guestName: guestName || undefined,
-            caption: caption || undefined,
+            message: message || undefined,
             isPrivate,
           });
+          setUploadProgress(100);
+          finish(result, 0);
+          return;
+        }
 
-          if (!result.ok) {
-            toast.error(messageForReason(result.reason));
+        let fileKeys: string[] = [];
+
+        if (files.length > 0) {
+          const presigned = await getPresignedUrls({
+            eventId,
+            files: files.map((file) => ({
+              fileName: file.name,
+              fileType: file.type,
+              fileSize: file.size,
+            })),
+          });
+
+          if (!presigned.ok) {
+            toast.error(messageForReason(presigned.reason));
             setUploadProgress(0);
             return;
           }
 
-          setUploadProgress(100);
-          toast.success(isPrivate ? t("successPrivate") : t("success"));
-          onUploadSuccess(result.upload);
-          setFile(null);
-          setCaption("");
-          setGuestName("");
-          setIsPrivate(false);
-          setUploadProgress(0);
-          return;
+          fileKeys = await uploadFiles(files, presigned.items, setUploadProgress);
+
+          if (fileKeys.length === 0 && !message.trim()) {
+            toast.error(t("error"));
+            setUploadProgress(0);
+            return;
+          }
         }
-
-        const presigned = await getPresignedUrl({
-          fileName: file.name,
-          fileType: file.type,
-          fileSize: file.size,
-          eventId,
-        });
-
-        if (!presigned.ok) {
-          toast.error(messageForReason(presigned.reason));
-          setUploadProgress(0);
-          return;
-        }
-
-        await new Promise<void>((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-
-          xhr.upload.addEventListener("progress", (e) => {
-            if (e.lengthComputable) {
-              const percentComplete = Math.round((e.loaded / e.total) * 100);
-              setUploadProgress(percentComplete);
-            }
-          });
-
-          xhr.addEventListener("load", () => {
-            if (xhr.status === 200 || xhr.status === 204) {
-              resolve();
-            } else {
-              reject(new Error(`Upload failed with status ${xhr.status}`));
-            }
-          });
-
-          xhr.addEventListener("error", () => {
-            reject(new Error("Network error during upload"));
-          });
-
-          xhr.addEventListener("abort", () => {
-            reject(new Error("Upload aborted"));
-          });
-
-          xhr.open("PUT", presigned.uploadUrl);
-          xhr.setRequestHeader("Content-Type", file.type);
-          xhr.send(file);
-        });
 
         setUploadProgress(100);
 
-        const result = await saveUploadToDb({
+        const result = await saveEntry({
           eventId,
-          fileKey: presigned.fileKey,
+          fileKeys,
           guestName: guestName || undefined,
-          caption: caption || undefined,
+          message: message || undefined,
           isPrivate,
         });
 
-        if (!result.ok) {
-          toast.error(messageForReason(result.reason));
-          setUploadProgress(0);
-          return;
-        }
-
-        toast.success(isPrivate ? t("successPrivate") : t("success"));
-
-        onUploadSuccess({
-          id: result.id,
-          file_url: result.file_url,
-          thumbnail_url: result.thumbnail_url,
-          media_type: result.media_type,
-          guest_name: guestName || null,
-          caption: caption || null,
-          is_private: isPrivate,
-          created_at: new Date().toISOString(),
-        });
-
-        setFile(null);
-        setCaption("");
-        setGuestName("");
-        setIsPrivate(false);
-        setUploadProgress(0);
+        finish(result, files.length - fileKeys.length);
       } catch (error) {
         toast.error(t("error"));
         console.error("[UploadDrawer] Upload failed:", error);
@@ -246,33 +325,72 @@ export function UploadDrawer({
 
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
-      <DrawerContent>
+      <DrawerContent className="max-h-[92dvh]">
         <DrawerHeader>
           <DrawerTitle>{t("title")}</DrawerTitle>
           <DrawerDescription>{t("description")}</DrawerDescription>
         </DrawerHeader>
 
-        <div className="space-y-4 p-4">
-          {/* File input */}
+        <div className="space-y-4 overflow-y-auto p-4">
+          {/* Files */}
           <div className="space-y-2">
-            <Label htmlFor="file">
+            <Label htmlFor="files">
               {videoAllowed ? t("photoOrVideo") : t("photoOnly")}
             </Label>
             <Input
-              id="file"
+              id="files"
               type="file"
+              multiple
               accept={acceptedTypes.join(",")}
               onChange={handleFileChange}
-              disabled={isPending}
+              disabled={isPending || files.length >= MAX_FILES_PER_ENTRY}
+              className="sr-only"
             />
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {selected.map(({ file, previewUrl }) => (
+                <div
+                  key={previewUrl}
+                  className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-muted"
+                >
+                  {file.type.startsWith("image/") ? (
+                    <MediaImage
+                      src={previewUrl}
+                      alt={file.name}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex size-full items-center justify-center">
+                      <Play className="size-6 text-muted-foreground" />
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeFile(previewUrl)}
+                    disabled={isPending}
+                    className="absolute top-1 right-1 rounded-full bg-black/60 p-1"
+                    aria-label={t("removeFile")}
+                  >
+                    <X className="size-3 text-white" />
+                  </button>
+                </div>
+              ))}
+              {files.length < MAX_FILES_PER_ENTRY && (
+                <label
+                  htmlFor="files"
+                  className="flex size-20 shrink-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed text-xs text-muted-foreground"
+                >
+                  <ImagePlus className="size-5" />
+                  {t("addFiles")}
+                </label>
+              )}
+            </div>
             <p className="text-xs text-muted-foreground">
-              {t("maxFileSize", { size: maxFileLabel })}
+              {t("filesHint", {
+                count: MAX_FILES_PER_ENTRY,
+                size: maxFileLabel,
+              })}
             </p>
-            {file && (
-              <p className="text-sm text-muted-foreground">
-                {t("selected")}: {file.name} ({formatBytes(file.size)})
-              </p>
-            )}
           </div>
 
           {/* Guest name */}
@@ -287,14 +405,14 @@ export function UploadDrawer({
             />
           </div>
 
-          {/* Caption */}
+          {/* Message */}
           <div className="space-y-2">
-            <Label htmlFor="caption">{t("message")}</Label>
+            <Label htmlFor="message">{t("message")}</Label>
             <Textarea
-              id="caption"
+              id="message"
               placeholder={t("messagePlaceholder")}
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
               disabled={isPending}
               rows={4}
             />
@@ -331,7 +449,7 @@ export function UploadDrawer({
         <DrawerFooter>
           <Button
             onClick={handleSubmit}
-            disabled={!file || isPending}
+            disabled={!canSubmit || isPending}
             className="w-full rounded-full shadow-md shadow-primary/20"
             size="lg"
           >
