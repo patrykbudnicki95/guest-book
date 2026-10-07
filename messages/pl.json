@@ -218,7 +218,7 @@
         "answer": "Tak. Galeria jest widoczna dla wszystkich gości, którzy dołączą przez kod QR."
       },
       "4": {
-        "question": "Jaki jest limit zdjęć i filmów?",
+        "question": "Jaki jest limit filmów i zdjęć?",
         "answer": "Każdy pakiet ma pulę miejsca na pliki — od {minStorage} do {maxStorage}, w zależności od wybranego pakietu."
       },
       "5": {
