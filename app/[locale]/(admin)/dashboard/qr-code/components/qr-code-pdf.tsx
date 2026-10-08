@@ -36,16 +36,17 @@ Font.register({
 Font.register({
   family: "Playfair",
   fonts: [
+    // Full-charset TTFs: the fontsource `latin` subset lacks Polish glyphs (ą, ę, ś…).
     {
-      src: "https://cdn.jsdelivr.net/fontsource/fonts/playfair-display@latest/latin-400-normal.ttf",
+      src: "/fonts/playfair-display-400.ttf",
       fontWeight: 400,
     },
     {
-      src: "https://cdn.jsdelivr.net/fontsource/fonts/playfair-display@latest/latin-700-normal.ttf",
+      src: "/fonts/playfair-display-700.ttf",
       fontWeight: 700,
     },
     {
-      src: "https://cdn.jsdelivr.net/fontsource/fonts/playfair-display@latest/latin-400-italic.ttf",
+      src: "/fonts/playfair-display-400-italic.ttf",
       fontWeight: 400,
       fontStyle: "italic",
     },
