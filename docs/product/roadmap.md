@@ -16,6 +16,7 @@ Living backlog (moved from root `TODO.md`). Not a Cursor rule — product priori
 - Plan limitations / plan info (works; still discuss exact package contents)
 - Demo / test mode (works; update when main app gains features)
 - Guest photo visibility: public / private when uploading
+- Download all (ZIP): photos per guest + offline wishes album, built in the browser
 
 ## Todo (by priority)
 
@@ -23,7 +24,6 @@ Living backlog (moved from root `TODO.md`). Not a Cursor rule — product priori
 - Main page content
   - Pricing options (review; align with plan entitlements)
 - Event page content polish
-- Download all (ZIP)
 - PDF download styles
 - Cookies / privacy policy
 - Payments (Stripe)

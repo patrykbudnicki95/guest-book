@@ -1,8 +1,10 @@
 import {
   DeleteObjectCommand,
+  GetObjectCommand,
   HeadObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 if (!process.env.R2_ACCOUNT_ID) {
   throw new Error("R2_ACCOUNT_ID environment variable is not set");
@@ -49,6 +51,19 @@ export function fileKeyFromPublicUrl(fileUrl: string): string | null {
   const prefix = `${getPublicDomain()}/`;
 
   return fileUrl.startsWith(prefix) ? fileUrl.slice(prefix.length) : null;
+}
+
+/**
+ * A signed GET on the S3 endpoint. Unlike the public domain it skips the CDN
+ * cache (which can hold a copy without CORS headers) and keeps working once the
+ * bucket is private.
+ */
+export function getDownloadUrl(fileKey: string, expiresInSeconds: number): Promise<string> {
+  return getSignedUrl(
+    r2Client,
+    new GetObjectCommand({ Bucket: R2_BUCKET_NAME, Key: fileKey }),
+    { expiresIn: expiresInSeconds },
+  );
 }
 
 export type StoredObjectInfo = {

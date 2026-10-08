@@ -2,7 +2,8 @@
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { EventIdWithNamesSchema, EventForPdfSchema, EventPlanSummarySchema, UploadFileUrlSchema, EntryWithMediaAndEventSchema, type Entry } from "@/lib/schemas/database";
+import { fileKeyFromPublicUrl, getDownloadUrl } from "@/lib/storage/r2";
+import { EventIdWithNamesSchema, EventForPdfSchema, EventPlanSummarySchema, UploadFileUrlSchema, EntryWithMediaAndEventSchema, EntryForExportSchema, type Entry, type EntryForExport } from "@/lib/schemas/database";
 import {
   formatBytes,
   getDownloadWindowEnd,
@@ -38,6 +39,10 @@ export type DashboardEntry = Entry & {
   event_id: string;
   event_names: string | null;
 };
+
+export type EventExportResult =
+  | { success: true; eventNames: string; entries: EntryForExport[] }
+  | { success: false; error: "notFound" | "downloadClosed" | "loadFailed" };
 
 export interface UserEvent {
   id: string;
@@ -224,6 +229,97 @@ export async function getUserEntries(userId: string): Promise<DashboardEntry[]> 
     ...entry,
     event_names: eventMap.get(entry.event_id) || null,
   }));
+}
+
+/** PostgREST caps a response at 1000 rows by default, so entries are paged. */
+const EXPORT_PAGE_SIZE = 1000;
+/** Long enough for a slow connection to get through a whole wedding. */
+const EXPORT_URL_TTL_SECONDS = 24 * 60 * 60;
+
+/**
+ * Every entry of one event, oldest first, with file sizes so the browser can
+ * build the "download all" ZIP straight from R2. Only the owner may call it,
+ * and only while the plan's download window is open.
+ */
+export async function getEventExport(eventId: string): Promise<EventExportResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "notFound" };
+  }
+
+  const { data: event, error: eventError } = await supabase
+    .from("events")
+    .select("id, names, date, plan_id, storage_used_bytes")
+    .eq("id", eventId)
+    .eq("owner_id", user.id)
+    .single();
+
+  if (eventError || !event) {
+    console.error("[getEventExport] Error fetching event:", eventError);
+    return { success: false, error: "notFound" };
+  }
+
+  const parsedEvent = EventPlanSummarySchema.safeParse(event);
+  if (!parsedEvent.success) {
+    console.error("[getEventExport] Zod validation failed:", z.prettifyError(parsedEvent.error));
+    console.error("[getEventExport] Raw data:", JSON.stringify(event, null, 2));
+    return { success: false, error: "loadFailed" };
+  }
+
+  if (!isDownloadOpen({ plan: parsedEvent.data.plan_id, eventDate: parsedEvent.data.date })) {
+    return { success: false, error: "downloadClosed" };
+  }
+
+  const entries: EntryForExport[] = [];
+
+  for (let from = 0; ; from += EXPORT_PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from("entries")
+      .select("id, guest_name, message, created_at, uploads(file_url, media_type, file_size_bytes)")
+      .eq("event_id", eventId)
+      .order("created_at")
+      .order("id")
+      .order("sort_order", { referencedTable: "uploads" })
+      .range(from, from + EXPORT_PAGE_SIZE - 1);
+
+    if (error || !data) {
+      console.error("[getEventExport] Error fetching entries:", error);
+      return { success: false, error: "loadFailed" };
+    }
+
+    const parsed = z.array(EntryForExportSchema).safeParse(data);
+    if (!parsed.success) {
+      console.error("[getEventExport] Zod validation failed:", z.prettifyError(parsed.error));
+      console.error("[getEventExport] Raw data:", JSON.stringify(data, null, 2));
+      return { success: false, error: "loadFailed" };
+    }
+
+    entries.push(...parsed.data);
+
+    if (data.length < EXPORT_PAGE_SIZE) {
+      break;
+    }
+  }
+
+  const signedEntries = await Promise.all(
+    entries.map(async (entry) => ({
+      ...entry,
+      uploads: await Promise.all(
+        entry.uploads.map(async (upload) => {
+          const fileKey = fileKeyFromPublicUrl(upload.file_url);
+          return fileKey
+            ? { ...upload, file_url: await getDownloadUrl(fileKey, EXPORT_URL_TTL_SECONDS) }
+            : upload;
+        }),
+      ),
+    })),
+  );
+
+  return { success: true, eventNames: parsedEvent.data.names, entries: signedEntries };
 }
 
 export async function getUserEvents(userId: string): Promise<UserEvent[]> {

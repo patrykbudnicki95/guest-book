@@ -9,7 +9,10 @@ import {
   useState,
 } from "react";
 import type { EventFull, EventPageContentUpdate, EventSettingsUpdate } from "@/lib/schemas/database";
-import type { DashboardEntry } from "@/app/actions/dashboard-actions";
+import type {
+  DashboardEntry,
+  EventExportResult,
+} from "@/app/actions/dashboard-actions";
 import type {
   LocalEntryInput,
   LocalEntryResult,
@@ -320,6 +323,35 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     [metas],
   );
 
+  /** Same shape as `getEventExport`: oldest first, files read from IndexedDB. */
+  const getExport = useCallback(async (): Promise<EventExportResult> => {
+    if (!event) {
+      return { success: false, error: "notFound" };
+    }
+
+    const sizes = new Map(
+      metas.flatMap((meta) =>
+        meta.files.map((file) => [file.id, file.file_size_bytes]),
+      ),
+    );
+
+    return {
+      success: true,
+      eventNames: event.names,
+      entries: [...entries].reverse().map((entry) => ({
+        id: entry.id,
+        guest_name: entry.guest_name,
+        message: entry.message,
+        created_at: entry.created_at,
+        uploads: entry.uploads.map((upload) => ({
+          file_url: upload.file_url,
+          media_type: upload.media_type,
+          file_size_bytes: sizes.get(upload.id) ?? 0,
+        })),
+      })),
+    };
+  }, [event, entries, metas]);
+
   const reset = useCallback(async () => {
     await resetDemoRecord();
     const record = await loadDemoRecord();
@@ -345,6 +377,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         uploadCover,
         addEntry,
         deleteEntry,
+        getExport,
         reset,
       }}
     >

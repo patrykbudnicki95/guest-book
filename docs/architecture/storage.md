@@ -15,6 +15,16 @@
 4. Client calls `saveEntry` with the keys that made it (or none, for a text-only wish). Server `HeadObject`s each for authoritative size, re-checks quota, deletes and skips files that fail, then calls the `create_entry` RPC to insert the entry and its `uploads` rows atomically (trigger updates `storage_used_bytes`).
 5. `deleteEntry` deletes the entry row (cascade + trigger release the quota), then the R2 objects.
 
+## Download all (ZIP)
+
+Built in the couple's browser so no bytes pass through Vercel and nothing can time out:
+
+1. `getEventExport` (owner + download window check) pages through the event's entries and returns presigned **GET** URLs on the S3 endpoint (not the public domain, whose CDN cache may hold copies without CORS headers).
+2. `gallery/lib/export-zip.ts` fetches each file from R2 and streams it into a ZIP with `client-zip` (stored, not recompressed), plus an offline HTML album of the wishes.
+3. Chrome/Edge stream one ZIP to disk via `showSaveFilePicker`; other browsers get ~1 GB parts held in memory.
+
+Requires `GET` in the bucket's CORS policy.
+
 ## Env vars
 
 | Variable | Purpose |

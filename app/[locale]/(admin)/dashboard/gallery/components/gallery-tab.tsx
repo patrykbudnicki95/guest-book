@@ -22,10 +22,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { deleteEntry } from "@/app/actions/upload-actions";
+import { getEventExport } from "@/app/actions/dashboard-actions";
 import { toast } from "sonner";
 import { MoreVertical, Trash2, Eye, Lock, MessageSquare } from "lucide-react";
-import type { DashboardEntry } from "@/app/actions/dashboard-actions";
+import type {
+  DashboardEntry,
+  EventExportResult,
+} from "@/app/actions/dashboard-actions";
 import type { EntryMedia } from "@/lib/schemas/database";
+import { DownloadAll } from "./download-all";
 
 interface GalleryTabProps {
   entries: DashboardEntry[];
@@ -36,12 +41,15 @@ interface GalleryTabProps {
    */
   downloadOpenByEvent: Record<string, boolean>;
   onDelete?: (entryId: string) => Promise<{ success: boolean }>;
+  /** Loads everything "download all" zips; defaults to the server action. */
+  onLoadExport?: (eventId: string) => Promise<EventExportResult>;
 }
 
 export function GalleryTab({
   entries: initialEntries,
   downloadOpenByEvent,
   onDelete,
+  onLoadExport = getEventExport,
 }: GalleryTabProps) {
   const t = useTranslations("dashboard.gallery");
   const tCommon = useTranslations("common");
@@ -118,27 +126,44 @@ export function GalleryTab({
     });
   };
 
+  const downloadableEvents = Array.from(
+    new Map(
+      entries
+        .filter((entry) => downloadOpenByEvent[entry.event_id] !== false)
+        .map((entry) => [
+          entry.event_id,
+          {
+            id: entry.event_id,
+            names: entry.event_names || tCommon("unknownEvent"),
+          },
+        ]),
+    ).values(),
+  );
+
   const handleDownload = (media: EntryMedia) => {
     window.open(media.file_url, "_blank");
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold">{t("title")}</h2>
           <p className="text-sm text-muted-foreground">{t("description")}</p>
         </div>
-        {selectedIds.size > 0 && (
-          <Button
-            variant="destructive"
-            onClick={handleBulkDelete}
-            disabled={isPending}
-            className="rounded-full"
-          >
-            {t("deleteSelected")} ({selectedIds.size})
-          </Button>
-        )}
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {selectedIds.size > 0 && (
+            <Button
+              variant="destructive"
+              onClick={handleBulkDelete}
+              disabled={isPending}
+              className="rounded-full"
+            >
+              {t("deleteSelected")} ({selectedIds.size})
+            </Button>
+          )}
+          <DownloadAll events={downloadableEvents} loadExport={onLoadExport} />
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-xl border-0 bg-white shadow-sm">
