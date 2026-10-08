@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
+import { getFormatter, getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
 import { buildMetadata, localizedUrl, type SeoHref } from "@/lib/seo/metadata";
@@ -24,7 +24,7 @@ import {
 } from "../content";
 
 type GuideArticlePageProps = {
-  params: Promise<{ locale: AppLocale; slug: string }>;
+  params: Promise<{ slug: string }>;
 };
 
 /**
@@ -47,7 +47,8 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: GuideArticlePageProps): Promise<Metadata> {
-  const { locale, slug } = await params;
+  const { slug } = await params;
+  const locale = await getLocale();
   const article = getGuideArticleBySlug(locale, slug);
   const content = article?.translations[locale];
 
@@ -81,7 +82,8 @@ export async function generateMetadata({
 export default async function GuideArticlePage({
   params,
 }: GuideArticlePageProps) {
-  const { locale, slug } = await params;
+  const { slug } = await params;
+  const locale = await getLocale();
   const article = getGuideArticleBySlug(locale, slug);
   const content = article?.translations[locale];
 
@@ -89,7 +91,6 @@ export default async function GuideArticlePage({
     notFound();
   }
 
-  setRequestLocale(locale);
 
   const t = await getTranslations("guidesPage");
   const tFooter = await getTranslations("footer");

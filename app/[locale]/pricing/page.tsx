@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import type { AppLocale } from "@/i18n/routing";
 import { buildMetadata, localizedUrl } from "@/lib/seo/metadata";
 import { breadcrumbListNode, itemListNode } from "@/lib/seo/json-ld";
 import { PLANS, PLAN_LIST } from "@/lib/pricing";
@@ -14,14 +13,8 @@ import { FAQ } from "@/components/marketing/faq";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
-type PricingPageProps = {
-  params: Promise<{ locale: AppLocale }>;
-};
-
-export async function generateMetadata({
-  params,
-}: PricingPageProps): Promise<Metadata> {
-  const { locale } = await params;
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "metadata.pricing" });
 
   return buildMetadata({
@@ -32,9 +25,8 @@ export async function generateMetadata({
   });
 }
 
-export default async function PricingPage({ params }: PricingPageProps) {
-  const { locale } = await params;
-  setRequestLocale(locale);
+export default async function PricingPage() {
+  const locale = await getLocale();
 
   const t = await getTranslations("pricingPage");
   const tLanding = await getTranslations("landing");

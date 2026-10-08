@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import type { AppLocale } from "@/i18n/routing";
 import { buildMetadata, localizedUrl } from "@/lib/seo/metadata";
 import { breadcrumbListNode, faqPageNode } from "@/lib/seo/json-ld";
 import { CURRENCY_SYMBOL, PLANS } from "@/lib/pricing";
@@ -14,14 +13,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { getGuidesForLocale } from "../guides/content";
 
-type GuestbookPageProps = {
-  params: Promise<{ locale: AppLocale }>;
-};
-
-export async function generateMetadata({
-  params,
-}: GuestbookPageProps): Promise<Metadata> {
-  const { locale } = await params;
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
   const t = await getTranslations({
     locale,
     namespace: "metadata.virtualGuestbook",
@@ -35,11 +28,8 @@ export async function generateMetadata({
   });
 }
 
-export default async function VirtualGuestbookPage({
-  params,
-}: GuestbookPageProps) {
-  const { locale } = await params;
-  setRequestLocale(locale);
+export default async function VirtualGuestbookPage() {
+  const locale = await getLocale();
 
   const t = await getTranslations("guestbookPage");
   const tFooter = await getTranslations("footer");

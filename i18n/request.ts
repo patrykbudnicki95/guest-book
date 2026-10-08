@@ -1,11 +1,23 @@
+import { hasLocale } from "next-intl";
 import { getRequestConfig } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { locale as rootLocale } from "next/root-params";
 import { routing } from "./routing";
 
-export default getRequestConfig(async ({ requestLocale }) => {
-  let locale = await requestLocale;
+/**
+ * The locale comes from the `[locale]` root param, which Next knows at build
+ * time, so pages prerender statically. Root params aren't available in Server
+ * Actions, so those pass the locale explicitly (`getTranslations({ locale })`).
+ */
+export default getRequestConfig(async ({ locale }) => {
+  if (!locale) {
+    const paramValue = await rootLocale();
 
-  if (!locale || !routing.locales.includes(locale as "pl" | "en")) {
-    locale = routing.defaultLocale;
+    if (!hasLocale(routing.locales, paramValue)) {
+      notFound();
+    }
+
+    locale = paramValue;
   }
 
   return {

@@ -103,7 +103,9 @@
       "title": "Virtual Wedding",
       "titleAccent": "Guestbook",
       "subtitle": "Let your guests upload photos and leave wishes from their phones. No app download required. Your beautiful online guestbook — ready in minutes.",
-      "viewDemo": "View Demo"
+      "viewDemo": "View Demo",
+      "imageAlt": "A bride and groom laughing as they walk hand in hand through a garden",
+      "guestImageAlt": "A wedding guest showing photos of the couple's first dance on her phone"
     },
     "features": {
       "title": "Everything you need in one place",
@@ -706,5 +708,10 @@
     "next": "Next",
     "mediaAlt": "Wedding memory {current} of {total}",
     "private": "Private"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "home": "Go to the home page"
   }
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
@@ -69,6 +69,7 @@ export function SettingsTab({
   const tPrivacy = useTranslations("dashboard.settings.privacy");
   const tDanger = useTranslations("dashboard.settings.dangerZone");
   const tPlan = useTranslations("dashboard.settings.planSwitcher");
+  const locale = useLocale();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
@@ -138,7 +139,7 @@ export function SettingsTab({
   const handleSignOut = () => {
     startTransition(async () => {
       try {
-        await signOut();
+        await signOut(locale);
       } catch (error: unknown) {
         const err = error as { message?: string; name?: string; digest?: string };
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
+import { getFormatter, getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { routing, type AppLocale } from "@/i18n/routing";
 import { buildMetadata, localizedUrl } from "@/lib/seo/metadata";
@@ -12,20 +12,14 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { getGuidesForLocale } from "./content";
 
-type GuidesPageProps = {
-  params: Promise<{ locale: AppLocale }>;
-};
-
 function localesWithGuides(): AppLocale[] {
   return routing.locales.filter(
     (locale) => getGuidesForLocale(locale).length > 0,
   );
 }
 
-export async function generateMetadata({
-  params,
-}: GuidesPageProps): Promise<Metadata> {
-  const { locale } = await params;
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "metadata.guides" });
 
   return buildMetadata({
@@ -37,9 +31,8 @@ export async function generateMetadata({
   });
 }
 
-export default async function GuidesPage({ params }: GuidesPageProps) {
-  const { locale } = await params;
-  setRequestLocale(locale);
+export default async function GuidesPage() {
+  const locale = await getLocale();
 
   const guides = getGuidesForLocale(locale);
 

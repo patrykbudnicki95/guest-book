@@ -3,10 +3,13 @@ import { Link } from "@/i18n/navigation";
 import { PLAN_LIST } from "@/lib/pricing";
 import { Heart } from "lucide-react";
 
+// Read once at module load rather than during render, so marketing pages can
+// prerender statically. The year is the deploy's, which is fine for a footer.
+const YEAR = new Date().getFullYear();
+
 export async function SiteFooter() {
   const t = await getTranslations("footer");
   const tPricing = await getTranslations("landing.pricing");
-  const year = new Date().getFullYear();
 
   return (
     <footer className="border-t bg-white py-12">
@@ -94,7 +97,7 @@ export async function SiteFooter() {
         </div>
 
         <p className="mt-10 border-t pt-6 text-sm text-muted-foreground">
-          © {year} Wirtualna Księga Gości. {t("rights")}
+          © {YEAR} Wirtualna Księga Gości. {t("rights")}
         </p>
       </div>
     </footer>
