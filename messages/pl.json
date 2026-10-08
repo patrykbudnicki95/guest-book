@@ -103,7 +103,9 @@
       "title": "Wirtualna",
       "titleAccent": "Księga Gości",
       "subtitle": "Pozwól gościom przesyłać zdjęcia i życzenia z telefonu. Bez pobierania aplikacji. Twoja piękna księga gości online — gotowa w kilka minut.",
-      "viewDemo": "Zobacz demo"
+      "viewDemo": "Zobacz demo",
+      "imageAlt": "Para młoda śmieje się, idąc za rękę przez ogród",
+      "guestImageAlt": "Gość weselny pokazuje na telefonie zdjęcia z pierwszego tańca pary młodej"
     },
     "features": {
       "title": "Wszystko w jednym miejscu",

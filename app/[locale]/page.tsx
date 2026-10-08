@@ -22,8 +22,6 @@ import {
   HeartHandshake,
   ImageOff,
   MessagesSquare,
-  QrCode,
-  Smartphone,
   Sparkles,
 } from "lucide-react";
 import { HeroSection } from "./components/hero-section";
@@ -47,35 +45,6 @@ export default async function LandingPage() {
   const locale = await getLocale();
 
   const t = await getTranslations("landing");
-
-  const howItWorksSteps = [
-    {
-      title: t("howItWorks.step1.title"),
-      description: t("howItWorks.step1.description"),
-      icon: <Smartphone className="size-7" />,
-    },
-    {
-      title: t("howItWorks.step2.title"),
-      description: t("howItWorks.step2.description"),
-      icon: <QrCode className="size-7" />,
-    },
-    {
-      title: t("howItWorks.step3.title"),
-      description: t("howItWorks.step3.description"),
-      icon: <Camera className="size-7" />,
-    },
-    {
-      title: t("howItWorks.step4.title"),
-      description: t("howItWorks.step4.description"),
-      icon: <Download className="size-7" />,
-    },
-  ];
-
-  const testimonials = [
-    { quote: t("testimonials.1.quote"), author: t("testimonials.1.author") },
-    { quote: t("testimonials.2.quote"), author: t("testimonials.2.author") },
-    { quote: t("testimonials.3.quote"), author: t("testimonials.3.author") },
-  ];
 
   const faqRange = planRangeValues();
   const faqItems = [1, 2, 3, 4, 5].map((index) => ({
@@ -124,14 +93,7 @@ export default async function LandingPage() {
     <MarketingShell>
       <JsonLd data={jsonLd} />
 
-      <HeroSection
-        badge={t("hero.badge")}
-        title={t("hero.title")}
-        titleAccent={t("hero.titleAccent")}
-        subtitle={t("hero.subtitle")}
-        ctaText={t("cta.button")}
-        demoText={t("hero.viewDemo")}
-      />
+      <HeroSection />
 
       {/* Definition — states plainly what the product is, for readers and for
           search engines building an entity around the brand. */}
@@ -154,11 +116,7 @@ export default async function LandingPage() {
       </section>
 
       <div id="how-it-works">
-        <HowItWorks
-          title={t("howItWorks.title")}
-          subtitle={t("howItWorks.subtitle")}
-          steps={howItWorksSteps}
-        />
+        <HowItWorks />
       </div>
 
       {/* Problem / solution */}
@@ -274,11 +232,7 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      <Testimonials
-        title={t("testimonials.title")}
-        subtitle={t("testimonials.subtitle")}
-        items={testimonials}
-      />
+      <Testimonials />
 
       <div id="faq">
         <FAQ title={t("faq.title")} items={faqItems} />
