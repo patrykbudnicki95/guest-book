@@ -3,7 +3,10 @@ import type {
   EventPageContentUpdate,
   EventSettingsUpdate,
 } from "@/lib/schemas/database";
-import type { DashboardEntry } from "@/app/actions/dashboard-actions";
+import type {
+  DashboardEntry,
+  EventExportResult,
+} from "@/app/actions/dashboard-actions";
 import type {
   LocalEntryInput,
   LocalEntryResult,
@@ -22,5 +25,6 @@ export type DemoWorkspace = {
   uploadCover: (file: File) => Promise<{ publicUrl: string }>;
   addEntry: (input: LocalEntryInput) => Promise<LocalEntryResult>;
   deleteEntry: (entryId: string) => Promise<{ success: boolean }>;
+  getExport: () => Promise<EventExportResult>;
   reset: () => Promise<void>;
 };

@@ -493,7 +493,32 @@
       "download": "Pobierz",
       "delete": "Usuń",
       "open": "Otwórz",
-      "textOnly": "Życzenia bez zdjęć"
+      "textOnly": "Życzenia bez zdjęć",
+      "downloadAll": {
+        "button": "Pobierz wszystko",
+        "title": "Pobierz wszystkie zdjęcia i życzenia",
+        "description": "Plik ZIP ze wszystkimi zdjęciami i filmami, w osobnym folderze dla każdego gościa, oraz {album}: otwórz go w przeglądarce, aby zobaczyć każde życzenie obok zdjęć.",
+        "albumFile": "Życzenia",
+        "loading": "Przygotowujemy listę plików…",
+        "photos": "{count, plural, one {# zdjęcie} few {# zdjęcia} many {# zdjęć} other {# zdjęcia}}",
+        "videos": "{count, plural, one {# film} few {# filmy} many {# filmów} other {# filmu}}",
+        "wishes": "{count, plural, one {# życzenie} few {# życzenia} many {# życzeń} other {# życzenia}}",
+        "keepOpen": "Pliki pobierają się bezpośrednio na Twoje urządzenie. Nie zamykaj tej karty do końca pobierania; przy dużym weselu może to chwilę potrwać.",
+        "parts": "Twoja przeglądarka nie zapisze jednego dużego pliku, więc otrzymasz {count, plural, one {# plik ZIP} few {# pliki ZIP} many {# plików ZIP} other {# pliku ZIP}} o rozmiarze do {size} i może poprosić o zgodę na pobranie wielu plików. Aby dostać jeden plik, użyj Chrome lub Edge na komputerze.",
+        "start": "Pobierz ZIP",
+        "close": "Zamknij",
+        "progress": "{done} z {total} plików · {doneSize} z {totalSize}",
+        "partProgress": "część {part} z {total}",
+        "done": "Pobieranie zakończone.",
+        "failedFiles": "{count, plural, one {Nie udało się pobrać # pliku, został pominięty.} few {Nie udało się pobrać # plików, zostały pominięte.} many {Nie udało się pobrać # plików, zostały pominięte.} other {Nie udało się pobrać # pliku, został pominięty.}}",
+        "empty": "Nie ma jeszcze nic do pobrania.",
+        "errors": {
+          "notFound": "Nie znaleziono wydarzenia.",
+          "downloadClosed": "Czas na pobranie materiałów z tego wesela minął.",
+          "loadFailed": "Nie udało się wczytać listy plików. Spróbuj ponownie.",
+          "downloadFailed": "Pobieranie zostało przerwane. Sprawdź połączenie i spróbuj ponownie."
+        }
+      }
     },
     "qrCode": {
       "title": "Generator kodów QR",

@@ -493,7 +493,32 @@
       "download": "Download",
       "delete": "Delete",
       "open": "Open",
-      "textOnly": "Wish without photos"
+      "textOnly": "Wish without photos",
+      "downloadAll": {
+        "button": "Download all",
+        "title": "Download all photos and wishes",
+        "description": "A ZIP with every photo and video, one folder per guest, plus {album}: open it in a browser to see each wish next to its photos.",
+        "albumFile": "Wishes",
+        "loading": "Preparing the list of files…",
+        "photos": "{count, plural, one {# photo} other {# photos}}",
+        "videos": "{count, plural, one {# video} other {# videos}}",
+        "wishes": "{count, plural, one {# wish} other {# wishes}}",
+        "keepOpen": "Files download straight to your device. Keep this tab open until it finishes; for a big wedding that can take a while.",
+        "parts": "Your browser can't save one big file, so you'll get {count, plural, one {# ZIP file} other {# ZIP files}} of up to {size}, and it may ask you to allow multiple downloads. For a single file, use Chrome or Edge on a computer.",
+        "start": "Download ZIP",
+        "close": "Close",
+        "progress": "{done} of {total} files · {doneSize} of {totalSize}",
+        "partProgress": "part {part} of {total}",
+        "done": "Download complete.",
+        "failedFiles": "{count, plural, one {# file couldn't be downloaded and was skipped.} other {# files couldn't be downloaded and were skipped.}}",
+        "empty": "There's nothing to download yet.",
+        "errors": {
+          "notFound": "Event not found.",
+          "downloadClosed": "The download period for this wedding has ended.",
+          "loadFailed": "Couldn't load the list of files. Try again.",
+          "downloadFailed": "The download stopped. Check your connection and try again."
+        }
+      }
     },
     "qrCode": {
       "title": "QR Code Generator",

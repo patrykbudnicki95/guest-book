@@ -134,6 +134,21 @@ export const EntryWithMediaAndEventSchema = EntryWithMediaSchema.extend({
   event_id: z.string().uuid(),
 });
 
+// Entry with file sizes, for the "download all" ZIP
+export const EntryForExportSchema = z.object({
+  id: z.string().uuid(),
+  guest_name: z.string().nullable(),
+  message: z.string().nullable(),
+  created_at: z.string(),
+  uploads: z.array(
+    z.object({
+      file_url: z.string().url(),
+      media_type: z.enum(["image", "video"]),
+      file_size_bytes: z.coerce.number().int().nonnegative(),
+    }),
+  ),
+});
+
 // Entry lookup before deleting it and its R2 objects
 export const EntryForDeleteSchema = z.object({
   event_id: z.string().uuid(),
@@ -177,6 +192,7 @@ export type EventPageContentUpdate = z.infer<typeof EventPageContentUpdateSchema
 export type UploadFileUrl = z.infer<typeof UploadFileUrlSchema>;
 export type EntryMedia = z.infer<typeof EntryMediaSchema>;
 export type Entry = z.infer<typeof EntryWithMediaSchema>;
+export type EntryForExport = z.infer<typeof EntryForExportSchema>;
 export type EntryInsert = z.infer<typeof EntryInsertSchema>;
 export type UploadInsert = z.infer<typeof UploadInsertSchema>;
 
