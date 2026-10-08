@@ -1,6 +1,6 @@
-# simple-change-to-trigger-build
+# download-all-files
 
-Couples can download every photo, video and wish of a wedding in one go, without the export running on (or timing out on) the server.
+Couples can download every photo, video and wish of a wedding in one go, without the export running on (or timing out on) the server. Marketing pages are now prerendered as static HTML.
 
 ## Added
 
@@ -9,6 +9,11 @@ Couples can download every photo, video and wish of a wedding in one go, without
 - One folder per guest entry (`001 Anna Kowalska/01.jpg`, oldest first) plus a `Wishes.html` / `Życzenia.html` album that shows each wish with its photos and videos, offline.
 - Chrome and Edge stream a single ZIP of any size to disk; Safari and Firefox get several ZIPs of up to 1 GB, each with its own album.
 - Progress (files and bytes), cancel, a leave-page warning while running, and skipped-file reporting instead of failing the whole export.
+
+## Changed
+
+- Home, marketing, guide, package, login, signup and demo pages are fully static (`○`) instead of rendered on every request; the dashboard prerenders its shell and streams user data. `[locale]` is now the root layout and reads the locale via `next/root-params` (replaces the deprecated `setRequestLocale`), which also removes the dev "runtime data" console errors.
+- URLs outside any locale get a dedicated 404 page (`global-not-found`), and the footer year is fixed at build time.
 
 ## Manual steps
 

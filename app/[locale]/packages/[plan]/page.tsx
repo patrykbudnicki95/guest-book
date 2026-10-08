@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import type { AppLocale } from "@/i18n/routing";
 import { buildMetadata, localizedUrl } from "@/lib/seo/metadata";
 import { breadcrumbListNode, productNode } from "@/lib/seo/json-ld";
 import {
@@ -21,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Check } from "lucide-react";
 
 type PackagePageProps = {
-  params: Promise<{ locale: AppLocale; plan: string }>;
+  params: Promise<{ plan: string }>;
 };
 
 export function generateStaticParams() {
@@ -31,7 +30,8 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: PackagePageProps): Promise<Metadata> {
-  const { locale, plan } = await params;
+  const { plan } = await params;
+  const locale = await getLocale();
 
   if (!isPlanId(plan)) {
     return {};
@@ -54,13 +54,13 @@ export async function generateMetadata({
 }
 
 export default async function PackagePage({ params }: PackagePageProps) {
-  const { locale, plan } = await params;
+  const { plan } = await params;
+  const locale = await getLocale();
 
   if (!isPlanId(plan)) {
     notFound();
   }
 
-  setRequestLocale(locale);
 
   const planId: PlanId = plan;
   const planData = PLANS[planId];

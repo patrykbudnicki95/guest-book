@@ -1,31 +1,40 @@
 import type { Metadata } from "next";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
-import { hasLocale } from "next-intl";
-import { notFound } from "next/navigation";
-import { routing, type AppLocale } from "@/i18n/routing";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { Toaster } from "@/components/ui/sonner";
+import { routing } from "@/i18n/routing";
 import { siteConfig } from "@/lib/seo/config";
+import "../globals.css";
 
-type Props = {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-};
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
 
-export async function generateMetadata({
-  params,
-}: Omit<Props, "children">): Promise<Metadata> {
-  const { locale } = await params;
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
-  if (!hasLocale(routing.locales, locale)) {
-    return {};
-  }
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+});
 
-  const t = await getTranslations({
-    locale: locale as AppLocale,
-    namespace: "metadata",
-  });
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata");
 
   return {
+    metadataBase: new URL(siteConfig.url),
+    applicationName: siteConfig.name,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true },
+    },
     title: {
       default: t("home.title"),
       template: `%s | ${siteConfig.name}`,
@@ -34,21 +43,29 @@ export async function generateMetadata({
   };
 }
 
-export default async function LocaleLayout({ children, params }: Props) {
-  const { locale } = await params;
-
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
-
-  setRequestLocale(locale);
-
+/**
+ * The root layout. `[locale]` is a root param, so the locale is known at build
+ * time and every page that doesn't read request data prerenders statically.
+ */
+export default async function LocaleLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const locale = await getLocale();
   const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider messages={messages}>
-      {children}
-    </NextIntlClientProvider>
+    <html lang={locale}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased`}
+      >
+        <NextIntlClientProvider messages={messages}>
+          {children}
+        </NextIntlClientProvider>
+        <Toaster />
+      </body>
+    </html>
   );
 }
 

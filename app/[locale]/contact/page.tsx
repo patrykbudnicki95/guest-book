@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import type { AppLocale } from "@/i18n/routing";
 import { buildMetadata, localizedUrl } from "@/lib/seo/metadata";
 import { breadcrumbListNode } from "@/lib/seo/json-ld";
 import { siteConfig } from "@/lib/seo/config";
@@ -10,14 +9,8 @@ import { MarketingShell } from "@/components/marketing/marketing-shell";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
 import { ArrowRight, Mail } from "lucide-react";
 
-type ContactPageProps = {
-  params: Promise<{ locale: AppLocale }>;
-};
-
-export async function generateMetadata({
-  params,
-}: ContactPageProps): Promise<Metadata> {
-  const { locale } = await params;
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "metadata.contact" });
 
   return buildMetadata({
@@ -28,9 +21,8 @@ export async function generateMetadata({
   });
 }
 
-export default async function ContactPage({ params }: ContactPageProps) {
-  const { locale } = await params;
-  setRequestLocale(locale);
+export default async function ContactPage() {
+  const locale = await getLocale();
 
   const t = await getTranslations("contactPage");
   const tFooter = await getTranslations("footer");

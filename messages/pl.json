@@ -706,5 +706,10 @@
     "next": "Następne",
     "mediaAlt": "Wspomnienie z wesela {current} z {total}",
     "private": "Prywatne"
+  },
+  "notFound": {
+    "title": "Nie znaleziono strony",
+    "description": "Strona, której szukasz, nie istnieje lub została przeniesiona.",
+    "home": "Przejdź na stronę główną"
   }
 }

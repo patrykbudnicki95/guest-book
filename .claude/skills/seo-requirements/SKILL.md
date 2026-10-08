@@ -11,7 +11,7 @@ The marketing pages (`/`, `/virtual-guestbook`, `/pricing`, `/packages/[plan]`, 
 ## Checklist for a new indexable page
 
 1. **Route.** Add the pathname to `i18n/routing.ts`, with a localized Polish slug for marketing pages (`/cennik`, `/poradnik`). `pl` has no URL prefix and `en` lives under `/en`.
-2. **Server-rendered content.** The page is an async server component that calls `setRequestLocale(locale)` and gets its copy from `getTranslations`. Use `'use client'` only for interactive leaves, never for the text that has to be indexed.
+2. **Server-rendered, static content.** The page is an async server component that gets the locale from `getLocale()` (backed by the `[locale]` root param via `next/root-params`, so don't `await params` for it or call the deprecated `setRequestLocale`) and its copy from `getTranslations`. Use `'use client'` only for interactive leaves, never for the text that has to be indexed. Avoid request data and `new Date()` during render: `npm run build` must list the page as `○` (static).
 3. **Metadata.** `generateMetadata` returns `buildMetadata({ href, locale, title, description })` from `lib/seo/metadata.ts`. That sets the canonical, hreflang `languages` with `x-default` pointing to `pl`, OpenGraph and Twitter. Copy goes under `metadata.<page>` in both `messages/*.json`.
    - If the page exists in only some locales, pass `availableLocales` so untranslated locales get no hreflang entry. The guides do this.
    - If the dynamic segment differs per locale, pass `hrefByLocale`. Guide slugs are per locale.

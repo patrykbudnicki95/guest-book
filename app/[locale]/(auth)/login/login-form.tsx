@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import { toast } from "sonner";
 export function LoginForm() {
   const t = useTranslations("auth.login");
   const tErrors = useTranslations("auth.errors");
+  const locale = useLocale();
   const [isPending, startTransition] = useTransition();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -28,7 +29,7 @@ export function LoginForm() {
 
     startTransition(async () => {
       try {
-        const result = await login(email, password);
+        const result = await login(email, password, locale);
 
         if (result && !result.success) {
           toast.error(result.error || tErrors("invalidCredentials"));

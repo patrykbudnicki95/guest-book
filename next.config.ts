@@ -9,6 +9,10 @@ const r2Hostname = r2Domain ? new URL(r2Domain).hostname : null;
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  experimental: {
+    // `[locale]` is the root layout, so URLs outside it need their own 404.
+    globalNotFound: true,
+  },
   images: {
     remotePatterns: [
       {
