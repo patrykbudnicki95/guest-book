@@ -324,7 +324,10 @@ export function UploadDrawer({
   };
 
   return (
-    <Drawer open={isOpen} onOpenChange={onOpenChange}>
+    // vaul's keyboard handling guesses whether the iOS keyboard is open from
+    // visualViewport resizes and gets it wrong, leaving the drawer pushed off
+    // screen. Safari scrolls a focused input into view well enough on its own.
+    <Drawer open={isOpen} onOpenChange={onOpenChange} repositionInputs={false}>
       <DrawerContent className="max-h-[92dvh]">
         <DrawerHeader>
           <DrawerTitle>{t("title")}</DrawerTitle>
