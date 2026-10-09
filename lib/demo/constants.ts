@@ -13,6 +13,12 @@ export const DEMO_COVER_SENTINEL = "local:cover";
 /** Sample hero in `public/images`. Used until the visitor uploads their own. */
 export const DEMO_COVER_FALLBACK = "/images/demo-hero.jpeg";
 
+/** Save the date photo and music blobs live in the files store under these keys. */
+export const DEMO_SAVE_THE_DATE_KEYS = {
+  photo: "save-the-date-photo",
+  music: "save-the-date-music",
+} as const;
+
 export function isStoredDemoCover(url: string | null | undefined): boolean {
   return url === DEMO_COVER_SENTINEL || Boolean(url?.startsWith("blob:"));
 }

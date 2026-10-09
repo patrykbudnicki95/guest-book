@@ -4,8 +4,8 @@ import { useTranslations } from "next-intl";
 import { Lock } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { getMinimumPlanFor, type PlanFeature } from "@/lib/permissions";
-import { PLAN_LABELS } from "@/lib/pricing";
+import { getAddonFor, getMinimumPlanFor, type PlanFeature } from "@/lib/permissions";
+import { ADDONS, PLAN_LABELS, formatPrice } from "@/lib/pricing";
 
 /**
  * Shown in place of an editor the current plan does not include. The server
@@ -15,6 +15,7 @@ import { PLAN_LABELS } from "@/lib/pricing";
 export function PlanLock({ feature }: { feature: PlanFeature }) {
   const t = useTranslations("dashboard.planLock");
   const minimumPlan = getMinimumPlanFor(feature);
+  const addon = getAddonFor(feature);
 
   return (
     <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed bg-muted/30 px-4 py-8 text-center">
@@ -28,6 +29,11 @@ export function PlanLock({ feature }: { feature: PlanFeature }) {
             ? t("availableIn", { plan: PLAN_LABELS[minimumPlan] })
             : t("comingSoon")}
         </p>
+        {addon && (
+          <p className="text-sm text-muted-foreground">
+            {t("orAddon", { price: formatPrice(ADDONS[addon].price) })}
+          </p>
+        )}
       </div>
       <Button asChild variant="outline" size="sm" className="rounded-full">
         <Link href="/pricing">{t("cta")}</Link>

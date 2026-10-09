@@ -16,6 +16,7 @@ export function DemoSettingsTab() {
           location: event.location,
           theme_color: event.theme_color,
           plan_id: event.plan_id,
+          addons: [],
         },
       ]}
       variant="demo"

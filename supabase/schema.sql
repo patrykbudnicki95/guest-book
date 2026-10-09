@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS events (
   schedule JSONB,
   menu JSONB,
   plan_id TEXT NOT NULL DEFAULT 'basic' CHECK (plan_id IN ('basic', 'silver', 'gold')),
+  -- One-off products bought on top of the plan
+  addons TEXT[] NOT NULL DEFAULT '{}' CONSTRAINT events_addons_check CHECK (addons <@ ARRAY['saveTheDate']::TEXT[]),
   storage_used_bytes BIGINT NOT NULL DEFAULT 0,
   is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -65,12 +67,28 @@ CREATE TABLE IF NOT EXISTS event_seating (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Create event_save_the_date table: the animated save the date page (Gold or
+-- add-on). Kept apart from events so a draft stays hidden by RLS.
+CREATE TABLE IF NOT EXISTS event_save_the_date (
+  event_id UUID PRIMARY KEY REFERENCES events(id) ON DELETE CASCADE,
+  template TEXT NOT NULL DEFAULT 'envelope'
+    CONSTRAINT event_save_the_date_template_check
+    CHECK (template IN ('envelope', 'editorial', 'polaroid', 'botanical')),
+  -- { names, eyebrow, message, location, photo_url, music_url, font,
+  --   colors: { background, text, accent }, show_countdown, show_calendar }
+  content JSONB NOT NULL DEFAULT '{}'::jsonb,
+  -- Off until the couple is happy with it; guests only read published rows.
+  is_published BOOLEAN NOT NULL DEFAULT false,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- Enable Row Level Security
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE uploads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE event_seating ENABLE ROW LEVEL SECURITY;
+ALTER TABLE event_save_the_date ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for profiles
 -- Users can only read their own profile
@@ -206,6 +224,49 @@ CREATE POLICY "Event owners can delete seating"
     )
   );
 
+-- RLS Policies for event_save_the_date
+-- Guests read the page once it is published; the owner always sees their draft
+CREATE POLICY "Published save the date is viewable by everyone, drafts by the owner"
+  ON event_save_the_date FOR SELECT
+  USING (
+    is_published
+    OR EXISTS (
+      SELECT 1 FROM events
+      WHERE events.id = event_save_the_date.event_id
+      AND events.owner_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Event owners can insert save the date"
+  ON event_save_the_date FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM events
+      WHERE events.id = event_save_the_date.event_id
+      AND events.owner_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Event owners can update save the date"
+  ON event_save_the_date FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM events
+      WHERE events.id = event_save_the_date.event_id
+      AND events.owner_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Event owners can delete save the date"
+  ON event_save_the_date FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM events
+      WHERE events.id = event_save_the_date.event_id
+      AND events.owner_id = auth.uid()
+    )
+  );
+
 -- Create function to handle new user creation
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
@@ -281,6 +342,11 @@ CREATE TRIGGER update_event_seating_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_event_save_the_date_updated_at
+  BEFORE UPDATE ON event_save_the_date
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_events_owner_id ON events(owner_id);
 CREATE INDEX IF NOT EXISTS idx_events_is_active ON events(is_active);
@@ -317,5 +383,7 @@ GRANT DELETE ON public.uploads TO authenticated;
 GRANT SELECT, UPDATE ON public.profiles TO authenticated;
 GRANT SELECT ON public.event_seating TO anon, authenticated;
 GRANT INSERT, UPDATE, DELETE ON public.event_seating TO authenticated;
+GRANT SELECT ON public.event_save_the_date TO anon, authenticated;
+GRANT INSERT, UPDATE, DELETE ON public.event_save_the_date TO authenticated;
 
 GRANT EXECUTE ON FUNCTION create_entry(JSONB, JSONB) TO anon, authenticated;

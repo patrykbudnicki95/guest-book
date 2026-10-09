@@ -46,6 +46,7 @@ export interface Database {
           schedule: Json | null;
           menu: Json | null;
           plan_id: string;
+          addons: string[];
           storage_used_bytes: number;
           is_active: boolean;
           created_at: string;
@@ -64,6 +65,7 @@ export interface Database {
           schedule?: Json | null;
           menu?: Json | null;
           plan_id?: string;
+          addons?: string[];
           storage_used_bytes?: number;
           is_active?: boolean;
           created_at?: string;
@@ -82,6 +84,7 @@ export interface Database {
           schedule?: Json | null;
           menu?: Json | null;
           plan_id?: string;
+          addons?: string[];
           storage_used_bytes?: number;
           is_active?: boolean;
           created_at?: string;
@@ -165,6 +168,29 @@ export interface Database {
         Update: {
           event_id?: string;
           tables?: Json;
+          is_published?: boolean;
+          updated_at?: string;
+        };
+      };
+      event_save_the_date: {
+        Row: {
+          event_id: string;
+          template: string;
+          content: Json;
+          is_published: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          event_id: string;
+          template?: string;
+          content?: Json;
+          is_published?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          event_id?: string;
+          template?: string;
+          content?: Json;
           is_published?: boolean;
           updated_at?: string;
         };

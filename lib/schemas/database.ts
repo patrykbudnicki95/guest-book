@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { PLAN_IDS } from "@/lib/pricing";
+import { ADDON_IDS, PLAN_IDS } from "@/lib/pricing";
 import { MAX_SEATS_PER_TABLE } from "@/lib/permissions";
 
 export const PlanIdSchema = z.enum(PLAN_IDS);
+export const AddonIdsSchema = z.array(z.enum(ADDON_IDS));
 
 // Event schemas
 export const EventIdSchema = z.object({
@@ -22,6 +23,7 @@ export const EventPlanSummarySchema = z.object({
 export const EventPlanContextSchema = z.object({
   id: z.string().uuid(),
   plan_id: PlanIdSchema,
+  addons: AddonIdsSchema,
   date: z.string(),
   is_active: z.boolean(),
   storage_used_bytes: z.coerce.number().int().nonnegative(),
@@ -57,6 +59,7 @@ export const EventSettingsSchema = z.object({
   location: z.string().nullable(),
   theme_color: z.string().nullable(),
   plan_id: PlanIdSchema,
+  addons: AddonIdsSchema,
 });
 
 export const EventSettingsUpdateSchema = z.object({
@@ -138,6 +141,68 @@ export const EventForSeatingSchema = z.object({
 
 /** The table count limit depends on the plan, so the action checks it. */
 export const SeatingUpdateSchema = EventSeatingSchema.omit({ event_id: true });
+
+// Save the date schemas
+export const SAVE_THE_DATE_TEMPLATES = [
+  "envelope",
+  "editorial",
+  "polaroid",
+  "botanical",
+] as const;
+
+export const SAVE_THE_DATE_FONTS = [
+  "classic",
+  "romantic",
+  "modern",
+  "timeless",
+] as const;
+
+const HexColorSchema = z.string().regex(/^#[0-9a-f]{6}$/i);
+
+export const SaveTheDateContentSchema = z.object({
+  names: z.string().max(80),
+  eyebrow: z.string().max(60),
+  message: z.string().max(600),
+  location: z.string().max(120),
+  photo_url: z.string().url().nullable(),
+  music_url: z.string().url().nullable(),
+  font: z.enum(SAVE_THE_DATE_FONTS),
+  colors: z.object({
+    background: HexColorSchema,
+    text: HexColorSchema,
+    accent: HexColorSchema,
+  }),
+  show_countdown: z.boolean(),
+  show_calendar: z.boolean(),
+});
+
+/** `event_save_the_date.select("event_id, template, content, is_published")` (dashboard) */
+export const EventSaveTheDateSchema = z.object({
+  event_id: z.string().uuid(),
+  template: z.enum(SAVE_THE_DATE_TEMPLATES),
+  content: SaveTheDateContentSchema,
+  is_published: z.boolean(),
+});
+
+/** `event_save_the_date.select("template, content")` (guest page) */
+export const GuestSaveTheDateSchema = EventSaveTheDateSchema.pick({
+  template: true,
+  content: true,
+});
+
+export const SaveTheDateUpdateSchema = EventSaveTheDateSchema.omit({
+  event_id: true,
+});
+
+/** `events.select("id, names, date, location, plan_id, addons")` */
+export const EventForSaveTheDateSchema = z.object({
+  id: z.string().uuid(),
+  names: z.string(),
+  date: z.string(),
+  location: z.string().nullable(),
+  plan_id: PlanIdSchema,
+  addons: AddonIdsSchema,
+});
 
 // Upload schemas
 export const UploadFileUrlSchema = z.object({
@@ -228,6 +293,12 @@ export type SeatingTable = z.infer<typeof SeatingTableSchema>;
 export type EventForSeating = z.infer<typeof EventForSeatingSchema>;
 export type EventSeating = z.infer<typeof EventSeatingSchema>;
 export type SeatingUpdate = z.infer<typeof SeatingUpdateSchema>;
+export type SaveTheDateTemplate = (typeof SAVE_THE_DATE_TEMPLATES)[number];
+export type SaveTheDateFont = (typeof SAVE_THE_DATE_FONTS)[number];
+export type SaveTheDateContent = z.infer<typeof SaveTheDateContentSchema>;
+export type SaveTheDateUpdate = z.infer<typeof SaveTheDateUpdateSchema>;
+export type GuestSaveTheDate = z.infer<typeof GuestSaveTheDateSchema>;
+export type EventForSaveTheDate = z.infer<typeof EventForSaveTheDateSchema>;
 export type UploadFileUrl = z.infer<typeof UploadFileUrlSchema>;
 export type EntryMedia = z.infer<typeof EntryMediaSchema>;
 export type Entry = z.infer<typeof EntryWithMediaSchema>;

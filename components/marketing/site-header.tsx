@@ -10,6 +10,7 @@ import { useTranslations } from "next-intl";
 
 const navLinks: { href: StaticAppPathname; labelKey: string }[] = [
   { href: "/virtual-guestbook", labelKey: "howItWorks" },
+  { href: "/save-the-date", labelKey: "saveTheDate" },
   { href: "/pricing", labelKey: "pricing" },
   { href: "/guides", labelKey: "guides" },
 ];

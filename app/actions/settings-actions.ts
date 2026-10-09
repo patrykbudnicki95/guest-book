@@ -3,10 +3,12 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import {
+  AddonIdsSchema,
   EventSettingsSchema,
   EventSettingsUpdateSchema,
   PlanIdSchema,
 } from "@/lib/schemas/database";
+import { ADDON_IDS } from "@/lib/pricing";
 import { hasFeature } from "@/lib/permissions";
 import { getEventPlanContext } from "@/lib/permissions/server";
 import type { Database } from "@/types/supabase";
@@ -18,7 +20,7 @@ export async function getEventSettingsList(userId: string): Promise<EventSetting
 
   const { data, error } = await supabase
     .from("events")
-    .select("id, names, date, location, theme_color, plan_id")
+    .select("id, names, date, location, theme_color, plan_id, addons")
     .eq("owner_id", userId)
     .eq("is_active", true)
     .order("created_at", { ascending: false });
@@ -46,7 +48,7 @@ export async function getEventSettings(
 
   const { data, error } = await supabase
     .from("events")
-    .select("id, names, date, location, theme_color, plan_id")
+    .select("id, names, date, location, theme_color, plan_id, addons")
     .eq("id", eventId)
     .eq("owner_id", userId)
     .eq("is_active", true)
@@ -157,6 +159,70 @@ export async function setEventPlan(
 
   if (error) {
     console.error("[setEventPlan] Error updating plan:", error);
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}
+
+/**
+ * Development-only companion to `setEventPlan` for add-ons, until checkout
+ * exists. Same server-side flag check.
+ */
+export async function setEventAddon(
+  eventId: string,
+  addonId: string,
+  enabled: boolean,
+): Promise<{ success: boolean; error?: string }> {
+  if (process.env.NEXT_PUBLIC_ENABLE_PLAN_SWITCHER !== "true") {
+    return { success: false, error: "Plan switching is disabled" };
+  }
+
+  if (!(ADDON_IDS as readonly string[]).includes(addonId)) {
+    return { success: false, error: "Unknown add-on" };
+  }
+
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const { data, error: readError } = await supabase
+    .from("events")
+    .select("addons")
+    .eq("id", eventId)
+    .eq("owner_id", user.id)
+    .single();
+
+  if (readError || !data) {
+    console.error("[setEventAddon] Error fetching event:", readError);
+    return { success: false, error: "Event not found" };
+  }
+
+  const current = AddonIdsSchema.safeParse((data as { addons: unknown }).addons);
+  if (!current.success) {
+    console.error("[setEventAddon] Zod validation failed:", z.prettifyError(current.error));
+    console.error("[setEventAddon] Raw data:", JSON.stringify(data, null, 2));
+    return { success: false, error: "Invalid add-on data" };
+  }
+
+  const addons = enabled
+    ? [...new Set([...current.data, addonId])]
+    : current.data.filter((id) => id !== addonId);
+
+  const { error } = await supabase
+    .from("events")
+    // @ts-expect-error Supabase update() infers 'never' - types/supabase.ts events.Update is correct
+    .update({ addons, updated_at: new Date().toISOString() })
+    .eq("id", eventId)
+    .eq("owner_id", user.id);
+
+  if (error) {
+    console.error("[setEventAddon] Error updating add-ons:", error);
     return { success: false, error: error.message };
   }
 

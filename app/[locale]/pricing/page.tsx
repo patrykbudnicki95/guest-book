@@ -3,7 +3,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { buildMetadata, localizedUrl } from "@/lib/seo/metadata";
 import { breadcrumbListNode, itemListNode } from "@/lib/seo/json-ld";
-import { PLANS, PLAN_LIST } from "@/lib/pricing";
+import { ADDONS, PLANS, PLAN_LIST, formatPrice } from "@/lib/pricing";
 import { planFeatures, planRangeValues } from "@/lib/plan-features";
 import { JsonLd } from "@/components/json-ld";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
@@ -89,6 +89,36 @@ export default async function PricingPage() {
                 detailsLabel={tLanding("pricing.seeDetails")}
               />
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="pb-16">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-5xl">
+            <h2 className="mb-6 text-2xl font-bold">{t("addons.title")}</h2>
+            <div className="flex flex-col gap-4 rounded-2xl border bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+              <div className="max-w-2xl">
+                <h3 className="text-lg font-semibold">
+                  {t("addons.saveTheDate.title")}{" "}
+                  <span className="text-primary">
+                    {formatPrice(ADDONS.saveTheDate.price)}
+                  </span>
+                </h3>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                  {t("addons.saveTheDate.description", {
+                    price: formatPrice(ADDONS.saveTheDate.price),
+                  })}
+                </p>
+              </div>
+              <Link
+                href="/save-the-date"
+                className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+              >
+                {t("addons.saveTheDate.link")}
+                <ArrowRight className="size-4" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>

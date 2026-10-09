@@ -37,12 +37,24 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "gold",
     price: 499,
     originalPrice: 599,
-    featureCount: 6,
+    featureCount: 7,
     highlighted: false,
   },
 };
 
 export const PLAN_LIST: Plan[] = PLAN_IDS.map((id) => PLANS[id]);
+
+/**
+ * One-off products bought on top of an event's plan (`events.addons`). What each
+ * one unlocks lives in `ADDON_FEATURES` in `lib/permissions/entitlements.ts`.
+ */
+export const ADDON_IDS = ["saveTheDate"] as const;
+
+export type AddonId = (typeof ADDON_IDS)[number];
+
+export const ADDONS: Record<AddonId, { id: AddonId; price: number }> = {
+  saveTheDate: { id: "saveTheDate", price: 100 },
+};
 
 /** Plan names are brand names, so they read the same in every locale. */
 export const PLAN_LABELS: Record<PlanId, string> = {
