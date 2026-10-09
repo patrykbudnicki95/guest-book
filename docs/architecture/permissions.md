@@ -19,7 +19,13 @@
 | Seating plan tables | 0 | 0 | 100 |
 | Features | uploads, gallery, QR | + branding, schedule, menu | + video, QR cards, findYourTable, saveTheDate, weddingGames |
 
-Some Gold keys (`saveTheDate`, `weddingGames`) are declared with no consumer yet — intentional.
+`weddingGames` is declared with no consumer yet — intentional.
+
+## Add-ons
+
+One-off products bought on top of a plan live in **`events.addons`** (`text[]`). Prices are in `ADDONS` (`lib/pricing.ts`), and what each unlocks in `ADDON_FEATURES` (`lib/permissions/entitlements.ts`). Today there is one: `saveTheDate` (included in Gold, sold separately for Basic and Silver).
+
+Wherever an add-on can unlock a feature, pass the event's add-ons: `hasFeature({ plan, feature, addons })`. `getEventPlanContext` returns `addons`, so `requireOwnedEventFeature` / `checkOwnedEventFeature` already account for them. `PlanLock` shows the add-on price next to the minimum plan.
 
 ## How to check in code
 
@@ -31,7 +37,7 @@ hasFeature({ plan, feature: "schedule" });
 getLimits(plan).storageBytes;
 
 const context = await getEventPlanContext(eventId);
-// { id, plan_id, date, is_active, storage_used_bytes }
+// { id, plan_id, addons, date, is_active, storage_used_bytes }
 ```
 
 | Layer | API | Role |
@@ -49,4 +55,5 @@ const context = await getEventPlanContext(eventId);
 ## Known gaps
 
 - **Download window**: gated in gallery UI only. Files use public R2 URLs until the bucket is private and downloads use signed GETs.
-- **Plan switcher**: `setEventPlan` runs only if `NEXT_PUBLIC_ENABLE_PLAN_SWITCHER=true` (server-checked). Dev escape hatch — off in production.
+- **Plan switcher**: `setEventPlan` and `setEventAddon` run only if `NEXT_PUBLIC_ENABLE_PLAN_SWITCHER=true` (server-checked). Dev escape hatch — off in production.
+- **Owners can write `plan_id` and `addons` directly**: the `events` UPDATE grant and policy cover every column, so an owner with the anon key could upgrade their own event. Must be closed (column-level grants or a trigger) before payments go live.

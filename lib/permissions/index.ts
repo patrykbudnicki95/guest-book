@@ -1,7 +1,13 @@
-import { PLAN_IDS, type PlanId } from "@/lib/pricing";
-import { PLAN_ENTITLEMENTS, type PlanFeature, type PlanLimits } from "./entitlements";
+import { ADDON_IDS, PLAN_IDS, type AddonId, type PlanId } from "@/lib/pricing";
+import {
+  ADDON_FEATURES,
+  PLAN_ENTITLEMENTS,
+  type PlanFeature,
+  type PlanLimits,
+} from "./entitlements";
 
 export {
+  ADDON_FEATURES,
   DEFAULT_PLAN_ID,
   PLAN_ENTITLEMENTS,
   PLAN_FEATURES,
@@ -14,8 +20,31 @@ export function getLimits(plan: PlanId): PlanLimits {
   return PLAN_ENTITLEMENTS[plan].limits;
 }
 
-export function hasFeature({ plan, feature }: { plan: PlanId; feature: PlanFeature }): boolean {
-  return (PLAN_ENTITLEMENTS[plan].features as readonly PlanFeature[]).includes(feature);
+/** Pass the event's `addons` wherever an add-on can unlock the feature. */
+export function hasFeature({
+  plan,
+  feature,
+  addons = [],
+}: {
+  plan: PlanId;
+  feature: PlanFeature;
+  addons?: readonly AddonId[];
+}): boolean {
+  return (
+    (PLAN_ENTITLEMENTS[plan].features as readonly PlanFeature[]).includes(feature) ||
+    addons.some((addon) =>
+      (ADDON_FEATURES[addon] as readonly PlanFeature[]).includes(feature),
+    )
+  );
+}
+
+/** The add-on that sells the feature on its own, for "or buy it separately" copy. */
+export function getAddonFor(feature: PlanFeature): AddonId | null {
+  return (
+    ADDON_IDS.find((addon) =>
+      (ADDON_FEATURES[addon] as readonly PlanFeature[]).includes(feature),
+    ) ?? null
+  );
 }
 
 /**

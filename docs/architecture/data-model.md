@@ -24,6 +24,7 @@ Source of truth: `supabase/schema.sql` (includes migration-era columns). Apply i
 | `cover_photo_url`, `welcome_message` | Event page |
 | `schedule`, `menu` | JSONB |
 | `plan_id` | `basic` \| `silver` \| `gold` (default `basic`) |
+| `addons` | `text[]`, one-off products on top of the plan (today only `saveTheDate`); checked by a constraint |
 | `storage_used_bytes` | Denormalized; maintained by trigger on `uploads` |
 | `is_active` | |
 | `created_at`, `updated_at` | |
@@ -66,6 +67,18 @@ The "find your table" plan (Gold). One row per event, created on the first save.
 | `is_published` | Couple's "show to guests" switch, default `false` |
 | `updated_at` | |
 
+### `event_save_the_date`
+
+The animated save the date page (Gold or the `saveTheDate` add-on). One row per event, created on the first save. Separate from `events` for the same reason as seating: a draft must stay hidden.
+
+| Column | Notes |
+|--------|--------|
+| `event_id` | PK → `events`, `ON DELETE CASCADE` |
+| `template` | `envelope` \| `editorial` \| `polaroid` \| `botanical` |
+| `content` | JSONB `{ names, eyebrow, message, location, photo_url, music_url, font, colors: { background, text, accent }, show_countdown, show_calendar }`. Photo and music must be R2 files under `events/<id>/save-the-date/` (checked in `updateSaveTheDate`) |
+| `is_published` | Couple's "show to guests" switch, default `false` |
+| `updated_at` | |
+
 ## RLS (summary)
 
 | Table | Read | Write |
@@ -75,6 +88,7 @@ The "find your table" plan (Gold). One row per event, created on the first save.
 | `entries` | Everyone for public rows; owner only for `is_private` rows | Anyone insert; owner delete (cascades to uploads) |
 | `uploads` | Same as their entry | Anyone insert; owner delete |
 | `event_seating` | Everyone when `is_published`; owner always | Owner insert/update/delete |
+| `event_save_the_date` | Everyone when `is_published`; owner always | Owner insert/update/delete |
 
 Also: table `GRANT`s for `anon` / `authenticated` (see schema).
 
@@ -86,7 +100,7 @@ Also: table `GRANT`s for `anon` / `authenticated` (see schema).
 
 - `handle_new_user` — create profile on signup
 - `sync_event_storage_used` — keep `events.storage_used_bytes` in sync (also fires on uploads removed by the entry cascade)
-- `update_updated_at_column` — profiles, events & event_seating
+- `update_updated_at_column` — profiles, events, event_seating & event_save_the_date
 
 ## App Zod schemas
 

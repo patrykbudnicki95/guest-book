@@ -43,6 +43,14 @@ export async function SiteFooter() {
               </li>
               <li>
                 <Link
+                  href="/save-the-date"
+                  className="transition-colors hover:text-foreground"
+                >
+                  {t("saveTheDate")}
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/pricing"
                   className="transition-colors hover:text-foreground"
                 >

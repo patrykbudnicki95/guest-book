@@ -2,6 +2,7 @@ import type {
   EventFull,
   EventPageContentUpdate,
   EventSettingsUpdate,
+  SaveTheDateUpdate,
   SeatingUpdate,
 } from "@/lib/schemas/database";
 import {
@@ -11,15 +12,19 @@ import {
   DEMO_DB_NAME,
   DEMO_DB_VERSION,
   DEMO_EVENT_ID,
+  DEMO_SAVE_THE_DATE_KEYS,
   isStoredDemoCover,
 } from "./constants";
-import { createDemoSeating, createDemoSeed } from "./seed";
+import { createDemoSaveTheDate, createDemoSeating, createDemoSeed } from "./seed";
 
 const KV_STORE = "kv";
 const FILES_STORE = "files";
 const EVENT_KEY = "event";
 const ENTRIES_KEY = "entries";
 const SEATING_KEY = "seating";
+const SAVE_THE_DATE_KEY = "saveTheDate";
+/** Stands in for a blob URL in IndexedDB; blob URLs die with the page. */
+const STORED_ASSET = "local:asset";
 
 /** One file of an entry; its blob lives in the files store under `id`. */
 export type StoredFileMeta = {
@@ -123,20 +128,25 @@ async function persistSeed(): Promise<{
   event: EventFull;
   entries: StoredEntryMeta[];
   seating: SeatingUpdate;
+  saveTheDate: SaveTheDateUpdate;
 }> {
   const event = createDemoSeed();
   const seating = createDemoSeating();
+  const saveTheDate = createDemoSaveTheDate();
   await kvPut(EVENT_KEY, event);
   await kvPut(ENTRIES_KEY, [] satisfies StoredEntryMeta[]);
   await kvPut(SEATING_KEY, seating);
+  await kvPut(SAVE_THE_DATE_KEY, saveTheDate);
   await fileDelete(DEMO_COVER_KEY);
-  return { event, entries: [], seating };
+  return { event, entries: [], seating, saveTheDate };
 }
 
 export async function loadDemoRecord(): Promise<{
   event: EventFull;
   entries: StoredEntryMeta[];
   seating: SeatingUpdate;
+  saveTheDate: SaveTheDateUpdate;
+  saveTheDateFiles: Partial<Record<keyof typeof DEMO_SAVE_THE_DATE_KEYS, Blob>>;
   cover: Blob | null;
   files: Record<string, Blob>;
 }> {
@@ -147,11 +157,21 @@ export async function loadDemoRecord(): Promise<{
   // existed; start over so stale per-upload blobs don't linger.
   if (!event || event.id !== DEMO_EVENT_ID || !entries) {
     const seeded = await resetDemoRecord();
-    return { ...seeded, cover: null, files: {} };
+    return { ...seeded, saveTheDateFiles: {}, cover: null, files: {} };
   }
 
   // Demos saved before seating existed get the sample plan.
   const seating = (await kvGet<SeatingUpdate>(SEATING_KEY)) ?? createDemoSeating();
+  // Demos saved before save the date existed get the sample page.
+  const saveTheDate =
+    (await kvGet<SaveTheDateUpdate>(SAVE_THE_DATE_KEY)) ?? createDemoSaveTheDate();
+  const saveTheDateFiles: Partial<Record<keyof typeof DEMO_SAVE_THE_DATE_KEYS, Blob>> = {};
+  for (const [kind, key] of Object.entries(DEMO_SAVE_THE_DATE_KEYS)) {
+    const blob = await fileGet(key);
+    if (blob) {
+      saveTheDateFiles[kind as keyof typeof DEMO_SAVE_THE_DATE_KEYS] = blob;
+    }
+  }
   const cover = (await fileGet(DEMO_COVER_KEY)) ?? null;
   const files: Record<string, Blob> = {};
 
@@ -162,7 +182,7 @@ export async function loadDemoRecord(): Promise<{
     }
   }
 
-  return { event, entries, seating, cover, files };
+  return { event, entries, seating, saveTheDate, saveTheDateFiles, cover, files };
 }
 
 export function serializeEvent(event: EventFull): EventFull {
@@ -186,6 +206,31 @@ export async function saveDemoEntries(
 
 export async function saveDemoSeating(seating: SeatingUpdate): Promise<void> {
   await kvPut(SEATING_KEY, seating);
+}
+
+/**
+ * Blob URLs are swapped for a marker before saving and back for fresh ones on
+ * load. A removed asset also drops its blob.
+ */
+export async function saveDemoSaveTheDate(saveTheDate: SaveTheDateUpdate): Promise<void> {
+  const { photo_url, music_url } = saveTheDate.content;
+  const stored = (url: string | null) => (url?.startsWith("blob:") ? STORED_ASSET : url);
+
+  if (!photo_url) await fileDelete(DEMO_SAVE_THE_DATE_KEYS.photo);
+  if (!music_url) await fileDelete(DEMO_SAVE_THE_DATE_KEYS.music);
+
+  await kvPut(SAVE_THE_DATE_KEY, {
+    ...saveTheDate,
+    content: {
+      ...saveTheDate.content,
+      photo_url: stored(photo_url),
+      music_url: stored(music_url),
+    },
+  } satisfies SaveTheDateUpdate);
+}
+
+export function isStoredDemoAsset(url: string | null): boolean {
+  return url === STORED_ASSET;
 }
 
 export async function putDemoFile(key: string, blob: Blob): Promise<void> {
@@ -247,6 +292,7 @@ export async function resetDemoRecord(): Promise<{
   event: EventFull;
   entries: StoredEntryMeta[];
   seating: SeatingUpdate;
+  saveTheDate: SaveTheDateUpdate;
 }> {
   const db = await openDb();
   try {

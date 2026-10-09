@@ -16,16 +16,20 @@ export const pathnames = {
   "/dashboard/qr-code": "/dashboard/qr-code",
   "/dashboard/event-page": "/dashboard/event-page",
   "/dashboard/seating": "/dashboard/seating",
+  "/dashboard/save-the-date": "/dashboard/save-the-date",
   "/demo": "/demo",
   "/demo/tables": "/demo/tables",
+  "/demo/save-the-date": "/demo/save-the-date",
   "/demo/dashboard": "/demo/dashboard",
   "/demo/dashboard/gallery": "/demo/dashboard/gallery",
   "/demo/dashboard/settings": "/demo/dashboard/settings",
   "/demo/dashboard/qr-code": "/demo/dashboard/qr-code",
   "/demo/dashboard/event-page": "/demo/dashboard/event-page",
   "/demo/dashboard/seating": "/demo/dashboard/seating",
+  "/demo/dashboard/save-the-date": "/demo/dashboard/save-the-date",
   "/e/[eventId]": "/e/[eventId]",
   "/e/[eventId]/tables": "/e/[eventId]/tables",
+  "/e/[eventId]/save-the-date": "/e/[eventId]/save-the-date",
   "/pricing": {
     pl: "/cennik",
     en: "/pricing",
@@ -33,6 +37,10 @@ export const pathnames = {
   "/packages/[plan]": {
     pl: "/pakiety/[plan]",
     en: "/packages/[plan]",
+  },
+  "/save-the-date": {
+    pl: "/save-the-date-online",
+    en: "/save-the-date",
   },
   "/virtual-guestbook": {
     pl: "/wirtualna-ksiega-gosci",

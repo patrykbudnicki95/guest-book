@@ -1,5 +1,10 @@
-import type { EventFull, SeatingUpdate } from "@/lib/schemas/database";
-import { DEMO_EVENT_ID } from "./constants";
+import type {
+  EventFull,
+  SaveTheDateUpdate,
+  SeatingUpdate,
+} from "@/lib/schemas/database";
+import { createSaveTheDateContent } from "@/lib/save-the-date";
+import { DEMO_COVER_FALLBACK, DEMO_EVENT_ID } from "./constants";
 
 export function createDemoSeed(): EventFull {
   return {
@@ -85,5 +90,22 @@ export function createDemoSeating(): SeatingUpdate {
         ],
       },
     ],
+  };
+}
+
+/** Published, so the demo save the date link works right away. */
+export function createDemoSaveTheDate(): SaveTheDateUpdate {
+  return {
+    template: "envelope",
+    is_published: true,
+    content: createSaveTheDateContent({
+      template: "envelope",
+      names: "Anna & Jan",
+      location: "Pałac w Radziejowicach",
+      eyebrow: "Save the date",
+      message:
+        "Zarezerwujcie sobie ten dzień. Formalne zaproszenie przyjdzie wkrótce, a my już nie możemy się doczekać, żeby świętować razem z Wami.",
+      photoUrl: DEMO_COVER_FALLBACK,
+    }),
   };
 }

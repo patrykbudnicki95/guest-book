@@ -17,7 +17,7 @@ export async function getEventPlanContext(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("events")
-    .select("id, plan_id, date, is_active, storage_used_bytes")
+    .select("id, plan_id, addons, date, is_active, storage_used_bytes")
     .eq("id", eventId)
     .single();
 
@@ -79,7 +79,7 @@ export async function requireOwnedEventFeature({
     throw new Error("Event not found");
   }
 
-  if (!hasFeature({ plan: context.plan_id, feature })) {
+  if (!hasFeature({ plan: context.plan_id, feature, addons: context.addons })) {
     throw new Error(`Plan ${context.plan_id} does not include ${feature}`);
   }
 
@@ -104,7 +104,11 @@ export async function checkOwnedEventFeature({
   }
 
   return {
-    allowed: hasFeature({ plan: context.plan_id, feature }),
+    allowed: hasFeature({
+      plan: context.plan_id,
+      feature,
+      addons: context.addons,
+    }),
     context,
   };
 }

@@ -34,12 +34,13 @@ import {
 } from "@/components/ui/select";
 import { signOut } from "@/app/actions/auth-actions";
 import {
+  setEventAddon,
   setEventPlan,
   updateEventSettings,
 } from "@/app/actions/settings-actions";
 import type { EventSettings } from "@/app/actions/settings-actions";
 import { hasFeature } from "@/lib/permissions";
-import { PLAN_IDS, PLAN_LABELS } from "@/lib/pricing";
+import { ADDON_IDS, PLAN_IDS, PLAN_LABELS, type AddonId } from "@/lib/pricing";
 import { PlanLock } from "../../components/plan-lock";
 import {
   eventSettingsFormSchema,
@@ -129,6 +130,20 @@ export function SettingsTab({
 
       if (result.success) {
         toast.success(tPlan("updated", { plan: planId }));
+        router.refresh();
+      } else {
+        toast.error(result.error ?? t("saveError"));
+      }
+    });
+  };
+
+  const handleAddonChange = (addonId: AddonId, enabled: boolean) => {
+    if (!effectiveEventId) return;
+
+    startTransition(async () => {
+      const result = await setEventAddon(effectiveEventId, addonId, enabled);
+
+      if (result.success) {
         router.refresh();
       } else {
         toast.error(result.error ?? t("saveError"));
@@ -302,24 +317,39 @@ export function SettingsTab({
             <CardTitle>{tPlan("title")}</CardTitle>
             <CardDescription>{tPlan("description")}</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <Label>{tPlan("label")}</Label>
-            <Select
-              value={selectedEvent?.plan_id ?? "basic"}
-              onValueChange={handlePlanChange}
-              disabled={isPending}
-            >
-              <SelectTrigger className="w-full max-w-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PLAN_IDS.map((planId) => (
-                  <SelectItem key={planId} value={planId}>
-                    {PLAN_LABELS[planId]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>{tPlan("label")}</Label>
+              <Select
+                value={selectedEvent?.plan_id ?? "basic"}
+                onValueChange={handlePlanChange}
+                disabled={isPending}
+              >
+                <SelectTrigger className="w-full max-w-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PLAN_IDS.map((planId) => (
+                    <SelectItem key={planId} value={planId}>
+                      {PLAN_LABELS[planId]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {ADDON_IDS.map((addonId) => (
+              <div key={addonId} className="flex items-center justify-between gap-4">
+                <Label htmlFor={`addon-${addonId}`} className="font-normal">
+                  {tPlan(`addons.${addonId}`)}
+                </Label>
+                <Switch
+                  id={`addon-${addonId}`}
+                  checked={selectedEvent?.addons.includes(addonId) ?? false}
+                  onCheckedChange={(enabled) => handleAddonChange(addonId, enabled)}
+                  disabled={isPending}
+                />
+              </div>
+            ))}
           </CardContent>
         </Card>
       )}

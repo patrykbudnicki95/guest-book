@@ -66,6 +66,10 @@
       "title": "{names} guestbook",
       "fallbackTitle": "Guestbook",
       "description": "Add a photo and your wishes to the guestbook."
+    },
+    "saveTheDate": {
+      "title": "Online save the date: an animated wedding announcement",
+      "description": "A digital save the date for phones: an opening animation, your photo and music, a countdown and add to calendar. Included in Gold or on its own for {price} PLN."
     }
   },
   "landing": {
@@ -75,7 +79,8 @@
       "guides": "Guides",
       "faq": "FAQ",
       "login": "Log in",
-      "getStarted": "Get Started"
+      "getStarted": "Get Started",
+      "saveTheDate": "Save the date"
     },
     "definition": {
       "title": "What is a virtual guestbook?",
@@ -160,7 +165,8 @@
           "3": "{downloadDays} days to download",
           "4": "{guestAccessDays}-day guest access",
           "5": "{qrTableCards} QR table cards",
-          "6": "Find Your Table feature"
+          "6": "Find Your Table feature",
+          "7": "Animated save the date"
         }
       }
     },
@@ -352,7 +358,15 @@
     "guideLink": "Not sure a virtual guestbook is right for you? See how it works",
     "ctaTitle": "Ready to collect the memories from your wedding?",
     "ctaSubtitle": "Setup takes a few minutes and your QR code is ready as soon as the guestbook is created.",
-    "ctaButton": "Get started"
+    "ctaButton": "Get started",
+    "addons": {
+      "title": "Add-ons",
+      "saveTheDate": {
+        "title": "Save the date",
+        "description": "An animated wedding announcement with your photo, music and a countdown. Included in Gold, and {price} for Basic and Silver.",
+        "link": "See save the date"
+      }
+    }
   },
   "packagePage": {
     "breadcrumb": "Packages",
@@ -385,7 +399,8 @@
     "guides": "Wedding guides",
     "about": "About us",
     "contact": "Contact",
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "saveTheDate": "Online save the date"
   },
   "auth": {
     "login": {
@@ -434,7 +449,8 @@
       "seating": "Seating",
       "gallery": "Gallery",
       "qrCode": "QR Code",
-      "settings": "Settings"
+      "settings": "Settings",
+      "saveTheDate": "Save the date"
     },
     "overview": {
       "totalPhotos": "Total Photos",
@@ -461,7 +477,8 @@
       "title": "This feature is locked",
       "availableIn": "Available in the {plan} package",
       "comingSoon": "Coming soon",
-      "cta": "See packages"
+      "cta": "See packages",
+      "orAddon": "or on its own as an add-on for {price}"
     },
     "plan": {
       "title": "Your package",
@@ -647,7 +664,10 @@
         "title": "Package (test mode)",
         "description": "Visible in development only. Switches the event package without a payment.",
         "label": "Active package",
-        "updated": "Package changed to {plan}"
+        "updated": "Package changed to {plan}",
+        "addons": {
+          "saveTheDate": "Add-on: save the date"
+        }
       },
       "privacy": {
         "title": "Privacy",
@@ -667,6 +687,89 @@
         "title": "Danger Zone",
         "description": "Irreversible actions",
         "deleteEvent": "Delete Event"
+      }
+    },
+    "saveTheDate": {
+      "title": "Save the date",
+      "description": "An animated wedding announcement to send your guests long before the invitation.",
+      "noEvents": "Create an event first.",
+      "selectEvent": "Select event",
+      "save": "Save",
+      "saving": "Saving...",
+      "saveSuccess": "Save the date saved",
+      "saveError": "Could not save",
+      "errors": {
+        "planUpgradeRequired": "Save the date comes with Gold or as a separate add-on.",
+        "invalidFileType": "This file type isn't supported.",
+        "fileTooLarge": "The file is too large."
+      },
+      "publish": {
+        "label": "Show to guests",
+        "on": "The page is live at its link.",
+        "off": "Draft. Guests can see the page once you switch this on."
+      },
+      "share": {
+        "copy": "Copy link",
+        "open": "Open page",
+        "copied": "Link copied",
+        "hint": "Send the link by text, email or Messenger. It looks best on a phone."
+      },
+      "template": {
+        "title": "Template",
+        "description": "Every template has its own opening animation. Switching templates resets the colours and font to that template's defaults."
+      },
+      "text": {
+        "title": "Content",
+        "names": "Names",
+        "eyebrow": "Heading",
+        "location": "Place",
+        "locationPlaceholder": "e.g. Kraków or Lime Tree Manor",
+        "message": "Message to guests",
+        "dateNote": "The date comes from your event settings. Change it in <link>Settings</link>."
+      },
+      "style": {
+        "title": "Look",
+        "palette": "Colour palette",
+        "colors": {
+          "background": "Background",
+          "text": "Text",
+          "accent": "Accent"
+        },
+        "font": "Font"
+      },
+      "media": {
+        "title": "Photo and music"
+      },
+      "photo": {
+        "label": "Photo",
+        "add": "Add photo",
+        "replace": "Change photo",
+        "remove": "Remove",
+        "hint": "JPG, PNG or WebP, up to {size}. Portrait works best.",
+        "invalidType": "Choose a JPG, PNG or WebP photo."
+      },
+      "music": {
+        "label": "Background music",
+        "add": "Add a song",
+        "replace": "Change song",
+        "remove": "Remove",
+        "hint": "MP3 or M4A, up to {size}. It starts when a guest opens the announcement. Only use music you have the rights to.",
+        "invalidType": "Choose an MP3 or M4A file."
+      },
+      "upload": {
+        "tooLarge": "The file is too large (max {size}).",
+        "success": "File added. Remember to save your changes.",
+        "error": "Could not upload the file."
+      },
+      "sections": {
+        "title": "Sections",
+        "show_countdown": "Countdown to the wedding",
+        "show_calendar": "\"Add to calendar\" buttons"
+      },
+      "preview": {
+        "open": "Preview",
+        "title": "Preview",
+        "replay": "Replay animation"
       }
     }
   },
@@ -766,5 +869,177 @@
     "title": "Page not found",
     "description": "The page you're looking for doesn't exist or has been moved.",
     "home": "Go to the home page"
+  },
+  "saveTheDate": {
+    "view": {
+      "tapToOpen": "Tap to open",
+      "open": "Open the announcement",
+      "envelopeLead": "We have a date for you",
+      "invitationToFollow": "Invitation to follow",
+      "countdownTitle": "Counting down to our day",
+      "fromUs": "From us",
+      "where": "Where",
+      "countdown": {
+        "days": "days",
+        "hours": "hours",
+        "minutes": "min",
+        "seconds": "sec",
+        "today": "It's today!"
+      },
+      "calendar": {
+        "google": "Google Calendar",
+        "apple": "Apple / Outlook",
+        "eventTitle": "Wedding: {names}",
+        "details": "Save the day. The invitation with all the details is coming soon."
+      },
+      "music": {
+        "play": "Play music",
+        "pause": "Mute music"
+      }
+    },
+    "templates": {
+      "envelope": {
+        "name": "Envelope",
+        "description": "The wax seal breaks under a finger and the card slides out."
+      },
+      "editorial": {
+        "name": "Cover",
+        "description": "A curtain parts and the names set themselves letter by letter."
+      },
+      "polaroid": {
+        "name": "Polaroid",
+        "description": "The photo develops in front of your guests and the date spins on a postmark."
+      },
+      "botanical": {
+        "name": "Garden",
+        "description": "A leaf wreath draws itself and branches grow in from the corners."
+      }
+    },
+    "palettes": {
+      "burgundy": "Burgundy",
+      "sage": "Eucalyptus",
+      "blush": "Blush",
+      "midnight": "Navy and gold",
+      "terracotta": "Terracotta",
+      "ivory": "Black and white"
+    },
+    "fonts": {
+      "classic": "Classic",
+      "romantic": "Handwritten",
+      "modern": "Modern",
+      "timeless": "Timeless"
+    },
+    "defaults": {
+      "eyebrow": "Save the date",
+      "message": "Keep this day free for us! The invitation with all the details is coming soon."
+    },
+    "guest": {
+      "title": "Save the date",
+      "metaTitle": "{names}: save the date",
+      "notReadyTitle": "This announcement isn't ready yet",
+      "notReadyDesc": "The couple is still working on it. Check back soon."
+    }
+  },
+  "saveTheDatePage": {
+    "breadcrumb": "Online save the date",
+    "eyebrow": "Digital save the date",
+    "heading": "A save the date your guests open like a letter",
+    "lead": "An animated wedding announcement for phones, with your photo, your music and a countdown to the big day. Send the link by text or Messenger, and guests add the date to their calendar in one tap.",
+    "ctaPrimary": "Create your save the date",
+    "ctaDemo": "Try the demo",
+    "priceNote": "Included in Gold or on its own for {addonPrice}. One payment, no subscription.",
+    "showcase": {
+      "title": "See it live",
+      "subtitle": "Pick a template and tap the preview. This is exactly what your guests will see.",
+      "phone": "Phone",
+      "desktop": "Desktop",
+      "replay": "Play it again"
+    },
+    "how": {
+      "title": "How it works",
+      "1": {
+        "title": "Pick a template",
+        "description": "Four designs, each with its own opening: a sealed envelope, a magazine cover, a polaroid and a garden."
+      },
+      "2": {
+        "title": "Make it yours",
+        "description": "Names, message, photo, colours, fonts and background music. The preview updates as you edit."
+      },
+      "3": {
+        "title": "Send the link",
+        "description": "One link for text, Messenger or email. Guests install nothing and create no account."
+      }
+    },
+    "features": {
+      "title": "What you get",
+      "1": {
+        "title": "An opening animation",
+        "description": "Instead of a plain page, guests break a seal, part a curtain or develop a photo first."
+      },
+      "2": {
+        "title": "Your photo and music",
+        "description": "Add a photo from your engagement shoot and a song that plays when a guest opens it."
+      },
+      "3": {
+        "title": "Colours and fonts",
+        "description": "Six ready-made palettes, your own colours and four font pairings."
+      },
+      "4": {
+        "title": "Countdown",
+        "description": "Days, hours, minutes and seconds to the wedding, live."
+      },
+      "5": {
+        "title": "Add to calendar",
+        "description": "Google Calendar plus a file for Apple and Outlook, so nobody forgets the date."
+      },
+      "6": {
+        "title": "Made for phones",
+        "description": "Designed phone-first, because that's where guests open your link."
+      }
+    },
+    "pricing": {
+      "title": "What it costs",
+      "gold": {
+        "title": "Included in Gold",
+        "description": "Save the date comes with the Gold package, together with the photo and video gallery, QR table cards and Find Your Table.",
+        "cta": "See the Gold package"
+      },
+      "addon": {
+        "title": "On its own",
+        "description": "Chose Basic or Silver? Add just the save the date. One payment.",
+        "cta": "See pricing"
+      }
+    },
+    "timing": {
+      "title": "When to send a save the date?",
+      "body": "Ideally 6–12 months before the wedding. For a peak-season date, a wedding abroad or a long weekend, send it even earlier, because guests need to book time off and a place to stay.",
+      "vsInvitation": "A save the date only announces the date and place. Keep times, directions, the menu and RSVPs for the invitation you send closer to the day."
+    },
+    "faqTitle": "Save the date questions",
+    "faq": {
+      "1": {
+        "question": "What is a save the date?",
+        "answer": "A short wedding announcement sent before the invitation. It asks guests to keep the day free before they know all the details."
+      },
+      "2": {
+        "question": "Do guests need to install anything?",
+        "answer": "No. The save the date is a web page, so guests just tap the link on a phone or computer."
+      },
+      "3": {
+        "question": "How much does a save the date cost?",
+        "answer": "It's included in Gold. For Basic and Silver you can add it on its own for {addonPrice}. One payment, no subscription."
+      },
+      "4": {
+        "question": "Can we add our own music?",
+        "answer": "Yes. Upload an MP3 or M4A file. It starts when a guest opens the announcement and can be muted at any time. Only use music you have the rights to."
+      },
+      "5": {
+        "question": "Can we change it after sending the link?",
+        "answer": "Yes. The link stays the same and guests always see the latest version."
+      }
+    },
+    "ctaTitle": "Tell your guests first",
+    "ctaSubtitle": "Your save the date takes a few minutes, and you see the preview straight away.",
+    "ctaButton": "Create your save the date"
   }
 }

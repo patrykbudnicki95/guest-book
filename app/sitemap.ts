@@ -57,6 +57,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.9,
     }),
+    ...localizedEntries(sameHrefForAllLocales("/save-the-date"), {
+      changeFrequency: "monthly",
+      priority: 0.8,
+    }),
     ...localizedEntries(sameHrefForAllLocales("/pricing"), {
       changeFrequency: "weekly",
       priority: 0.9,

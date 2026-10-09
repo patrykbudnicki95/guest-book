@@ -5,6 +5,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import {
   Armchair,
+  CalendarHeart,
   LayoutDashboard,
   Image,
   QrCode,
@@ -22,6 +23,7 @@ const navByBase: Record<
     labelKey:
       | "overview"
       | "eventPage"
+      | "saveTheDate"
       | "seating"
       | "gallery"
       | "qrCode"
@@ -32,6 +34,7 @@ const navByBase: Record<
   "/dashboard": [
     { href: "/dashboard", labelKey: "overview", icon: LayoutDashboard },
     { href: "/dashboard/event-page", labelKey: "eventPage", icon: Sparkles },
+    { href: "/dashboard/save-the-date", labelKey: "saveTheDate", icon: CalendarHeart },
     { href: "/dashboard/seating", labelKey: "seating", icon: Armchair },
     { href: "/dashboard/gallery", labelKey: "gallery", icon: Image },
     { href: "/dashboard/qr-code", labelKey: "qrCode", icon: QrCode },
@@ -40,6 +43,7 @@ const navByBase: Record<
   "/demo/dashboard": [
     { href: "/demo/dashboard", labelKey: "overview", icon: LayoutDashboard },
     { href: "/demo/dashboard/event-page", labelKey: "eventPage", icon: Sparkles },
+    { href: "/demo/dashboard/save-the-date", labelKey: "saveTheDate", icon: CalendarHeart },
     { href: "/demo/dashboard/seating", labelKey: "seating", icon: Armchair },
     { href: "/demo/dashboard/gallery", labelKey: "gallery", icon: Image },
     { href: "/demo/dashboard/qr-code", labelKey: "qrCode", icon: QrCode },
@@ -57,7 +61,7 @@ export function DashboardNav({
   const navItems = navByBase[basePath];
 
   return (
-    <nav className="grid w-full grid-cols-6 gap-1 rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-border/50">
+    <nav className="grid w-full grid-cols-7 gap-1 rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-border/50">
       {navItems.map((item) => {
         const isActive = pathname === item.href;
         const Icon = item.icon;

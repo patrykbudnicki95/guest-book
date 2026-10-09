@@ -66,6 +66,10 @@
       "title": "Księga gości {names}",
       "fallbackTitle": "Księga gości",
       "description": "Dodaj zdjęcie i życzenia do księgi gości."
+    },
+    "saveTheDate": {
+      "title": "Save the date online: animowana zapowiedź ślubu",
+      "description": "Cyfrowe save the date na telefon: animacja otwarcia, Wasze zdjęcie i muzyka, odliczanie i dodawanie do kalendarza. W pakiecie Gold albo osobno za {price} zł."
     }
   },
   "landing": {
@@ -75,7 +79,8 @@
       "guides": "Poradnik",
       "faq": "FAQ",
       "login": "Zaloguj się",
-      "getStarted": "Rozpocznij"
+      "getStarted": "Rozpocznij",
+      "saveTheDate": "Save the date"
     },
     "definition": {
       "title": "Czym jest wirtualna księga gości?",
@@ -160,7 +165,8 @@
           "3": "{downloadDays} dni na pobranie",
           "4": "Dostęp przez {guestAccessDays} dni",
           "5": "{qrTableCards} tabliczki z kodem QR na stół",
-          "6": "Funkcja Znajdź Swój Stół"
+          "6": "Funkcja Znajdź Swój Stół",
+          "7": "Animowane save the date"
         }
       }
     },
@@ -352,7 +358,15 @@
     "guideLink": "Nie wiecie jeszcze, czy wirtualna księga gości jest dla Was? Zobacz, jak działa",
     "ctaTitle": "Gotowi zebrać wspomnienia z Waszego wesela?",
     "ctaSubtitle": "Konfiguracja zajmuje kilka minut, a kod QR dostajecie zaraz po utworzeniu księgi.",
-    "ctaButton": "Rozpocznij"
+    "ctaButton": "Rozpocznij",
+    "addons": {
+      "title": "Dodatki",
+      "saveTheDate": {
+        "title": "Save the date",
+        "description": "Animowana zapowiedź ślubu z Waszym zdjęciem, muzyką i odliczaniem. W pakiecie Gold, a do Basic i Silver za {price}.",
+        "link": "Zobaczcie save the date"
+      }
+    }
   },
   "packagePage": {
     "breadcrumb": "Pakiety",
@@ -385,7 +399,8 @@
     "guides": "Poradnik ślubny",
     "about": "O nas",
     "contact": "Kontakt",
-    "rights": "Wszelkie prawa zastrzeżone."
+    "rights": "Wszelkie prawa zastrzeżone.",
+    "saveTheDate": "Save the date online"
   },
   "auth": {
     "login": {
@@ -434,7 +449,8 @@
       "seating": "Stoły",
       "gallery": "Galeria",
       "qrCode": "Kod QR",
-      "settings": "Ustawienia"
+      "settings": "Ustawienia",
+      "saveTheDate": "Save the date"
     },
     "overview": {
       "totalPhotos": "Łącznie zdjęć",
@@ -461,7 +477,8 @@
       "title": "Ta funkcja jest zablokowana",
       "availableIn": "Dostępna w pakiecie {plan}",
       "comingSoon": "Wkrótce dostępna",
-      "cta": "Zobacz pakiety"
+      "cta": "Zobacz pakiety",
+      "orAddon": "albo osobno jako dodatek za {price}"
     },
     "plan": {
       "title": "Twój pakiet",
@@ -647,7 +664,10 @@
         "title": "Pakiet (tryb testowy)",
         "description": "Widoczne tylko w środowisku deweloperskim. Zmienia pakiet wydarzenia bez płatności.",
         "label": "Aktywny pakiet",
-        "updated": "Pakiet zmieniony na {plan}"
+        "updated": "Pakiet zmieniony na {plan}",
+        "addons": {
+          "saveTheDate": "Dodatek: save the date"
+        }
       },
       "privacy": {
         "title": "Prywatność",
@@ -667,6 +687,89 @@
         "title": "Strefa niebezpieczna",
         "description": "Nieodwracalne działania",
         "deleteEvent": "Usuń wydarzenie"
+      }
+    },
+    "saveTheDate": {
+      "title": "Save the date",
+      "description": "Animowana zapowiedź ślubu, którą wyślecie gościom na długo przed zaproszeniem.",
+      "noEvents": "Najpierw utwórzcie wydarzenie.",
+      "selectEvent": "Wybierz wydarzenie",
+      "save": "Zapisz",
+      "saving": "Zapisywanie...",
+      "saveSuccess": "Save the date zapisane",
+      "saveError": "Nie udało się zapisać",
+      "errors": {
+        "planUpgradeRequired": "Save the date jest w pakiecie Gold albo jako osobny dodatek.",
+        "invalidFileType": "Ten typ pliku nie jest obsługiwany.",
+        "fileTooLarge": "Plik jest za duży."
+      },
+      "publish": {
+        "label": "Pokaż gościom",
+        "on": "Strona jest dostępna pod linkiem.",
+        "off": "Szkic. Goście zobaczą stronę dopiero po włączeniu."
+      },
+      "share": {
+        "copy": "Kopiuj link",
+        "open": "Otwórz stronę",
+        "copied": "Link skopiowany",
+        "hint": "Wyślijcie link SMS-em, mailem albo na Messengerze. Najlepiej wygląda na telefonie."
+      },
+      "template": {
+        "title": "Szablon",
+        "description": "Każdy szablon ma własną animację otwarcia. Po zmianie szablonu kolory i czcionka wracają do jego ustawień."
+      },
+      "text": {
+        "title": "Treść",
+        "names": "Imiona",
+        "eyebrow": "Nagłówek",
+        "location": "Miejsce",
+        "locationPlaceholder": "np. Kraków albo Dwór pod Lipami",
+        "message": "Wiadomość dla gości",
+        "dateNote": "Data pochodzi z ustawień wydarzenia. Zmienicie ją w <link>Ustawieniach</link>."
+      },
+      "style": {
+        "title": "Wygląd",
+        "palette": "Paleta kolorów",
+        "colors": {
+          "background": "Tło",
+          "text": "Tekst",
+          "accent": "Akcent"
+        },
+        "font": "Czcionka"
+      },
+      "media": {
+        "title": "Zdjęcie i muzyka"
+      },
+      "photo": {
+        "label": "Zdjęcie",
+        "add": "Dodaj zdjęcie",
+        "replace": "Zmień zdjęcie",
+        "remove": "Usuń",
+        "hint": "JPG, PNG lub WebP, do {size}. Najlepiej pionowe.",
+        "invalidType": "Wybierzcie zdjęcie JPG, PNG lub WebP."
+      },
+      "music": {
+        "label": "Muzyka w tle",
+        "add": "Dodaj utwór",
+        "replace": "Zmień utwór",
+        "remove": "Usuń",
+        "hint": "MP3 lub M4A, do {size}. Muzyka startuje, gdy gość otworzy zapowiedź. Używajcie utworów, do których macie prawa.",
+        "invalidType": "Wybierzcie plik MP3 lub M4A."
+      },
+      "upload": {
+        "tooLarge": "Plik jest za duży (maks. {size}).",
+        "success": "Plik dodany. Pamiętajcie, żeby zapisać zmiany.",
+        "error": "Nie udało się wgrać pliku."
+      },
+      "sections": {
+        "title": "Sekcje",
+        "show_countdown": "Odliczanie do ślubu",
+        "show_calendar": "Przyciski „Dodaj do kalendarza”"
+      },
+      "preview": {
+        "open": "Podgląd",
+        "title": "Podgląd",
+        "replay": "Odtwórz animację"
       }
     }
   },
@@ -766,5 +869,177 @@
     "title": "Nie znaleziono strony",
     "description": "Strona, której szukasz, nie istnieje lub została przeniesiona.",
     "home": "Przejdź na stronę główną"
+  },
+  "saveTheDate": {
+    "view": {
+      "tapToOpen": "Dotknij, aby otworzyć",
+      "open": "Otwórz zapowiedź",
+      "envelopeLead": "Mamy dla Was ważną datę",
+      "invitationToFollow": "Zaproszenie wkrótce",
+      "countdownTitle": "Do naszego dnia zostało",
+      "fromUs": "Od nas",
+      "where": "Gdzie",
+      "countdown": {
+        "days": "dni",
+        "hours": "godz.",
+        "minutes": "min",
+        "seconds": "sek",
+        "today": "To już dziś!"
+      },
+      "calendar": {
+        "google": "Kalendarz Google",
+        "apple": "Apple / Outlook",
+        "eventTitle": "Ślub: {names}",
+        "details": "Zarezerwujcie ten dzień. Zaproszenie ze wszystkimi szczegółami przyjdzie wkrótce."
+      },
+      "music": {
+        "play": "Włącz muzykę",
+        "pause": "Wycisz muzykę"
+      }
+    },
+    "templates": {
+      "envelope": {
+        "name": "Koperta",
+        "description": "Pieczęć pęka pod palcem, a z koperty wysuwa się kartka."
+      },
+      "editorial": {
+        "name": "Okładka",
+        "description": "Kurtyna się rozsuwa, a imiona składają się litera po literze."
+      },
+      "polaroid": {
+        "name": "Polaroid",
+        "description": "Zdjęcie wywołuje się na oczach gości, a data kręci się na stemplu."
+      },
+      "botanical": {
+        "name": "Ogród",
+        "description": "Wieniec z liści rysuje się sam, a z rogów wyrastają gałązki."
+      }
+    },
+    "palettes": {
+      "burgundy": "Burgund",
+      "sage": "Eukaliptus",
+      "blush": "Pudrowy róż",
+      "midnight": "Granat i złoto",
+      "terracotta": "Terakota",
+      "ivory": "Czerń i biel"
+    },
+    "fonts": {
+      "classic": "Klasyczna",
+      "romantic": "Odręczna",
+      "modern": "Nowoczesna",
+      "timeless": "Ponadczasowa"
+    },
+    "defaults": {
+      "eyebrow": "Save the date",
+      "message": "Zarezerwujcie sobie ten dzień! Zaproszenie ze wszystkimi szczegółami przyjdzie wkrótce."
+    },
+    "guest": {
+      "title": "Save the date",
+      "metaTitle": "{names}: save the date",
+      "notReadyTitle": "Ta zapowiedź nie jest jeszcze gotowa",
+      "notReadyDesc": "Para Młoda wciąż ją przygotowuje. Zajrzyjcie tu wkrótce."
+    }
+  },
+  "saveTheDatePage": {
+    "breadcrumb": "Save the date online",
+    "eyebrow": "Cyfrowe save the date",
+    "heading": "Save the date, które goście otworzą jak list",
+    "lead": "Animowana zapowiedź ślubu na telefon, z Waszym zdjęciem, muzyką i odliczaniem do wielkiego dnia. Wyślijcie link SMS-em albo na Messengerze, a goście jednym kliknięciem dodadzą datę do kalendarza.",
+    "ctaPrimary": "Stwórzcie save the date",
+    "ctaDemo": "Wypróbujcie w demo",
+    "priceNote": "W pakiecie Gold albo osobno za {addonPrice}. Płacicie raz, bez abonamentu.",
+    "showcase": {
+      "title": "Zobaczcie na żywo",
+      "subtitle": "Wybierzcie szablon i dotknijcie podglądu. Tak samo zobaczą to Wasi goście.",
+      "phone": "Telefon",
+      "desktop": "Komputer",
+      "replay": "Odtwórzcie od nowa"
+    },
+    "how": {
+      "title": "Jak to działa",
+      "1": {
+        "title": "Wybierzcie szablon",
+        "description": "Cztery projekty, każdy z inną animacją otwarcia: koperta z pieczęcią, okładka magazynu, polaroid i ogród."
+      },
+      "2": {
+        "title": "Dopasujcie go do siebie",
+        "description": "Imiona, wiadomość, zdjęcie, kolory, czcionki i muzyka w tle. Podgląd zmienia się od razu, gdy coś poprawiacie."
+      },
+      "3": {
+        "title": "Wyślijcie link",
+        "description": "Jeden link na SMS, Messengera albo maila. Goście nie instalują aplikacji i nie zakładają konta."
+      }
+    },
+    "features": {
+      "title": "Co dostajecie",
+      "1": {
+        "title": "Animacja otwarcia",
+        "description": "Zamiast zwykłej strony goście najpierw łamią pieczęć, rozsuwają kurtynę albo wywołują zdjęcie."
+      },
+      "2": {
+        "title": "Wasze zdjęcie i muzyka",
+        "description": "Dodajcie zdjęcie z sesji narzeczeńskiej i piosenkę, która zagra, gdy gość otworzy zapowiedź."
+      },
+      "3": {
+        "title": "Kolory i czcionki",
+        "description": "Sześć gotowych palet, własne kolory i cztery zestawy czcionek z polskimi znakami."
+      },
+      "4": {
+        "title": "Odliczanie",
+        "description": "Dni, godziny, minuty i sekundy do ślubu, liczone na żywo."
+      },
+      "5": {
+        "title": "Dodaj do kalendarza",
+        "description": "Kalendarz Google oraz plik dla Apple i Outlooka, żeby nikt nie zapomniał o dacie."
+      },
+      "6": {
+        "title": "Zrobione pod telefon",
+        "description": "Projektujemy najpierw na telefon, bo to na nim goście otworzą Wasz link."
+      }
+    },
+    "pricing": {
+      "title": "Ile to kosztuje",
+      "gold": {
+        "title": "W pakiecie Gold",
+        "description": "Save the date jest częścią pakietu Gold, razem z galerią zdjęć i wideo, tabliczkami z kodem QR i funkcją Znajdź Swój Stół.",
+        "cta": "Zobaczcie pakiet Gold"
+      },
+      "addon": {
+        "title": "Osobno",
+        "description": "Wybraliście Basic albo Silver? Dokupcie samo save the date. Płacicie raz.",
+        "cta": "Zobaczcie cennik"
+      }
+    },
+    "timing": {
+      "title": "Kiedy wysłać save the date?",
+      "body": "Najlepiej 6–12 miesięcy przed ślubem. Przy weselu w szczycie sezonu, za granicą albo w długi weekend warto wysłać je jeszcze wcześniej, bo goście muszą zaplanować urlop i nocleg.",
+      "vsInvitation": "Save the date tylko zapowiada datę i miejsce. Godziny, dojazd, menu i potwierdzenie obecności zostawcie na właściwe zaproszenie, które wyślecie bliżej ślubu."
+    },
+    "faqTitle": "Pytania o save the date",
+    "faq": {
+      "1": {
+        "question": "Czym jest save the date?",
+        "answer": "To krótka zapowiedź ślubu, którą wysyła się przed zaproszeniem. Daje gościom znać, żeby zarezerwowali sobie dzień, zanim poznają wszystkie szczegóły."
+      },
+      "2": {
+        "question": "Czy goście muszą coś instalować?",
+        "answer": "Nie. Save the date to strona internetowa, więc wystarczy kliknąć link na telefonie albo komputerze."
+      },
+      "3": {
+        "question": "Ile kosztuje save the date?",
+        "answer": "Jest w pakiecie Gold. Do pakietów Basic i Silver możecie dokupić je osobno za {addonPrice}. Płacicie raz, bez abonamentu."
+      },
+      "4": {
+        "question": "Czy możemy dodać własną muzykę?",
+        "answer": "Tak. Wgrajcie plik MP3 lub M4A. Muzyka startuje, gdy gość otworzy zapowiedź, i w każdej chwili można ją wyciszyć. Używajcie utworów, do których macie prawa."
+      },
+      "5": {
+        "question": "Czy można zmienić treść po wysłaniu linku?",
+        "answer": "Tak. Link się nie zmienia, a goście zawsze zobaczą najnowszą wersję."
+      }
+    },
+    "ctaTitle": "Dajcie gościom znać jako pierwsi",
+    "ctaSubtitle": "Save the date przygotujecie w kilka minut, a podgląd widzicie od razu.",
+    "ctaButton": "Stwórzcie save the date"
   }
 }

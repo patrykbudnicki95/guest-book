@@ -1,4 +1,4 @@
-import type { PlanId } from "@/lib/pricing";
+import type { AddonId, PlanId } from "@/lib/pricing";
 
 const MB = 1024 ** 2;
 const GB = 1024 ** 3;
@@ -105,3 +105,8 @@ export const PLAN_ENTITLEMENTS = {
 } as const satisfies Record<PlanId, PlanEntitlement>;
 
 export const DEFAULT_PLAN_ID: PlanId = "basic";
+
+/** Features an add-on unlocks on events whose plan doesn't include them. */
+export const ADDON_FEATURES = {
+  saveTheDate: ["saveTheDate"],
+} as const satisfies Record<AddonId, readonly PlanFeature[]>;

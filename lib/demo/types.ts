@@ -2,8 +2,10 @@ import type {
   EventFull,
   EventPageContentUpdate,
   EventSettingsUpdate,
+  SaveTheDateUpdate,
   SeatingUpdate,
 } from "@/lib/schemas/database";
+import type { SaveTheDateAssetKind } from "@/lib/save-the-date";
 import type {
   DashboardEntry,
   EventExportResult,
@@ -17,6 +19,7 @@ export type DemoWorkspace = {
   event: EventFull;
   entries: DashboardEntry[];
   seating: SeatingUpdate;
+  saveTheDate: SaveTheDateUpdate;
   isReady: boolean;
   updateSettings: (
     data: EventSettingsUpdate,
@@ -28,6 +31,13 @@ export type DemoWorkspace = {
   updateSeating: (
     data: SeatingUpdate,
   ) => Promise<{ success: boolean; error?: string }>;
+  updateSaveTheDate: (
+    data: SaveTheDateUpdate,
+  ) => Promise<{ success: boolean; error?: string }>;
+  uploadSaveTheDateAsset: (
+    kind: SaveTheDateAssetKind,
+    file: File,
+  ) => Promise<{ url: string }>;
   addEntry: (input: LocalEntryInput) => Promise<LocalEntryResult>;
   deleteEntry: (entryId: string) => Promise<{ success: boolean }>;
   getExport: () => Promise<EventExportResult>;

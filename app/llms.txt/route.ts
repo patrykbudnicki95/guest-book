@@ -1,7 +1,7 @@
 import { routing } from "@/i18n/routing";
 import { siteConfig } from "@/lib/seo/config";
 import { localizedUrl } from "@/lib/seo/metadata";
-import { CURRENCY, PLAN_LIST } from "@/lib/pricing";
+import { ADDONS, CURRENCY, PLAN_LIST } from "@/lib/pricing";
 import { getGuidesForLocale } from "@/app/[locale]/guides/content";
 
 /**
@@ -20,6 +20,7 @@ export function GET() {
     "## Najważniejsze strony",
     `- Strona główna: ${localizedUrl("/", locale)}`,
     `- Jak to działa: ${localizedUrl("/virtual-guestbook", locale)}`,
+    `- Save the date online: ${localizedUrl("/save-the-date", locale)}`,
     `- Cennik: ${localizedUrl("/pricing", locale)}`,
     `- Poradnik: ${localizedUrl("/guides", locale)}`,
     `- O nas: ${localizedUrl("/about", locale)}`,
@@ -36,6 +37,10 @@ export function GET() {
     const name = plan.id.charAt(0).toUpperCase() + plan.id.slice(1);
     lines.push(`- ${name}: ${plan.price} ${CURRENCY} — ${url}`);
   }
+
+  lines.push(
+    `- Dodatek save the date (w Gold w cenie): ${ADDONS.saveTheDate.price} ${CURRENCY} — ${localizedUrl("/save-the-date", locale)}`,
+  );
 
   if (guides.length > 0) {
     lines.push("", "## Poradniki");

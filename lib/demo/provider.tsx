@@ -12,8 +12,10 @@ import type {
   EventFull,
   EventPageContentUpdate,
   EventSettingsUpdate,
+  SaveTheDateUpdate,
   SeatingUpdate,
 } from "@/lib/schemas/database";
+import type { SaveTheDateAssetKind } from "@/lib/save-the-date";
 import type {
   DashboardEntry,
   EventExportResult,
@@ -27,16 +29,19 @@ import {
   DEMO_COVER_FALLBACK,
   DEMO_MAX_FILE_BYTES,
   DEMO_MAX_UPLOADS,
+  DEMO_SAVE_THE_DATE_KEYS,
 } from "./constants";
 import {
   applyPageContent,
   applySettings,
   deleteDemoFile,
+  isStoredDemoAsset,
   loadDemoRecord,
   putDemoFile,
   resetDemoRecord,
   saveDemoEvent,
   saveDemoEntries,
+  saveDemoSaveTheDate,
   saveDemoSeating,
   type StoredEntryMeta,
 } from "./store";
@@ -106,6 +111,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [entries, setEntries] = useState<DashboardEntry[]>([]);
   const [metas, setMetas] = useState<StoredEntryMeta[]>([]);
   const [seating, setSeating] = useState<SeatingUpdate | null>(null);
+  const [saveTheDate, setSaveTheDate] = useState<SaveTheDateUpdate | null>(null);
   const objectUrls = useRef<string[]>([]);
 
   const revokeAll = useCallback(() => {
@@ -148,6 +154,20 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       setEntries(mapped);
       setMetas(record.entries);
       setSeating(record.seating);
+
+      const assetUrl = (kind: SaveTheDateAssetKind, url: string | null) => {
+        if (!isStoredDemoAsset(url)) return url;
+        const blob = record.saveTheDateFiles[kind];
+        return blob ? rememberUrl(URL.createObjectURL(blob)) : null;
+      };
+      setSaveTheDate({
+        ...record.saveTheDate,
+        content: {
+          ...record.saveTheDate.content,
+          photo_url: assetUrl("photo", record.saveTheDate.content.photo_url),
+          music_url: assetUrl("music", record.saveTheDate.content.music_url),
+        },
+      });
 
       return { event: eventWithCover, entries: mapped, metas: record.entries };
     },
@@ -259,6 +279,32 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       return { success: true };
     },
     [event],
+  );
+
+  /** Same checks as `updateSaveTheDate`, minus auth: the demo runs as Gold. */
+  const updateSaveTheDate = useCallback(
+    async (data: SaveTheDateUpdate) => {
+      if (!event) {
+        return { success: false, error: "Demo not ready" };
+      }
+
+      if (!hasFeature({ plan: event.plan_id, feature: "saveTheDate" })) {
+        return { success: false, error: "planUpgradeRequired" };
+      }
+
+      await saveDemoSaveTheDate(data);
+      setSaveTheDate(data);
+      return { success: true };
+    },
+    [event],
+  );
+
+  const uploadSaveTheDateAsset = useCallback(
+    async (kind: SaveTheDateAssetKind, file: File) => {
+      await putDemoFile(DEMO_SAVE_THE_DATE_KEYS[kind], file);
+      return { url: rememberUrl(URL.createObjectURL(file)) };
+    },
+    [rememberUrl],
   );
 
   const addEntry = useCallback(
@@ -396,7 +442,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     applyRecord(record);
   }, [applyRecord]);
 
-  if (!event || !seating) {
+  if (!event || !seating || !saveTheDate) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Skeleton className="h-8 w-48" />
@@ -410,11 +456,14 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         event,
         entries,
         seating,
+        saveTheDate,
         isReady: true,
         updateSettings,
         updatePageContent,
         uploadCover,
         updateSeating,
+        updateSaveTheDate,
+        uploadSaveTheDateAsset,
         addEntry,
         deleteEntry,
         getExport,
