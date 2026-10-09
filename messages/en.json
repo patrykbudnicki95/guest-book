@@ -431,6 +431,7 @@
     "nav": {
       "overview": "Overview",
       "eventPage": "Event Page",
+      "seating": "Seating",
       "gallery": "Gallery",
       "qrCode": "QR Code",
       "settings": "Settings"
@@ -586,6 +587,47 @@
         "itemPlaceholder": "e.g. Salmon carpaccio"
       }
     },
+    "seating": {
+      "title": "Find your table",
+      "description": "Seat your guests at tables. Everyone can look up their seat on the event page.",
+      "noEvents": "No active events. Create an event to add a seating plan.",
+      "selectEvent": "Select event",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "saveSuccess": "Seating plan saved",
+      "saveError": "Couldn't save",
+      "defaultTableName": "Table {number}",
+      "tooManyNames": "Table “{table}” has more guests than seats",
+      "errors": {
+        "planUpgradeRequired": "This feature is available in a higher plan",
+        "tooManyTables": "You can add up to {max} tables"
+      },
+      "publish": {
+        "label": "Show the plan to guests",
+        "on": "Guests see a “Your table” button on the event page.",
+        "off": "The plan is hidden. Turn it on when it's ready."
+      },
+      "privacyNote": "Anyone with the event link will see the seating plan. You can enter first names only, or something like “Auntie Barbara”.",
+      "tables": {
+        "title": "Tables",
+        "summary": "{tables} of {max} tables · {guests, plural, one {# guest} other {# guests}}",
+        "add": "Add table",
+        "empty": "No tables yet.",
+        "name": "Table name",
+        "namePlaceholder": "Table 1",
+        "remove": "Remove table",
+        "shape": "Shape",
+        "seats": "Seats",
+        "guests": "Guests: one person per line, in seat order. An empty line is a free seat.",
+        "guestsPlaceholder": "Anna Smith\nJohn Smith",
+        "overflow": "{count, plural, one {# person doesn't fit} other {# people don't fit}} at this table. Add more seats."
+      },
+      "shapes": {
+        "round": "Round",
+        "rectangle": "Rectangular",
+        "head": "Rectangular, one side"
+      }
+    },
     "settings": {
       "title": "Event Settings",
       "description": "Edit your wedding information",
@@ -640,6 +682,17 @@
     },
     "menu": {
       "title": "Menu"
+    },
+    "seating": {
+      "open": "Your table",
+      "title": "Find your table",
+      "metaTitle": "Find your table · {names}",
+      "description": "Type a first or last name, or scroll through the tables.",
+      "searchPlaceholder": "Type a first or last name",
+      "matches": "{count, plural, one {Found # person} other {Found # people}}",
+      "noResults": "We couldn't find that name. Try just the first name, or ask the venue staff.",
+      "unavailable": "The seating plan isn't available yet. Check back on the wedding day.",
+      "back": "Back to the event page"
     },
     "upload": {
       "title": "Add a Memory",

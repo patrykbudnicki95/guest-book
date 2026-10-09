@@ -1,9 +1,11 @@
-"use client";
-
 import { useTranslations } from "next-intl";
 import { Heart } from "lucide-react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { DashboardNav } from "@/app/[locale]/(admin)/dashboard/dashboard-nav";
+
+// The demo reads its state from IndexedDB, so DemoProvider renders a skeleton
+// instead of this segment on the server and Next can't validate it.
+export const instant = false;
 
 export default function DemoDashboardLayout({
   children,

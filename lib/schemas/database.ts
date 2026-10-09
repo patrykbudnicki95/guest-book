@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { PLAN_IDS } from "@/lib/pricing";
+import { MAX_SEATS_PER_TABLE } from "@/lib/permissions";
 
 export const PlanIdSchema = z.enum(PLAN_IDS);
 
@@ -105,6 +106,39 @@ export const EventPageContentUpdateSchema = z.object({
   menu: z.array(MenuSectionSchema).nullable().optional(),
 });
 
+// Seating ("find your table") schemas
+export const SEATING_SHAPES = ["round", "rectangle", "head"] as const;
+
+export const SeatingTableSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().max(60),
+  shape: z.enum(SEATING_SHAPES),
+  /** One name per seat, in seat order; an empty string is a free seat. */
+  seats: z.array(z.string().max(80)).min(1).max(MAX_SEATS_PER_TABLE),
+});
+
+/** `event_seating.select("tables")` (guest page) */
+export const GuestSeatingSchema = z.object({
+  tables: z.array(SeatingTableSchema),
+});
+
+/** `event_seating.select("event_id, tables, is_published")` (dashboard) */
+export const EventSeatingSchema = z.object({
+  event_id: z.string().uuid(),
+  tables: z.array(SeatingTableSchema),
+  is_published: z.boolean(),
+});
+
+/** `events.select("id, names, plan_id")` for the seating editor */
+export const EventForSeatingSchema = z.object({
+  id: z.string().uuid(),
+  names: z.string(),
+  plan_id: PlanIdSchema,
+});
+
+/** The table count limit depends on the plan, so the action checks it. */
+export const SeatingUpdateSchema = EventSeatingSchema.omit({ event_id: true });
+
 // Upload schemas
 export const UploadFileUrlSchema = z.object({
   file_url: z.string().url(),
@@ -189,6 +223,11 @@ export type MenuItem = z.infer<typeof MenuItemSchema>;
 export type MenuSection = z.infer<typeof MenuSectionSchema>;
 export type EventFull = z.infer<typeof EventFullSchema>;
 export type EventPageContentUpdate = z.infer<typeof EventPageContentUpdateSchema>;
+export type SeatingShape = (typeof SEATING_SHAPES)[number];
+export type SeatingTable = z.infer<typeof SeatingTableSchema>;
+export type EventForSeating = z.infer<typeof EventForSeatingSchema>;
+export type EventSeating = z.infer<typeof EventSeatingSchema>;
+export type SeatingUpdate = z.infer<typeof SeatingUpdateSchema>;
 export type UploadFileUrl = z.infer<typeof UploadFileUrlSchema>;
 export type EntryMedia = z.infer<typeof EntryMediaSchema>;
 export type Entry = z.infer<typeof EntryWithMediaSchema>;

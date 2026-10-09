@@ -3,7 +3,14 @@
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Image, QrCode, Settings, Sparkles } from "lucide-react";
+import {
+  Armchair,
+  LayoutDashboard,
+  Image,
+  QrCode,
+  Settings,
+  Sparkles,
+} from "lucide-react";
 import type { StaticAppPathname } from "@/i18n/routing";
 
 export type DashboardBasePath = "/dashboard" | "/demo/dashboard";
@@ -12,13 +19,20 @@ const navByBase: Record<
   DashboardBasePath,
   readonly {
     href: StaticAppPathname;
-    labelKey: "overview" | "eventPage" | "gallery" | "qrCode" | "settings";
+    labelKey:
+      | "overview"
+      | "eventPage"
+      | "seating"
+      | "gallery"
+      | "qrCode"
+      | "settings";
     icon: typeof LayoutDashboard;
   }[]
 > = {
   "/dashboard": [
     { href: "/dashboard", labelKey: "overview", icon: LayoutDashboard },
     { href: "/dashboard/event-page", labelKey: "eventPage", icon: Sparkles },
+    { href: "/dashboard/seating", labelKey: "seating", icon: Armchair },
     { href: "/dashboard/gallery", labelKey: "gallery", icon: Image },
     { href: "/dashboard/qr-code", labelKey: "qrCode", icon: QrCode },
     { href: "/dashboard/settings", labelKey: "settings", icon: Settings },
@@ -26,6 +40,7 @@ const navByBase: Record<
   "/demo/dashboard": [
     { href: "/demo/dashboard", labelKey: "overview", icon: LayoutDashboard },
     { href: "/demo/dashboard/event-page", labelKey: "eventPage", icon: Sparkles },
+    { href: "/demo/dashboard/seating", labelKey: "seating", icon: Armchair },
     { href: "/demo/dashboard/gallery", labelKey: "gallery", icon: Image },
     { href: "/demo/dashboard/qr-code", labelKey: "qrCode", icon: QrCode },
     { href: "/demo/dashboard/settings", labelKey: "settings", icon: Settings },
@@ -42,7 +57,7 @@ export function DashboardNav({
   const navItems = navByBase[basePath];
 
   return (
-    <nav className="grid w-full grid-cols-5 gap-1 rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-border/50">
+    <nav className="grid w-full grid-cols-6 gap-1 rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-border/50">
       {navItems.map((item) => {
         const isActive = pathname === item.href;
         const Icon = item.icon;

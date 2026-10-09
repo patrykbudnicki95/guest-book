@@ -8,7 +8,12 @@ import {
   useRef,
   useState,
 } from "react";
-import type { EventFull, EventPageContentUpdate, EventSettingsUpdate } from "@/lib/schemas/database";
+import type {
+  EventFull,
+  EventPageContentUpdate,
+  EventSettingsUpdate,
+  SeatingUpdate,
+} from "@/lib/schemas/database";
 import type {
   DashboardEntry,
   EventExportResult,
@@ -32,9 +37,10 @@ import {
   resetDemoRecord,
   saveDemoEvent,
   saveDemoEntries,
+  saveDemoSeating,
   type StoredEntryMeta,
 } from "./store";
-import { MAX_FILES_PER_ENTRY, hasFeature } from "@/lib/permissions";
+import { MAX_FILES_PER_ENTRY, getLimits, hasFeature } from "@/lib/permissions";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { DemoWorkspace } from "./types";
 
@@ -99,6 +105,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [event, setEvent] = useState<EventFull | null>(null);
   const [entries, setEntries] = useState<DashboardEntry[]>([]);
   const [metas, setMetas] = useState<StoredEntryMeta[]>([]);
+  const [seating, setSeating] = useState<SeatingUpdate | null>(null);
   const objectUrls = useRef<string[]>([]);
 
   const revokeAll = useCallback(() => {
@@ -140,6 +147,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       setEvent(eventWithCover);
       setEntries(mapped);
       setMetas(record.entries);
+      setSeating(record.seating);
 
       return { event: eventWithCover, entries: mapped, metas: record.entries };
     },
@@ -221,6 +229,36 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       return { publicUrl };
     },
     [event, rememberUrl],
+  );
+
+  /** Same checks as `updateSeating`, minus auth: the demo runs as Gold. */
+  const updateSeating = useCallback(
+    async (data: SeatingUpdate) => {
+      if (!event) {
+        return { success: false, error: "Demo not ready" };
+      }
+
+      if (!hasFeature({ plan: event.plan_id, feature: "findYourTable" })) {
+        return { success: false, error: "planUpgradeRequired" };
+      }
+
+      if (data.tables.length > getLimits(event.plan_id).seatingTables) {
+        return { success: false, error: "tooManyTables" };
+      }
+
+      const next: SeatingUpdate = {
+        is_published: data.is_published,
+        tables: data.tables.map((table) => ({
+          ...table,
+          name: table.name.trim(),
+          seats: table.seats.map((seat) => seat.trim()),
+        })),
+      };
+      await saveDemoSeating(next);
+      setSeating(next);
+      return { success: true };
+    },
+    [event],
   );
 
   const addEntry = useCallback(
@@ -358,7 +396,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     applyRecord(record);
   }, [applyRecord]);
 
-  if (!event) {
+  if (!event || !seating) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Skeleton className="h-8 w-48" />
@@ -371,10 +409,12 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       value={{
         event,
         entries,
+        seating,
         isReady: true,
         updateSettings,
         updatePageContent,
         uploadCover,
+        updateSeating,
         addEntry,
         deleteEntry,
         getExport,

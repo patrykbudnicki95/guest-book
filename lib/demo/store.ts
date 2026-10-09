@@ -2,6 +2,7 @@ import type {
   EventFull,
   EventPageContentUpdate,
   EventSettingsUpdate,
+  SeatingUpdate,
 } from "@/lib/schemas/database";
 import {
   DEMO_COVER_KEY,
@@ -12,12 +13,13 @@ import {
   DEMO_EVENT_ID,
   isStoredDemoCover,
 } from "./constants";
-import { createDemoSeed } from "./seed";
+import { createDemoSeating, createDemoSeed } from "./seed";
 
 const KV_STORE = "kv";
 const FILES_STORE = "files";
 const EVENT_KEY = "event";
 const ENTRIES_KEY = "entries";
+const SEATING_KEY = "seating";
 
 /** One file of an entry; its blob lives in the files store under `id`. */
 export type StoredFileMeta = {
@@ -120,17 +122,21 @@ async function fileDelete(key: string): Promise<void> {
 async function persistSeed(): Promise<{
   event: EventFull;
   entries: StoredEntryMeta[];
+  seating: SeatingUpdate;
 }> {
   const event = createDemoSeed();
+  const seating = createDemoSeating();
   await kvPut(EVENT_KEY, event);
   await kvPut(ENTRIES_KEY, [] satisfies StoredEntryMeta[]);
+  await kvPut(SEATING_KEY, seating);
   await fileDelete(DEMO_COVER_KEY);
-  return { event, entries: [] };
+  return { event, entries: [], seating };
 }
 
 export async function loadDemoRecord(): Promise<{
   event: EventFull;
   entries: StoredEntryMeta[];
+  seating: SeatingUpdate;
   cover: Blob | null;
   files: Record<string, Blob>;
 }> {
@@ -144,6 +150,8 @@ export async function loadDemoRecord(): Promise<{
     return { ...seeded, cover: null, files: {} };
   }
 
+  // Demos saved before seating existed get the sample plan.
+  const seating = (await kvGet<SeatingUpdate>(SEATING_KEY)) ?? createDemoSeating();
   const cover = (await fileGet(DEMO_COVER_KEY)) ?? null;
   const files: Record<string, Blob> = {};
 
@@ -154,7 +162,7 @@ export async function loadDemoRecord(): Promise<{
     }
   }
 
-  return { event, entries, cover, files };
+  return { event, entries, seating, cover, files };
 }
 
 export function serializeEvent(event: EventFull): EventFull {
@@ -174,6 +182,10 @@ export async function saveDemoEntries(
   entries: StoredEntryMeta[],
 ): Promise<void> {
   await kvPut(ENTRIES_KEY, entries);
+}
+
+export async function saveDemoSeating(seating: SeatingUpdate): Promise<void> {
+  await kvPut(SEATING_KEY, seating);
 }
 
 export async function putDemoFile(key: string, blob: Blob): Promise<void> {
@@ -234,6 +246,7 @@ export async function applyPageContent(
 export async function resetDemoRecord(): Promise<{
   event: EventFull;
   entries: StoredEntryMeta[];
+  seating: SeatingUpdate;
 }> {
   const db = await openDb();
   try {

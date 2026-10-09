@@ -149,6 +149,26 @@ export interface Database {
           created_at?: string;
         };
       };
+      event_seating: {
+        Row: {
+          event_id: string;
+          tables: Json;
+          is_published: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          event_id: string;
+          tables?: Json;
+          is_published?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          event_id?: string;
+          tables?: Json;
+          is_published?: boolean;
+          updated_at?: string;
+        };
+      };
     };
     Functions: {
       create_entry: {

@@ -54,11 +54,23 @@ CREATE TABLE IF NOT EXISTS uploads (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Create event_seating table: the "find your table" plan (Gold). Kept apart
+-- from events, which everyone can read, so a draft plan stays hidden by RLS.
+CREATE TABLE IF NOT EXISTS event_seating (
+  event_id UUID PRIMARY KEY REFERENCES events(id) ON DELETE CASCADE,
+  -- [{ id, name, shape: 'round' | 'rectangle' | 'head', seats: string[] }]
+  tables JSONB NOT NULL DEFAULT '[]'::jsonb,
+  -- Off until the couple finishes the plan; guests only read published rows.
+  is_published BOOLEAN NOT NULL DEFAULT false,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- Enable Row Level Security
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE uploads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE event_seating ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for profiles
 -- Users can only read their own profile
@@ -151,6 +163,49 @@ CREATE POLICY "Event owners can delete uploads"
     )
   );
 
+-- RLS Policies for event_seating
+-- Guests read a plan once it is published; the owner always sees their draft
+CREATE POLICY "Published seating is viewable by everyone, drafts by the owner"
+  ON event_seating FOR SELECT
+  USING (
+    is_published
+    OR EXISTS (
+      SELECT 1 FROM events
+      WHERE events.id = event_seating.event_id
+      AND events.owner_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Event owners can insert seating"
+  ON event_seating FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM events
+      WHERE events.id = event_seating.event_id
+      AND events.owner_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Event owners can update seating"
+  ON event_seating FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM events
+      WHERE events.id = event_seating.event_id
+      AND events.owner_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Event owners can delete seating"
+  ON event_seating FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM events
+      WHERE events.id = event_seating.event_id
+      AND events.owner_id = auth.uid()
+    )
+  );
+
 -- Create function to handle new user creation
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
@@ -221,6 +276,11 @@ CREATE TRIGGER update_events_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_event_seating_updated_at
+  BEFORE UPDATE ON event_seating
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_events_owner_id ON events(owner_id);
 CREATE INDEX IF NOT EXISTS idx_events_is_active ON events(is_active);
@@ -255,5 +315,7 @@ GRANT DELETE ON public.entries TO authenticated;
 GRANT SELECT, INSERT ON public.uploads TO anon, authenticated;
 GRANT DELETE ON public.uploads TO authenticated;
 GRANT SELECT, UPDATE ON public.profiles TO authenticated;
+GRANT SELECT ON public.event_seating TO anon, authenticated;
+GRANT INSERT, UPDATE, DELETE ON public.event_seating TO authenticated;
 
 GRANT EXECUTE ON FUNCTION create_entry(JSONB, JSONB) TO anon, authenticated;

@@ -31,7 +31,7 @@ const context = await getEventPlanContext(eventId); // { id, plan_id, date, is_a
 - `hasFeature` and `PlanLock` in the UI only control what's shown. They are **not** a security check.
 - **Server actions must re-check.** Guest uploads call `checkUploadAllowed` both before presigning and when saving. Owner mutations go through `getEventPlanContext` / `requireOwnedEventFeature`.
 - To add a feature: add it to `PLAN_FEATURES` and to the right plans in `PLAN_ENTITLEMENTS`, then gate the UI (`hasFeature` + `PlanLock`), the server action, and the demo (`lib/demo` runs as Gold).
-- `saveTheDate`, `weddingGames` and `findYourTable` intentionally have no consumers yet.
+- `saveTheDate` and `weddingGames` intentionally have no consumers yet.
 - `setEventPlan` only works when `NEXT_PUBLIC_ENABLE_PLAN_SWITCHER=true`, and that check runs on the server.
 
 For more detail, read `docs/architecture/permissions.md`.

@@ -1,17 +1,10 @@
-"use client";
+import { DemoGalleryTab } from "../../components/demo-gallery-tab";
 
-import { GalleryTab } from "@/app/[locale]/(admin)/dashboard/gallery/components/gallery-tab";
-import { useDemoWorkspace } from "@/lib/demo/provider";
+// DemoProvider shows a skeleton until IndexedDB loads, so this segment never
+// renders on the server and Next can't validate it for instant navigation.
+// `instant` isn't allowed in Client Components, hence this server wrapper.
+export const instant = false;
 
 export default function DemoGalleryPage() {
-  const { event, entries, deleteEntry, getExport } = useDemoWorkspace();
-
-  return (
-    <GalleryTab
-      entries={entries}
-      downloadOpenByEvent={{ [event.id]: true }}
-      onDelete={deleteEntry}
-      onLoadExport={getExport}
-    />
-  );
+  return <DemoGalleryTab />;
 }

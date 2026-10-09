@@ -55,6 +55,17 @@ The files of an entry.
 | `sort_order` | Carousel order inside the entry |
 | `created_at` | |
 
+### `event_seating`
+
+The "find your table" plan (Gold). One row per event, created on the first save. Separate from `events` because everyone can read events, and a draft plan must stay hidden.
+
+| Column | Notes |
+|--------|--------|
+| `event_id` | PK → `events`, `ON DELETE CASCADE` |
+| `tables` | JSONB `[{ id, name, shape: round \| rectangle \| head, seats: string[] }]`; one name per seat, `""` = free seat. Count capped by `seatingTables`, seats by `MAX_SEATS_PER_TABLE` |
+| `is_published` | Couple's "show to guests" switch, default `false` |
+| `updated_at` | |
+
 ## RLS (summary)
 
 | Table | Read | Write |
@@ -63,6 +74,7 @@ The files of an entry.
 | `events` | Everyone | Owner insert/update/delete |
 | `entries` | Everyone for public rows; owner only for `is_private` rows | Anyone insert; owner delete (cascades to uploads) |
 | `uploads` | Same as their entry | Anyone insert; owner delete |
+| `event_seating` | Everyone when `is_published`; owner always | Owner insert/update/delete |
 
 Also: table `GRANT`s for `anon` / `authenticated` (see schema).
 
@@ -74,7 +86,7 @@ Also: table `GRANT`s for `anon` / `authenticated` (see schema).
 
 - `handle_new_user` — create profile on signup
 - `sync_event_storage_used` — keep `events.storage_used_bytes` in sync (also fires on uploads removed by the entry cascade)
-- `update_updated_at_column` — profiles & events
+- `update_updated_at_column` — profiles, events & event_seating
 
 ## App Zod schemas
 

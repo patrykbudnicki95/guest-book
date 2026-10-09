@@ -17,9 +17,13 @@ Living backlog (moved from root `TODO.md`). Not a Cursor rule — product priori
 - Demo / test mode (works; update when main app gains features)
 - Guest photo visibility: public / private when uploading
 - Download all (ZIP): photos per guest + offline wishes album, built in the browser
+- Find your table (Gold): seating plan editor + guest search with table diagram
 
 ## Todo (by priority)
 
+- security - password min/max
+- login - google login?
+- save the date - in gold + as a separate product?
 - PDF download with event information
 - Main page content
   - Pricing options (review; align with plan entitlements)
@@ -30,9 +34,10 @@ Living backlog (moved from root `TODO.md`). Not a Cursor rule — product priori
 - QR + fancy printable card (print / ship)
 - Google monitoring - monitor actions that shows user journey + actions that will be useful to integrate them with google
   adwords to see conversion - this will help us to modify page/prices/google adwords to maximize the profit
-- znajdź swój stół? w wyzszym pakiecie?
 - Games? Field game with QR codes and questions about the couple
 - Basic auth gate until production (avoid early SEO indexing of unfinished site)
+- Clearing events after some specific time
+  - be carefull, if someone in setting will be changing date of his event - for example for the future date, after his wedding
 
 ## Notes for agents
 

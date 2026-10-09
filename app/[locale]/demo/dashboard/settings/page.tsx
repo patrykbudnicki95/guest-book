@@ -1,25 +1,10 @@
-"use client";
+import { DemoSettingsTab } from "../../components/demo-settings-tab";
 
-import { SettingsTab } from "@/app/[locale]/(admin)/dashboard/settings/components/settings-tab";
-import { useDemoWorkspace } from "@/lib/demo/provider";
+// DemoProvider shows a skeleton until IndexedDB loads, so this segment never
+// renders on the server and Next can't validate it for instant navigation.
+// `instant` isn't allowed in Client Components, hence this server wrapper.
+export const instant = false;
 
 export default function DemoSettingsPage() {
-  const { event, updateSettings } = useDemoWorkspace();
-
-  return (
-    <SettingsTab
-      events={[
-        {
-          id: event.id,
-          names: event.names,
-          date: event.date,
-          location: event.location,
-          theme_color: event.theme_color,
-          plan_id: event.plan_id,
-        },
-      ]}
-      variant="demo"
-      onSave={async (_eventId, data) => updateSettings(data)}
-    />
-  );
+  return <DemoSettingsTab />;
 }
