@@ -1,5 +1,6 @@
 "use client";
 
+import { useFormatter } from "next-intl";
 import { Heart, MapPin, Calendar } from "lucide-react";
 import { MediaImage } from "@/components/media-image";
 
@@ -10,24 +11,14 @@ interface EventHeroProps {
   location: string | null;
 }
 
-function formatDate(dateStr: string): string {
-  try {
-    return new Date(dateStr).toLocaleDateString(undefined, {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  } catch {
-    return dateStr;
-  }
-}
-
 export function EventHero({
   names,
   date,
   coverPhotoUrl,
   location,
 }: EventHeroProps) {
+  const format = useFormatter();
+
   return (
     <section className="relative overflow-hidden">
       {coverPhotoUrl ? (
@@ -56,7 +47,14 @@ export function EventHero({
         <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-white/80 sm:gap-4">
           <span className="inline-flex items-center gap-1.5">
             <Calendar className="size-3.5" />
-            {formatDate(date)}
+            {/* The page locale, not the machine's, so server and browser agree.
+                `date` is a plain DATE, so UTC keeps it from shifting a day. */}
+            {format.dateTime(new Date(date), {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              timeZone: "UTC",
+            })}
           </span>
           {location && (
             <span className="inline-flex items-center gap-1.5">

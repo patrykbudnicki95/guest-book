@@ -431,6 +431,7 @@
     "nav": {
       "overview": "Przegląd",
       "eventPage": "Strona wydarzenia",
+      "seating": "Stoły",
       "gallery": "Galeria",
       "qrCode": "Kod QR",
       "settings": "Ustawienia"
@@ -586,6 +587,47 @@
         "itemPlaceholder": "np. Carpaccio z łososia"
       }
     },
+    "seating": {
+      "title": "Znajdź swój stół",
+      "description": "Rozsadź gości przy stołach. Na stronie wydarzenia każdy znajdzie swoje miejsce.",
+      "noEvents": "Brak aktywnych wydarzeń. Utwórz wydarzenie, aby dodać plan stołów.",
+      "selectEvent": "Wybierz wydarzenie",
+      "save": "Zapisz zmiany",
+      "saving": "Zapisywanie...",
+      "saveSuccess": "Plan stołów został zapisany",
+      "saveError": "Nie udało się zapisać",
+      "defaultTableName": "Stół {number}",
+      "tooManyNames": "Przy stole „{table}” jest więcej gości niż miejsc",
+      "errors": {
+        "planUpgradeRequired": "Ta funkcja jest dostępna w wyższym pakiecie",
+        "tooManyTables": "Możesz dodać maksymalnie {max} stołów"
+      },
+      "publish": {
+        "label": "Pokaż plan gościom",
+        "on": "Goście widzą przycisk „Twój stół” na stronie wydarzenia.",
+        "off": "Plan jest ukryty. Włącz go, gdy będzie gotowy."
+      },
+      "privacyNote": "Plan stołów zobaczy każdy, kto ma link do wydarzenia. Możesz wpisać same imiona albo np. „Ciocia Basia”.",
+      "tables": {
+        "title": "Stoły",
+        "summary": "{tables} z {max} stołów · {guests, plural, one {# gość} few {# gości} many {# gości} other {# gościa}}",
+        "add": "Dodaj stół",
+        "empty": "Nie dodano jeszcze żadnego stołu.",
+        "name": "Nazwa stołu",
+        "namePlaceholder": "Stół 1",
+        "remove": "Usuń stół",
+        "shape": "Kształt",
+        "seats": "Liczba miejsc",
+        "guests": "Goście: jedna osoba w linii, w kolejności miejsc. Pusta linia to wolne miejsce.",
+        "guestsPlaceholder": "Anna Kowalska\nJan Kowalski",
+        "overflow": "{count, plural, one {# osoba nie mieści się} few {# osoby nie mieszczą się} many {# osób nie mieści się} other {# osoby nie mieści się}} przy stole. Zwiększ liczbę miejsc."
+      },
+      "shapes": {
+        "round": "Okrągły",
+        "rectangle": "Prostokątny",
+        "head": "Prostokątny, jedna strona"
+      }
+    },
     "settings": {
       "title": "Ustawienia wydarzenia",
       "description": "Edytuj informacje o swoim weselu",
@@ -640,6 +682,17 @@
     },
     "menu": {
       "title": "Menu"
+    },
+    "seating": {
+      "open": "Twój stół",
+      "title": "Znajdź swój stół",
+      "metaTitle": "Znajdź swój stół · {names}",
+      "description": "Wpisz imię lub nazwisko albo przewiń listę stołów.",
+      "searchPlaceholder": "Wpisz imię lub nazwisko",
+      "matches": "{count, plural, one {Znaleziono # osobę} few {Znaleziono # osoby} many {Znaleziono # osób} other {Znaleziono # osoby}}",
+      "noResults": "Nie znaleźliśmy tej osoby. Spróbuj samego imienia albo zapytaj obsługę sali.",
+      "unavailable": "Plan stołów nie jest jeszcze dostępny. Zajrzyj tu w dniu wesela.",
+      "back": "Wróć do strony wydarzenia"
     },
     "upload": {
       "title": "Dodaj wspomnienie",

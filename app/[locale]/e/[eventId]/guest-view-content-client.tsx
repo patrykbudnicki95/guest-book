@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentProps } from "react";
 import { useFormatter, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { Camera } from "lucide-react";
+import { Armchair, Camera } from "lucide-react";
 import { PhotoGrid } from "./photo-grid";
 import {
   UploadDrawer,
@@ -23,6 +24,7 @@ export function GuestViewContentClient({
   event,
   initialEntries,
   uploadWindow,
+  seatingHref,
   onUpload,
   maxFileBytes,
   headerClassName,
@@ -30,6 +32,8 @@ export function GuestViewContentClient({
   event: EventFull;
   initialEntries: Entry[];
   uploadWindow: { isOpen: boolean; closesAt: string };
+  /** The "find your table" page, or null when there is no published plan. */
+  seatingHref: ComponentProps<typeof Link>["href"] | null;
   onUpload?: (input: LocalEntryInput) => Promise<LocalEntryResult>;
   maxFileBytes?: number;
   headerClassName?: string;
@@ -66,6 +70,19 @@ export function GuestViewContentClient({
         <div className="flex items-center justify-between gap-2 px-4 py-2.5">
           <p className="truncate text-sm font-semibold">{event.names}</p>
           <div className="flex shrink-0 items-center gap-2">
+            {seatingHref && (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+              >
+                <Link href={seatingHref}>
+                  <Armchair className="size-4" />
+                  {t("seating.open")}
+                </Link>
+              </Button>
+            )}
             <LanguageSwitcher />
           </div>
         </div>

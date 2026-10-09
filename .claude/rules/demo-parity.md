@@ -12,10 +12,11 @@ paths:
 
 | Demo page | Reuses |
 | --- | --- |
-| `app/[locale]/demo/dashboard/<tab>/page.tsx` | `app/[locale]/(admin)/dashboard/<tab>/components/<tab>-tab.tsx` |
+| `app/[locale]/demo/components/demo-<tab>-tab.tsx` (rendered by `demo/dashboard/<tab>/page.tsx`) | `app/[locale]/(admin)/dashboard/<tab>/components/<tab>-tab.tsx` |
 | `app/[locale]/demo/components/demo-guest-page.tsx` | guest page pieces from `app/[locale]/e/[eventId]/` |
 
 - When you change a tab's or guest component's props, callbacks or behaviour, update the demo page and `lib/demo/*` (`types.ts`, `store.ts`, `provider.tsx`, `seed.ts`) in the same change. The build catches a prop mismatch but not a feature that's missing from the demo.
 - Demo callbacks mirror the server-action return shapes (`{ success, error? }`). Keep them in sync.
 - The demo event is **Gold**, so new plan-gated features show up there unlocked.
 - The demo must never write to Supabase or R2.
+- Every demo `page.tsx` and layout stays a **server** file with `export const instant = false`, and its client logic lives in `demo/components/`. `DemoProvider` renders a skeleton until IndexedDB loads, so these segments never render on the server and Next 16.3 otherwise reports them as "dropped from rendering". `instant` can't be exported from a `"use client"` file.

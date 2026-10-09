@@ -16,9 +16,10 @@
 | Guest upload window (days after wedding) | 3 | 5 | 14 |
 | Download window (days) | 14 | 30 | 90 |
 | QR table cards | 0 | 0 | 3 |
+| Seating plan tables | 0 | 0 | 100 |
 | Features | uploads, gallery, QR | + branding, schedule, menu | + video, QR cards, findYourTable, saveTheDate, weddingGames |
 
-Some Gold keys (`saveTheDate`, `weddingGames`, `findYourTable`) are declared with no consumer yet — intentional.
+Some Gold keys (`saveTheDate`, `weddingGames`) are declared with no consumer yet — intentional.
 
 ## How to check in code
 

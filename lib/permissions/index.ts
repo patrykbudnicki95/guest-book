@@ -1,9 +1,5 @@
 import { PLAN_IDS, type PlanId } from "@/lib/pricing";
-import {
-  PLAN_ENTITLEMENTS,
-  type PlanFeature,
-  type PlanLimits,
-} from "./entitlements";
+import { PLAN_ENTITLEMENTS, type PlanFeature, type PlanLimits } from "./entitlements";
 
 export {
   DEFAULT_PLAN_ID,
@@ -18,16 +14,8 @@ export function getLimits(plan: PlanId): PlanLimits {
   return PLAN_ENTITLEMENTS[plan].limits;
 }
 
-export function hasFeature({
-  plan,
-  feature,
-}: {
-  plan: PlanId;
-  feature: PlanFeature;
-}): boolean {
-  return (PLAN_ENTITLEMENTS[plan].features as readonly PlanFeature[]).includes(
-    feature,
-  );
+export function hasFeature({ plan, feature }: { plan: PlanId; feature: PlanFeature }): boolean {
+  return (PLAN_ENTITLEMENTS[plan].features as readonly PlanFeature[]).includes(feature);
 }
 
 /**
@@ -51,13 +39,7 @@ function endOfDayAfter(eventDate: string, days: number): Date {
   return end;
 }
 
-export function getUploadWindowEnd({
-  plan,
-  eventDate,
-}: {
-  plan: PlanId;
-  eventDate: string;
-}): Date {
+export function getUploadWindowEnd({ plan, eventDate }: { plan: PlanId; eventDate: string }): Date {
   return endOfDayAfter(eventDate, getLimits(plan).guestAccessDays);
 }
 
@@ -77,13 +59,7 @@ export function isGuestUploadOpen({
   return now <= getUploadWindowEnd({ plan, eventDate });
 }
 
-export function getDownloadWindowEnd({
-  plan,
-  eventDate,
-}: {
-  plan: PlanId;
-  eventDate: string;
-}): Date {
+export function getDownloadWindowEnd({ plan, eventDate }: { plan: PlanId; eventDate: string }): Date {
   return endOfDayAfter(eventDate, getLimits(plan).downloadDays);
 }
 
@@ -106,13 +82,7 @@ export type StorageState = {
   percentUsed: number;
 };
 
-export function getStorageState({
-  plan,
-  usedBytes,
-}: {
-  plan: PlanId;
-  usedBytes: number;
-}): StorageState {
+export function getStorageState({ plan, usedBytes }: { plan: PlanId; usedBytes: number }): StorageState {
   const totalBytes = getLimits(plan).storageBytes;
   const safeUsed = Math.max(0, usedBytes);
 
@@ -127,6 +97,9 @@ export function getStorageState({
 /** Files a guest can attach to one entry. The same on every plan. */
 export const MAX_FILES_PER_ENTRY = 10;
 
+/** Seats around one table in the seating plan. The same on every plan. */
+export const MAX_SEATS_PER_TABLE = 100;
+
 export type UploadRejectionReason =
   | "eventInactive"
   | "windowClosed"
@@ -134,9 +107,7 @@ export type UploadRejectionReason =
   | "fileTooLarge"
   | "quotaExceeded";
 
-export type UploadCheckResult =
-  | { allowed: true }
-  | { allowed: false; reason: UploadRejectionReason };
+export type UploadCheckResult = { allowed: true } | { allowed: false; reason: UploadRejectionReason };
 
 /**
  * The one place that decides whether a guest upload may proceed. Both the

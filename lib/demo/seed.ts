@@ -1,4 +1,4 @@
-import type { EventFull } from "@/lib/schemas/database";
+import type { EventFull, SeatingUpdate } from "@/lib/schemas/database";
 import { DEMO_EVENT_ID } from "./constants";
 
 export function createDemoSeed(): EventFull {
@@ -29,5 +29,61 @@ export function createDemoSeed(): EventFull {
     ],
     plan_id: "gold",
     storage_used_bytes: 0,
+  };
+}
+
+/** Published so the demo guest page shows "find your table" right away. */
+export function createDemoSeating(): SeatingUpdate {
+  return {
+    is_published: true,
+    tables: [
+      {
+        id: "demo-table-couple",
+        name: "Para Młoda",
+        shape: "head",
+        seats: [
+          "Marta Kowalska",
+          "Piotr Kowalski",
+          "Anna",
+          "Jan",
+          "Ewa Nowak",
+          "Tomasz Nowak",
+        ],
+      },
+      {
+        id: "demo-table-1",
+        name: "Stół 1",
+        shape: "round",
+        seats: [
+          "Katarzyna Wiśniewska",
+          "Michał Wiśniewski",
+          "Zofia Lewandowska",
+          "Łukasz Lewandowski",
+          "Agnieszka Zielińska",
+          "Paweł Zieliński",
+          "Magdalena Wójcik",
+          "Krzysztof Wójcik",
+          "",
+          "",
+        ],
+      },
+      {
+        id: "demo-table-2",
+        name: "Stół 2",
+        shape: "rectangle",
+        seats: [
+          "Ciocia Basia",
+          "Wujek Staszek",
+          "Babcia Halina",
+          "Dziadek Józef",
+          "Joanna Kamińska",
+          "Adam Kamiński",
+          "Natalia Dąbrowska",
+          "Jakub Dąbrowski",
+          "Ola Mazur",
+          "Bartek Mazur",
+        ],
+      },
+    ],
   };
 }

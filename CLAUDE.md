@@ -14,7 +14,7 @@ Virtual wedding guestbook SaaS. Guests scan a QR code, open `/e/[eventId]` and u
 
 ```
 app/[locale]/(auth)/              login, signup
-app/[locale]/(admin)/dashboard/   couple dashboard: overview, gallery, event-page, qr-code, settings
+app/[locale]/(admin)/dashboard/   couple dashboard, one folder per tab
 app/[locale]/e/[eventId]/         guest event page (public, noindex)
 app/[locale]/demo/                /demo sandbox: state in IndexedDB (lib/demo), no server writes
 app/[locale]/{pricing,packages,guides,...}   marketing (indexable)

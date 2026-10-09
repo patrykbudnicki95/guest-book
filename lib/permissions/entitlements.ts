@@ -35,6 +35,8 @@ export type PlanLimits = {
   downloadDays: number;
   /** Printed QR table cards included in the package. */
   qrTableCards: number;
+  /** Tables in the "find your table" seating plan. */
+  seatingTables: number;
 };
 
 export type PlanEntitlement = {
@@ -56,6 +58,7 @@ export const PLAN_ENTITLEMENTS = {
       guestAccessDays: 3,
       downloadDays: 14,
       qrTableCards: 0,
+      seatingTables: 0,
     },
   },
   silver: {
@@ -73,6 +76,7 @@ export const PLAN_ENTITLEMENTS = {
       guestAccessDays: 5,
       downloadDays: 30,
       qrTableCards: 0,
+      seatingTables: 0,
     },
   },
   gold: {
@@ -95,6 +99,7 @@ export const PLAN_ENTITLEMENTS = {
       guestAccessDays: 14,
       downloadDays: 90,
       qrTableCards: 3,
+      seatingTables: 100,
     },
   },
 } as const satisfies Record<PlanId, PlanEntitlement>;

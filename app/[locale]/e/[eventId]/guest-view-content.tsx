@@ -7,7 +7,12 @@ import {
   EventFullSchema,
   type Entry,
 } from "@/lib/schemas/database";
-import { getUploadWindowEnd, isGuestUploadOpen } from "@/lib/permissions";
+import {
+  getUploadWindowEnd,
+  hasFeature,
+  isGuestUploadOpen,
+} from "@/lib/permissions";
+import { getPublishedSeating } from "@/app/actions/seating-actions";
 
 async function getEvent(eventId: string) {
   const supabase = await createClient();
@@ -73,9 +78,10 @@ async function getEventEntries(eventId: string): Promise<Entry[]> {
 }
 
 export async function GuestViewContent({ eventId }: { eventId: string }) {
-  const [event, entries] = await Promise.all([
+  const [event, entries, seating] = await Promise.all([
     getEvent(eventId),
     getEventEntries(eventId),
+    getPublishedSeating(eventId),
   ]);
 
   if (!event) {
@@ -107,6 +113,11 @@ export async function GuestViewContent({ eventId }: { eventId: string }) {
       event={event}
       initialEntries={entries}
       uploadWindow={uploadWindow}
+      seatingHref={
+        seating && hasFeature({ plan: event.plan_id, feature: "findYourTable" })
+          ? { pathname: "/e/[eventId]/tables", params: { eventId } }
+          : null
+      }
     />
   );
 }

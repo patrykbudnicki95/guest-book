@@ -1,22 +1,10 @@
-"use client";
+import { DemoEventPageTab } from "../../components/demo-event-page-tab";
 
-import { EventPageTab } from "@/app/[locale]/(admin)/dashboard/event-page/components/event-page-tab";
-import {
-  DEMO_COVER_FALLBACK,
-  DEMO_MAX_FILE_BYTES,
-  useDemoWorkspace,
-} from "@/lib/demo/provider";
+// DemoProvider shows a skeleton until IndexedDB loads, so this segment never
+// renders on the server and Next can't validate it for instant navigation.
+// `instant` isn't allowed in Client Components, hence this server wrapper.
+export const instant = false;
 
 export default function DemoEventPage() {
-  const { event, updatePageContent, uploadCover } = useDemoWorkspace();
-
-  return (
-    <EventPageTab
-      events={[event]}
-      onSave={async (_eventId, data) => updatePageContent(data)}
-      onCoverUpload={uploadCover}
-      maxCoverBytes={DEMO_MAX_FILE_BYTES}
-      fallbackCoverUrl={DEMO_COVER_FALLBACK}
-    />
-  );
+  return <DemoEventPageTab />;
 }

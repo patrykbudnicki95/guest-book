@@ -2,6 +2,7 @@ import type {
   EventFull,
   EventPageContentUpdate,
   EventSettingsUpdate,
+  SeatingUpdate,
 } from "@/lib/schemas/database";
 import type {
   DashboardEntry,
@@ -15,6 +16,7 @@ import type {
 export type DemoWorkspace = {
   event: EventFull;
   entries: DashboardEntry[];
+  seating: SeatingUpdate;
   isReady: boolean;
   updateSettings: (
     data: EventSettingsUpdate,
@@ -23,6 +25,9 @@ export type DemoWorkspace = {
     data: EventPageContentUpdate,
   ) => Promise<{ success: boolean; error?: string }>;
   uploadCover: (file: File) => Promise<{ publicUrl: string }>;
+  updateSeating: (
+    data: SeatingUpdate,
+  ) => Promise<{ success: boolean; error?: string }>;
   addEntry: (input: LocalEntryInput) => Promise<LocalEntryResult>;
   deleteEntry: (entryId: string) => Promise<{ success: boolean }>;
   getExport: () => Promise<EventExportResult>;
