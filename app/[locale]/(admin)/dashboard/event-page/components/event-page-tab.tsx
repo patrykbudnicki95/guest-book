@@ -68,10 +68,10 @@ export function EventPageTab({
   const selectedEvent =
     events.find((e) => e.id === effectiveEventId) ?? events[0] ?? null;
 
-  const plan = selectedEvent?.plan_id ?? "basic";
-  const canBrand = hasFeature({ plan, feature: "customBranding" });
-  const canEditSchedule = hasFeature({ plan, feature: "schedule" });
-  const canEditMenu = hasFeature({ plan, feature: "menu" });
+  const products = selectedEvent?.products ?? [];
+  const canBrand = hasFeature({ products, feature: "customBranding" });
+  const canEditSchedule = hasFeature({ products, feature: "schedule" });
+  const canEditMenu = hasFeature({ products, feature: "menu" });
   const displayedCover = coverPhotoUrl ?? fallbackCoverUrl ?? null;
   const canRemoveCover =
     Boolean(coverPhotoUrl) && coverPhotoUrl !== fallbackCoverUrl;

@@ -1,16 +1,18 @@
 import { routing } from "@/i18n/routing";
 import { siteConfig } from "@/lib/seo/config";
 import { localizedUrl } from "@/lib/seo/metadata";
-import { ADDONS, CURRENCY, PLAN_LIST } from "@/lib/pricing";
+import { getTranslations } from "next-intl/server";
+import { CURRENCY, PRODUCT_LIST } from "@/lib/pricing";
 import { getGuidesForLocale } from "@/app/[locale]/guides/content";
 
 /**
  * A plain-text summary for tools and assistants that fetch a site directly.
  * Generated so prices, URLs and the article list can never drift from the app.
  */
-export function GET() {
+export async function GET() {
   const locale = routing.defaultLocale;
   const guides = getGuidesForLocale(locale);
+  const tProducts = await getTranslations({ locale, namespace: "products" });
 
   const lines: string[] = [
     `# ${siteConfig.name}`,
@@ -26,21 +28,14 @@ export function GET() {
     `- O nas: ${localizedUrl("/about", locale)}`,
     `- Kontakt: ${localizedUrl("/contact", locale)}`,
     "",
-    "## Pakiety",
+    `## Aplikacje (cennik: ${localizedUrl("/pricing", locale)})`,
   ];
 
-  for (const plan of PLAN_LIST) {
-    const url = localizedUrl(
-      { pathname: "/packages/[plan]", params: { plan: plan.id } },
-      locale,
+  for (const product of PRODUCT_LIST) {
+    lines.push(
+      `- ${tProducts(`${product.id}.name`)}: ${product.price} ${CURRENCY} — ${tProducts(`${product.id}.tagline`)}`,
     );
-    const name = plan.id.charAt(0).toUpperCase() + plan.id.slice(1);
-    lines.push(`- ${name}: ${plan.price} ${CURRENCY} — ${url}`);
   }
-
-  lines.push(
-    `- Dodatek save the date (w Gold w cenie): ${ADDONS.saveTheDate.price} ${CURRENCY} — ${localizedUrl("/save-the-date", locale)}`,
-  );
 
   if (guides.length > 0) {
     lines.push("", "## Poradniki");

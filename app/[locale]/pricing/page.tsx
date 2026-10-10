@@ -3,8 +3,13 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { buildMetadata, localizedUrl } from "@/lib/seo/metadata";
 import { breadcrumbListNode, itemListNode } from "@/lib/seo/json-ld";
-import { ADDONS, PLANS, PLAN_LIST, formatPrice } from "@/lib/pricing";
-import { planFeatures, planRangeValues } from "@/lib/plan-features";
+import {
+  APPS_TOTAL_PRICE,
+  LOWEST_PRICE,
+  PRODUCT_LIST,
+  PRODUCT_PAGES,
+} from "@/lib/pricing";
+import { productCopyValues, productFeatures } from "@/lib/plan-features";
 import { JsonLd } from "@/components/json-ld";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
@@ -21,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
     href: "/pricing",
     locale,
     title: t("title"),
-    description: t("description", { price: PLANS.basic.price }),
+    description: t("description", { price: LOWEST_PRICE }),
   });
 }
 
@@ -32,10 +37,10 @@ export default async function PricingPage() {
   const tLanding = await getTranslations("landing");
   const tFooter = await getTranslations("footer");
 
-  const faqRange = planRangeValues();
+  const values = productCopyValues();
   const faqItems = [1, 2, 3, 4, 5].map((index) => ({
     question: tLanding(`faq.${index}.question`),
-    answer: tLanding(`faq.${index}.answer`, faqRange),
+    answer: tLanding(`faq.${index}.answer`, values),
   }));
 
   const jsonLd = [
@@ -45,12 +50,9 @@ export default async function PricingPage() {
     ]),
     itemListNode({
       name: t("heading"),
-      items: PLAN_LIST.map((plan) => ({
-        name: tLanding(`pricing.${plan.id}.title`),
-        url: localizedUrl(
-          { pathname: "/packages/[plan]", params: { plan: plan.id } },
-          locale,
-        ),
+      items: PRODUCT_LIST.map((product) => ({
+        name: tLanding(`pricing.${product.id}.title`),
+        url: localizedUrl(PRODUCT_PAGES[product.id] ?? "/pricing", locale),
       })),
     }),
   ];
@@ -73,52 +75,26 @@ export default async function PricingPage() {
               {t("heading")}
             </h1>
             <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-              {t("intro")}
+              {t("intro", values)}
             </p>
           </div>
 
-          <div className="mx-auto mt-14 grid max-w-5xl gap-6 sm:grid-cols-3">
-            {PLAN_LIST.map((plan) => (
-              <PricingCard
-                key={plan.id}
-                plan={plan}
-                title={tLanding(`pricing.${plan.id}.title`)}
-                description={tLanding(`pricing.${plan.id}.description`)}
-                features={planFeatures(tLanding, plan.id)}
-                cta={tLanding("pricing.choosePlan")}
-                detailsLabel={tLanding("pricing.seeDetails")}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="pb-16">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-5xl">
-            <h2 className="mb-6 text-2xl font-bold">{t("addons.title")}</h2>
-            <div className="flex flex-col gap-4 rounded-2xl border bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-              <div className="max-w-2xl">
-                <h3 className="text-lg font-semibold">
-                  {t("addons.saveTheDate.title")}{" "}
-                  <span className="text-primary">
-                    {formatPrice(ADDONS.saveTheDate.price)}
-                  </span>
-                </h3>
-                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                  {t("addons.saveTheDate.description", {
-                    price: formatPrice(ADDONS.saveTheDate.price),
-                  })}
-                </p>
-              </div>
-              <Link
-                href="/save-the-date"
-                className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
-              >
-                {t("addons.saveTheDate.link")}
-                <ArrowRight className="size-4" />
-              </Link>
-            </div>
+          <div className="mx-auto mt-14 grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {PRODUCT_LIST.map((product) => {
+              const page = PRODUCT_PAGES[product.id];
+              return (
+                <PricingCard
+                  key={product.id}
+                  product={product}
+                  title={tLanding(`pricing.${product.id}.title`)}
+                  description={tLanding(`pricing.${product.id}.description`)}
+                  features={productFeatures(tLanding, product.id)}
+                  cta={tLanding("pricing.choose")}
+                  compareAtPrice={product.id === "gold" ? APPS_TOTAL_PRICE : undefined}
+                  details={page ? { href: page, label: tLanding("pricing.seeDetails") } : undefined}
+                />
+              );
+            })}
           </div>
         </div>
       </section>
@@ -132,39 +108,33 @@ export default async function PricingPage() {
             <p className="mt-3 text-muted-foreground">{t("chooseSubtitle")}</p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
-            {PLAN_LIST.map((plan) => (
-              <div
-                key={plan.id}
-                className="rounded-2xl border bg-white p-6 shadow-sm"
-              >
-                <h3 className="mb-2 text-lg font-semibold">
-                  {tLanding(`pricing.${plan.id}.title`)}
-                </h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {t(`choose.${plan.id}`)}
-                </p>
-                <Link
-                  href={{
-                    pathname: "/packages/[plan]",
-                    params: { plan: plan.id },
-                  }}
-                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {PRODUCT_LIST.map((product) => {
+              const page = PRODUCT_PAGES[product.id];
+              return (
+                <div
+                  key={product.id}
+                  className="rounded-2xl border bg-white p-6 shadow-sm"
                 >
-                  {tLanding("pricing.seeDetails")}
-                  <ArrowRight className="size-4" />
-                </Link>
-              </div>
-            ))}
+                  <h3 className="mb-2 text-lg font-semibold">
+                    {tLanding(`pricing.${product.id}.title`)}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {t(`choose.${product.id}`, values)}
+                  </p>
+                  {page && (
+                    <Link
+                      href={page}
+                      className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+                    >
+                      {tLanding("pricing.seeDetails")}
+                      <ArrowRight className="size-4" />
+                    </Link>
+                  )}
+                </div>
+              );
+            })}
           </div>
-
-          <Link
-            href="/virtual-guestbook"
-            className="mt-10 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
-          >
-            {t("guideLink")}
-            <ArrowRight className="size-4" />
-          </Link>
         </div>
       </section>
 

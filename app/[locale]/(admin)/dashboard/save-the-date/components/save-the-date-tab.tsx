@@ -145,11 +145,7 @@ export function SaveTheDateTab({
   }
 
   const canEdit = selectedEvent
-    ? hasFeature({
-        plan: selectedEvent.plan_id,
-        feature: "saveTheDate",
-        addons: selectedEvent.addons,
-      })
+    ? hasFeature({ products: selectedEvent.products, feature: "saveTheDate" })
     : false;
 
   const guestHref =

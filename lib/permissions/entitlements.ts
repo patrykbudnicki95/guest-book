@@ -1,14 +1,10 @@
-import type { AddonId, PlanId } from "@/lib/pricing";
+import type { AppId } from "@/lib/pricing";
 
 const MB = 1024 ** 2;
 const GB = 1024 ** 3;
 
-/**
- * Every capability the app can gate on. Some are declared before they exist so
- * the pricing table can advertise them and wiring them up later is a single
- * `hasFeature` call at the new call site.
- */
-export const PLAN_FEATURES = [
+/** Every capability the app can gate on. Each belongs to exactly one app. */
+export const FEATURES = [
   "guestUploads",
   "photoGallery",
   "qrCode",
@@ -19,12 +15,11 @@ export const PLAN_FEATURES = [
   "qrTableCards",
   "findYourTable",
   "saveTheDate",
-  "weddingGames",
 ] as const;
 
-export type PlanFeature = (typeof PLAN_FEATURES)[number];
+export type Feature = (typeof FEATURES)[number];
 
-export type PlanLimits = {
+export type Limits = {
   /** Total bytes of guest uploads allowed for one event. */
   storageBytes: number;
   /** Largest single file a guest may upload. */
@@ -33,53 +28,26 @@ export type PlanLimits = {
   guestAccessDays: number;
   /** Days after the wedding date during which the couple can download. */
   downloadDays: number;
-  /** Printed QR table cards included in the package. */
+  /** Printed QR table cards included. */
   qrTableCards: number;
   /** Tables in the "find your table" seating plan. */
   seatingTables: number;
 };
 
-export type PlanEntitlement = {
-  features: readonly PlanFeature[];
-  limits: PlanLimits;
+export type AppEntitlement = {
+  features: readonly Feature[];
+  /** Only the limits this app is about; the rest stay at zero. */
+  limits: Partial<Limits>;
 };
 
 /**
- * Single source of truth for what each plan allows. The UI, the server actions
+ * Single source of truth for what each app allows. The UI, the server actions
  * and the marketing feature bullets all read from here, so changing a limit is
- * a one-line edit that propagates everywhere.
+ * a one-line edit that propagates everywhere. Gold is not listed: it grants
+ * every app (see `ownedApps` in `lib/pricing.ts`).
  */
-export const PLAN_ENTITLEMENTS = {
-  basic: {
-    features: ["guestUploads", "photoGallery", "qrCode"],
-    limits: {
-      storageBytes: 100 * GB,
-      maxFileBytes: 50 * MB,
-      guestAccessDays: 3,
-      downloadDays: 14,
-      qrTableCards: 0,
-      seatingTables: 0,
-    },
-  },
-  silver: {
-    features: [
-      "guestUploads",
-      "photoGallery",
-      "qrCode",
-      "customBranding",
-      "schedule",
-      "menu",
-    ],
-    limits: {
-      storageBytes: 400 * GB,
-      maxFileBytes: 100 * MB,
-      guestAccessDays: 5,
-      downloadDays: 30,
-      qrTableCards: 0,
-      seatingTables: 0,
-    },
-  },
-  gold: {
+export const APP_ENTITLEMENTS = {
+  guestbook: {
     features: [
       "guestUploads",
       "photoGallery",
@@ -89,9 +57,6 @@ export const PLAN_ENTITLEMENTS = {
       "menu",
       "videoUploads",
       "qrTableCards",
-      "findYourTable",
-      "saveTheDate",
-      "weddingGames",
     ],
     limits: {
       storageBytes: 800 * GB,
@@ -99,14 +64,24 @@ export const PLAN_ENTITLEMENTS = {
       guestAccessDays: 14,
       downloadDays: 90,
       qrTableCards: 3,
-      seatingTables: 100,
     },
   },
-} as const satisfies Record<PlanId, PlanEntitlement>;
+  saveTheDate: {
+    features: ["saveTheDate"],
+    limits: {},
+  },
+  seating: {
+    features: ["findYourTable"],
+    limits: { seatingTables: 100 },
+  },
+} as const satisfies Record<AppId, AppEntitlement>;
 
-export const DEFAULT_PLAN_ID: PlanId = "basic";
-
-/** Features an add-on unlocks on events whose plan doesn't include them. */
-export const ADDON_FEATURES = {
-  saveTheDate: ["saveTheDate"],
-} as const satisfies Record<AddonId, readonly PlanFeature[]>;
+/** An event that owns nothing gets nothing. */
+export const NO_LIMITS: Limits = {
+  storageBytes: 0,
+  maxFileBytes: 0,
+  guestAccessDays: 0,
+  downloadDays: 0,
+  qrTableCards: 0,
+  seatingTables: 0,
+};

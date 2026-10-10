@@ -25,7 +25,7 @@ export async function getSeatingList(userId: string): Promise<SeatingEvent[]> {
 
   const { data: eventsData, error: eventsError } = await supabase
     .from("events")
-    .select("id, names, plan_id")
+    .select("id, names, products")
     .eq("owner_id", userId)
     .eq("is_active", true)
     .order("created_at", { ascending: false });
@@ -157,11 +157,11 @@ export async function updateSeating(
     return { success: false, error: "Event not found" };
   }
 
-  const plan = planContext.plan_id;
-  if (!hasFeature({ plan, feature: "findYourTable" })) {
+  const { products } = planContext;
+  if (!hasFeature({ products, feature: "findYourTable" })) {
     return { success: false, error: "planUpgradeRequired" };
   }
-  if (parsed.data.tables.length > getLimits(plan).seatingTables) {
+  if (parsed.data.tables.length > getLimits(products).seatingTables) {
     return { success: false, error: "tooManyTables" };
   }
 

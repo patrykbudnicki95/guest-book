@@ -1,11 +1,21 @@
-export const PLAN_IDS = ["basic", "silver", "gold"] as const;
+import type { StaticAppPathname } from "@/i18n/routing";
 
-export type PlanId = (typeof PLAN_IDS)[number];
+/**
+ * The apps a couple can own. Each one is sold on its own and has its own
+ * entitlements in `lib/permissions/entitlements.ts`.
+ */
+export const APP_IDS = ["guestbook", "saveTheDate", "seating"] as const;
 
-export type Plan = {
-  id: PlanId;
+export type AppId = (typeof APP_IDS)[number];
+
+/** What can be bought (`events.products`): every app, plus Gold, which grants all of them. */
+export const PRODUCT_IDS = [...APP_IDS, "gold"] as const;
+
+export type ProductId = (typeof PRODUCT_IDS)[number];
+
+export type Product = {
+  id: ProductId;
   price: number;
-  originalPrice: number;
   featureCount: number;
   highlighted: boolean;
 };
@@ -16,57 +26,47 @@ export const CURRENCY_SYMBOL = "zł";
 /**
  * Prices live here and nowhere else. Google treats a mismatch between the price
  * rendered on the page and the price in Product structured data as invalid markup,
- * so the pricing cards, the package pages and the JSON-LD all read from this map.
+ * so the pricing cards and the JSON-LD all read from this map.
+ *
+ * Placeholders until the keyword and competitor research is in (see
+ * `docs/product/roadmap.md`). Gold costs about as much as two apps, so it's the
+ * obvious pick once a couple wants a second one.
  */
-export const PLANS: Record<PlanId, Plan> = {
-  basic: {
-    id: "basic",
-    price: 299,
-    originalPrice: 399,
-    featureCount: 5,
-    highlighted: false,
-  },
-  silver: {
-    id: "silver",
-    price: 399,
-    originalPrice: 499,
-    featureCount: 5,
-    highlighted: true,
-  },
-  gold: {
-    id: "gold",
-    price: 499,
-    originalPrice: 599,
-    featureCount: 7,
-    highlighted: false,
-  },
+export const PRODUCTS: Record<ProductId, Product> = {
+  guestbook: { id: "guestbook", price: 249, featureCount: 6, highlighted: false },
+  saveTheDate: { id: "saveTheDate", price: 100, featureCount: 5, highlighted: false },
+  seating: { id: "seating", price: 99, featureCount: 4, highlighted: false },
+  gold: { id: "gold", price: 349, featureCount: 5, highlighted: true },
 };
 
-export const PLAN_LIST: Plan[] = PLAN_IDS.map((id) => PLANS[id]);
+export const PRODUCT_LIST: Product[] = PRODUCT_IDS.map((id) => PRODUCTS[id]);
+
+/** What the apps cost bought one by one, to show what Gold saves. */
+export const APPS_TOTAL_PRICE = APP_IDS.reduce((sum, id) => sum + PRODUCTS[id].price, 0);
+
+/** The cheapest way in, for "from X zł" copy. */
+export const LOWEST_PRICE = Math.min(...PRODUCT_LIST.map((product) => product.price));
 
 /**
- * One-off products bought on top of an event's plan (`events.addons`). What each
- * one unlocks lives in `ADDON_FEATURES` in `lib/permissions/entitlements.ts`.
+ * The apps a list of purchases unlocks. Gold unlocks every app, including ones
+ * added after the purchase.
  */
-export const ADDON_IDS = ["saveTheDate"] as const;
+export function ownedApps(products: readonly ProductId[]): AppId[] {
+  return products.includes("gold")
+    ? [...APP_IDS]
+    : APP_IDS.filter((app) => products.includes(app));
+}
 
-export type AddonId = (typeof ADDON_IDS)[number];
-
-export const ADDONS: Record<AddonId, { id: AddonId; price: number }> = {
-  saveTheDate: { id: "saveTheDate", price: 100 },
-};
-
-/** Plan names are brand names, so they read the same in every locale. */
-export const PLAN_LABELS: Record<PlanId, string> = {
-  basic: "Basic",
-  silver: "Silver",
-  gold: "Gold",
-};
-
-export function isPlanId(value: string): value is PlanId {
-  return PLAN_IDS.includes(value as PlanId);
+export function isProductId(value: string): value is ProductId {
+  return (PRODUCT_IDS as readonly string[]).includes(value);
 }
 
 export function formatPrice(amount: number): string {
   return `${amount} ${CURRENCY_SYMBOL}`;
 }
+
+/** Products that already have a marketing landing page. */
+export const PRODUCT_PAGES: Partial<Record<ProductId, StaticAppPathname>> = {
+  guestbook: "/virtual-guestbook",
+  saveTheDate: "/save-the-date",
+};

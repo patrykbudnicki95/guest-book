@@ -4,26 +4,31 @@ import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
-import { CURRENCY_SYMBOL, type Plan } from "@/lib/pricing";
+import type { StaticAppPathname } from "@/i18n/routing";
+import { CURRENCY_SYMBOL, type Product } from "@/lib/pricing";
 
 type PricingCardProps = {
-  plan: Plan;
+  product: Product;
   title: string;
   description: string;
   features: string[];
   cta: string;
-  detailsLabel?: string;
+  /** A real "instead of" price, e.g. the apps bought one by one for Gold. */
+  compareAtPrice?: number;
+  /** The product's landing page, when it has one. */
+  details?: { href: StaticAppPathname; label: string };
 };
 
 export function PricingCard({
-  plan,
+  product,
   title,
   description,
   features,
   cta,
-  detailsLabel,
+  compareAtPrice,
+  details,
 }: PricingCardProps) {
-  const { highlighted } = plan;
+  const { highlighted } = product;
 
   return (
     <div
@@ -49,11 +54,13 @@ export function PricingCard({
       </div>
 
       <div className="mb-6 flex items-baseline gap-2">
-        <span className="text-4xl font-bold">{plan.price}</span>
+        <span className="text-4xl font-bold">{product.price}</span>
         <span className="text-lg text-muted-foreground">{CURRENCY_SYMBOL}</span>
-        <span className="ml-1 text-sm text-muted-foreground line-through">
-          {plan.originalPrice} {CURRENCY_SYMBOL}
-        </span>
+        {compareAtPrice !== undefined && (
+          <span className="ml-1 text-sm text-muted-foreground line-through">
+            {compareAtPrice} {CURRENCY_SYMBOL}
+          </span>
+        )}
       </div>
 
       <ul className="mb-8 flex-1 space-y-3">
@@ -78,17 +85,17 @@ export function PricingCard({
           variant={highlighted ? "default" : "outline"}
           size="lg"
         >
-          <Link href={{ pathname: "/signup", query: { plan: plan.id } }}>
+          <Link href={{ pathname: "/signup", query: { product: product.id } }}>
             {cta}
           </Link>
         </Button>
 
-        {detailsLabel && (
+        {details && (
           <Link
-            href={{ pathname: "/packages/[plan]", params: { plan: plan.id } }}
+            href={details.href}
             className="block text-center text-sm font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
           >
-            {detailsLabel}
+            {details.label}
           </Link>
         )}
       </div>

@@ -34,13 +34,12 @@ import {
 } from "@/components/ui/select";
 import { signOut } from "@/app/actions/auth-actions";
 import {
-  setEventAddon,
-  setEventPlan,
+  setEventProducts,
   updateEventSettings,
 } from "@/app/actions/settings-actions";
 import type { EventSettings } from "@/app/actions/settings-actions";
 import { hasFeature } from "@/lib/permissions";
-import { ADDON_IDS, PLAN_IDS, PLAN_LABELS, type AddonId } from "@/lib/pricing";
+import { PRODUCT_IDS, type ProductId } from "@/lib/pricing";
 import { PlanLock } from "../../components/plan-lock";
 import {
   eventSettingsFormSchema,
@@ -70,6 +69,7 @@ export function SettingsTab({
   const tPrivacy = useTranslations("dashboard.settings.privacy");
   const tDanger = useTranslations("dashboard.settings.dangerZone");
   const tPlan = useTranslations("dashboard.settings.planSwitcher");
+  const tProducts = useTranslations("products");
   const locale = useLocale();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -79,7 +79,7 @@ export function SettingsTab({
   const selectedEvent =
     events.find((e) => e.id === effectiveEventId) ?? events[0] ?? null;
   const canBrand = hasFeature({
-    plan: selectedEvent?.plan_id ?? "basic",
+    products: selectedEvent?.products ?? [],
     feature: "customBranding",
   });
 
@@ -122,28 +122,19 @@ export function SettingsTab({
     });
   };
 
-  const handlePlanChange = (planId: string) => {
-    if (!effectiveEventId) return;
+  const handleProductChange = (product: ProductId, owned: boolean) => {
+    if (!effectiveEventId || !selectedEvent) return;
+
+    const products = owned
+      ? [...selectedEvent.products, product]
+      : selectedEvent.products.filter((id) => id !== product);
 
     startTransition(async () => {
-      const result = await setEventPlan(effectiveEventId, planId);
+      const result = await setEventProducts(effectiveEventId, products);
 
       if (result.success) {
-        toast.success(tPlan("updated", { plan: planId }));
-        router.refresh();
-      } else {
-        toast.error(result.error ?? t("saveError"));
-      }
-    });
-  };
-
-  const handleAddonChange = (addonId: AddonId, enabled: boolean) => {
-    if (!effectiveEventId) return;
-
-    startTransition(async () => {
-      const result = await setEventAddon(effectiveEventId, addonId, enabled);
-
-      if (result.success) {
+        toast.success(tPlan("updated"));
+        // Re-renders the layout, so the navigation picks up the new apps.
         router.refresh();
       } else {
         toast.error(result.error ?? t("saveError"));
@@ -318,34 +309,15 @@ export function SettingsTab({
             <CardDescription>{tPlan("description")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>{tPlan("label")}</Label>
-              <Select
-                value={selectedEvent?.plan_id ?? "basic"}
-                onValueChange={handlePlanChange}
-                disabled={isPending}
-              >
-                <SelectTrigger className="w-full max-w-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PLAN_IDS.map((planId) => (
-                    <SelectItem key={planId} value={planId}>
-                      {PLAN_LABELS[planId]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            {ADDON_IDS.map((addonId) => (
-              <div key={addonId} className="flex items-center justify-between gap-4">
-                <Label htmlFor={`addon-${addonId}`} className="font-normal">
-                  {tPlan(`addons.${addonId}`)}
+            {PRODUCT_IDS.map((product) => (
+              <div key={product} className="flex items-center justify-between gap-4">
+                <Label htmlFor={`product-${product}`} className="font-normal">
+                  {tProducts(`${product}.name`)}
                 </Label>
                 <Switch
-                  id={`addon-${addonId}`}
-                  checked={selectedEvent?.addons.includes(addonId) ?? false}
-                  onCheckedChange={(enabled) => handleAddonChange(addonId, enabled)}
+                  id={`product-${product}`}
+                  checked={selectedEvent?.products.includes(product) ?? false}
+                  onCheckedChange={(owned) => handleProductChange(product, owned)}
                   disabled={isPending}
                 />
               </div>

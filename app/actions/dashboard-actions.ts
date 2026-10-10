@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { fileKeyFromPublicUrl, getDownloadUrl } from "@/lib/storage/r2";
-import { EventIdWithNamesSchema, EventForPdfSchema, EventPlanSummarySchema, UploadFileUrlSchema, EntryWithMediaAndEventSchema, EntryForExportSchema, type Entry, type EntryForExport } from "@/lib/schemas/database";
+import { EventIdWithNamesSchema, EventForPdfSchema, EventProductsSchema, EventPlanSummarySchema, UploadFileUrlSchema, EntryWithMediaAndEventSchema, EntryForExportSchema, type Entry, type EntryForExport } from "@/lib/schemas/database";
 import {
   formatBytes,
   getDownloadWindowEnd,
@@ -13,7 +13,7 @@ import {
   isGuestUploadOpen,
   type StorageState,
 } from "@/lib/permissions";
-import type { PlanId } from "@/lib/pricing";
+import { ownedApps, type AppId, type ProductId } from "@/lib/pricing";
 
 export interface DashboardStats {
   totalPhotos: number;
@@ -27,7 +27,7 @@ export interface EventPlanSummary {
   id: string;
   names: string;
   date: string;
-  plan: PlanId;
+  products: ProductId[];
   storage: StorageState;
   uploadWindowEnd: string;
   downloadWindowEnd: string;
@@ -54,7 +54,7 @@ export interface UserEventForPdf {
   names: string;
   date: string;
   location: string | null;
-  plan_id: PlanId;
+  products: ProductId[];
 }
 
 const EMPTY_STATS: DashboardStats = {
@@ -71,7 +71,7 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
   // Get user's events
   const { data: events, error: eventsError } = await supabase
     .from("events")
-    .select("id, names, date, plan_id, storage_used_bytes")
+    .select("id, names, date, products, storage_used_bytes")
     .eq("owner_id", userId)
     .eq("is_active", true);
 
@@ -134,13 +134,13 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
   };
 }
 
-/** Plan, quota usage and access windows for every event the user owns. */
+/** Products, quota usage and access windows for every event the user owns. */
 export async function getEventPlanSummaries(userId: string): Promise<EventPlanSummary[]> {
   const supabase = await createClient();
 
   const { data: events, error } = await supabase
     .from("events")
-    .select("id, names, date, plan_id, storage_used_bytes")
+    .select("id, names, date, products, storage_used_bytes")
     .eq("owner_id", userId)
     .eq("is_active", true)
     .order("created_at", { ascending: false });
@@ -158,19 +158,19 @@ export async function getEventPlanSummaries(userId: string): Promise<EventPlanSu
   }
 
   return parsed.data.map((event) => {
-    const plan = event.plan_id;
+    const { products } = event;
     const eventDate = event.date;
 
     return {
       id: event.id,
       names: event.names,
       date: eventDate,
-      plan,
-      storage: getStorageState({ plan, usedBytes: event.storage_used_bytes }),
-      uploadWindowEnd: getUploadWindowEnd({ plan, eventDate }).toISOString(),
-      downloadWindowEnd: getDownloadWindowEnd({ plan, eventDate }).toISOString(),
-      isUploadOpen: isGuestUploadOpen({ plan, eventDate }),
-      isDownloadOpen: isDownloadOpen({ plan, eventDate }),
+      products,
+      storage: getStorageState({ products, usedBytes: event.storage_used_bytes }),
+      uploadWindowEnd: getUploadWindowEnd({ products, eventDate }).toISOString(),
+      downloadWindowEnd: getDownloadWindowEnd({ products, eventDate }).toISOString(),
+      isUploadOpen: isGuestUploadOpen({ products, eventDate }),
+      isDownloadOpen: isDownloadOpen({ products, eventDate }),
     };
   });
 }
@@ -239,7 +239,7 @@ const EXPORT_URL_TTL_SECONDS = 24 * 60 * 60;
 /**
  * Every entry of one event, oldest first, with file sizes so the browser can
  * build the "download all" ZIP straight from R2. Only the owner may call it,
- * and only while the plan's download window is open.
+ * and only while the guestbook's download window is open.
  */
 export async function getEventExport(eventId: string): Promise<EventExportResult> {
   const supabase = await createClient();
@@ -253,7 +253,7 @@ export async function getEventExport(eventId: string): Promise<EventExportResult
 
   const { data: event, error: eventError } = await supabase
     .from("events")
-    .select("id, names, date, plan_id, storage_used_bytes")
+    .select("id, names, date, products, storage_used_bytes")
     .eq("id", eventId)
     .eq("owner_id", user.id)
     .single();
@@ -270,7 +270,7 @@ export async function getEventExport(eventId: string): Promise<EventExportResult
     return { success: false, error: "loadFailed" };
   }
 
-  if (!isDownloadOpen({ plan: parsedEvent.data.plan_id, eventDate: parsedEvent.data.date })) {
+  if (!isDownloadOpen({ products: parsedEvent.data.products, eventDate: parsedEvent.data.date })) {
     return { success: false, error: "downloadClosed" };
   }
 
@@ -358,7 +358,7 @@ export async function getUserEventsForPdf(userId: string): Promise<UserEventForP
 
   const { data: events, error: eventsError } = await supabase
     .from("events")
-    .select("id, names, date, location, plan_id")
+    .select("id, names, date, location, products")
     .eq("owner_id", userId)
     .eq("is_active", true)
     .order("created_at", { ascending: false });
@@ -376,4 +376,32 @@ export async function getUserEventsForPdf(userId: string): Promise<UserEventForP
   }
 
   return parsedEvents.data;
+}
+
+/**
+ * Every app the user owns through any of their events. The dashboard navigation
+ * shows exactly these, so buying an app makes its tabs appear.
+ */
+export async function getOwnedApps(userId: string): Promise<AppId[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("events")
+    .select("products")
+    .eq("owner_id", userId)
+    .eq("is_active", true);
+
+  if (error || !data) {
+    console.error("[getOwnedApps] Error fetching events:", error);
+    return [];
+  }
+
+  const parsed = z.array(EventProductsSchema).safeParse(data);
+  if (!parsed.success) {
+    console.error("[getOwnedApps] Zod validation failed:", z.prettifyError(parsed.error));
+    console.error("[getOwnedApps] Raw data:", JSON.stringify(data, null, 2));
+    return [];
+  }
+
+  return ownedApps(parsed.data.flatMap((event) => event.products));
 }

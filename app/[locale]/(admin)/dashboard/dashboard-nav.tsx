@@ -13,62 +13,53 @@ import {
   Sparkles,
 } from "lucide-react";
 import type { StaticAppPathname } from "@/i18n/routing";
+import type { AppId } from "@/lib/pricing";
 
 export type DashboardBasePath = "/dashboard" | "/demo/dashboard";
 
-const navByBase: Record<
-  DashboardBasePath,
-  readonly {
-    href: StaticAppPathname;
-    labelKey:
-      | "overview"
-      | "eventPage"
-      | "saveTheDate"
-      | "seating"
-      | "gallery"
-      | "qrCode"
-      | "settings";
-    icon: typeof LayoutDashboard;
-  }[]
-> = {
-  "/dashboard": [
-    { href: "/dashboard", labelKey: "overview", icon: LayoutDashboard },
-    { href: "/dashboard/event-page", labelKey: "eventPage", icon: Sparkles },
-    { href: "/dashboard/save-the-date", labelKey: "saveTheDate", icon: CalendarHeart },
-    { href: "/dashboard/seating", labelKey: "seating", icon: Armchair },
-    { href: "/dashboard/gallery", labelKey: "gallery", icon: Image },
-    { href: "/dashboard/qr-code", labelKey: "qrCode", icon: QrCode },
-    { href: "/dashboard/settings", labelKey: "settings", icon: Settings },
-  ],
-  "/demo/dashboard": [
-    { href: "/demo/dashboard", labelKey: "overview", icon: LayoutDashboard },
-    { href: "/demo/dashboard/event-page", labelKey: "eventPage", icon: Sparkles },
-    { href: "/demo/dashboard/save-the-date", labelKey: "saveTheDate", icon: CalendarHeart },
-    { href: "/demo/dashboard/seating", labelKey: "seating", icon: Armchair },
-    { href: "/demo/dashboard/gallery", labelKey: "gallery", icon: Image },
-    { href: "/demo/dashboard/qr-code", labelKey: "qrCode", icon: QrCode },
-    { href: "/demo/dashboard/settings", labelKey: "settings", icon: Settings },
-  ],
+type NavItem = {
+  path: "" | "/event-page" | "/save-the-date" | "/seating" | "/gallery" | "/qr-code" | "/settings";
+  labelKey: "overview" | "eventPage" | "saveTheDate" | "seating" | "gallery" | "qrCode" | "settings";
+  icon: typeof LayoutDashboard;
+  /** The app the tab belongs to; tabs without one are always shown. */
+  app?: AppId;
 };
 
+const NAV_ITEMS: NavItem[] = [
+  { path: "", labelKey: "overview", icon: LayoutDashboard },
+  { path: "/event-page", labelKey: "eventPage", icon: Sparkles, app: "guestbook" },
+  { path: "/save-the-date", labelKey: "saveTheDate", icon: CalendarHeart, app: "saveTheDate" },
+  { path: "/seating", labelKey: "seating", icon: Armchair, app: "seating" },
+  { path: "/gallery", labelKey: "gallery", icon: Image, app: "guestbook" },
+  { path: "/qr-code", labelKey: "qrCode", icon: QrCode, app: "guestbook" },
+  { path: "/settings", labelKey: "settings", icon: Settings },
+];
+
+/** Only the apps the couple owns get tabs; the rest live in "Discover" on the overview. */
 export function DashboardNav({
   basePath = "/dashboard",
+  apps,
 }: {
   basePath?: DashboardBasePath;
+  apps: readonly AppId[];
 }) {
   const pathname = usePathname();
   const t = useTranslations("dashboard.nav");
-  const navItems = navByBase[basePath];
+  const navItems = NAV_ITEMS.filter((item) => !item.app || apps.includes(item.app));
 
   return (
-    <nav className="grid w-full grid-cols-7 gap-1 rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-border/50">
+    <nav
+      className="grid w-full gap-1 rounded-xl bg-white p-1.5 shadow-sm ring-1 ring-border/50"
+      style={{ gridTemplateColumns: `repeat(${navItems.length}, minmax(0, 1fr))` }}
+    >
       {navItems.map((item) => {
-        const isActive = pathname === item.href;
+        const href = `${basePath}${item.path}` as StaticAppPathname;
+        const isActive = pathname === href;
         const Icon = item.icon;
         return (
           <Link
-            key={item.href}
-            href={item.href}
+            key={href}
+            href={href}
             className={cn(
               "flex items-center justify-center gap-2 rounded-lg px-2 py-2.5 text-sm font-medium transition-all sm:px-3",
               isActive

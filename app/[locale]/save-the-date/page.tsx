@@ -13,7 +13,7 @@ import { Link } from "@/i18n/navigation";
 import { buildMetadata, localizedUrl } from "@/lib/seo/metadata";
 import { breadcrumbListNode, faqPageNode } from "@/lib/seo/json-ld";
 import { siteConfig } from "@/lib/seo/config";
-import { ADDONS, PLANS, formatPrice } from "@/lib/pricing";
+import { PRODUCTS, formatPrice } from "@/lib/pricing";
 import { JsonLd } from "@/components/json-ld";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
     href: "/save-the-date",
     locale,
     title: t("title"),
-    description: t("description", { price: ADDONS.saveTheDate.price }),
+    description: t("description", { price: PRODUCTS.saveTheDate.price }),
   });
 }
 
@@ -42,8 +42,8 @@ export default async function SaveTheDateMarketingPage() {
   const tFooter = await getTranslations("footer");
 
   const prices = {
-    addonPrice: formatPrice(ADDONS.saveTheDate.price),
-    goldPrice: formatPrice(PLANS.gold.price),
+    addonPrice: formatPrice(PRODUCTS.saveTheDate.price),
+    goldPrice: formatPrice(PRODUCTS.gold.price),
   };
 
   const steps = [1, 2, 3].map((index) => ({
@@ -97,7 +97,9 @@ export default async function SaveTheDateMarketingPage() {
                 <Link href="/signup">{t("ctaPrimary")}</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="rounded-full">
-                <Link href="/demo/save-the-date">{t("ctaDemo")}</Link>
+                <Link href={{ pathname: "/demo/dashboard/save-the-date", query: { apps: "saveTheDate" } }}>
+                  {t("ctaDemo")}
+                </Link>
               </Button>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">{t("priceNote", prices)}</p>
@@ -165,7 +167,7 @@ export default async function SaveTheDateMarketingPage() {
                 {t("pricing.gold.description")}
               </p>
               <Link
-                href={{ pathname: "/packages/[plan]", params: { plan: "gold" } }}
+                href="/pricing"
                 className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
               >
                 {t("pricing.gold.cta")}
@@ -173,16 +175,16 @@ export default async function SaveTheDateMarketingPage() {
               </Link>
             </div>
             <div className="rounded-2xl border bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-semibold">{t("pricing.addon.title")}</h3>
+              <h3 className="text-lg font-semibold">{t("pricing.single.title")}</h3>
               <p className="mt-2 text-3xl font-bold">{prices.addonPrice}</p>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {t("pricing.addon.description")}
+                {t("pricing.single.description")}
               </p>
               <Link
                 href="/pricing"
                 className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
               >
-                {t("pricing.addon.cta")}
+                {t("pricing.single.cta")}
                 <ArrowRight className="size-4" />
               </Link>
             </div>

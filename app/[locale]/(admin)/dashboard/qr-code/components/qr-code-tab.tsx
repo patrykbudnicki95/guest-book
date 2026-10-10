@@ -60,9 +60,9 @@ export function QRCodeTab({ events, guestHref }: QRCodeTabProps) {
     [guestHref, locale],
   );
 
-  // Every plan gets a QR card; only the paid tiers can restyle it.
+  // Restyling the card is part of the guestbook's custom branding.
   const canPersonalizeCard = events.some((event) =>
-    hasFeature({ plan: event.plan_id, feature: "customBranding" }),
+    hasFeature({ products: event.products, feature: "customBranding" }),
   );
 
   useEffect(() => {
@@ -241,10 +241,10 @@ export function QRCodeTab({ events, guestHref }: QRCodeTabProps) {
                   </div>
                 )}
               </div>
-              {getLimits(event.plan_id).qrTableCards > 0 && (
+              {getLimits(event.products).qrTableCards > 0 && (
                 <p className="text-center text-xs text-muted-foreground">
                   {tPlan("qrTableCards")}:{" "}
-                  {getLimits(event.plan_id).qrTableCards}
+                  {getLimits(event.products).qrTableCards}
                 </p>
               )}
               <div className="flex justify-center">

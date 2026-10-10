@@ -24,7 +24,7 @@ export async function getEventPageDataList(userId: string): Promise<EventFull[]>
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, names, date, location, theme_color, cover_photo_url, welcome_message, schedule, menu, plan_id, storage_used_bytes",
+      "id, names, date, location, theme_color, cover_photo_url, welcome_message, schedule, menu, products, storage_used_bytes",
     )
     .eq("owner_id", userId)
     .eq("is_active", true)
@@ -56,7 +56,7 @@ export async function getEventPageData(
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, names, date, location, theme_color, cover_photo_url, welcome_message, schedule, menu, plan_id, storage_used_bytes",
+      "id, names, date, location, theme_color, cover_photo_url, welcome_message, schedule, menu, products, storage_used_bytes",
     )
     .eq("id", eventId)
     .eq("is_active", true)
@@ -106,13 +106,13 @@ export async function updateEventPageContent(
     return { success: false, error: "Event not found" };
   }
 
-  const plan = planContext.plan_id;
+  const { products } = planContext;
   const updateData: Database["public"]["Tables"]["events"]["Update"] = {
     updated_at: new Date().toISOString(),
   };
 
   if (parsed.data.cover_photo_url !== undefined) {
-    if (!hasFeature({ plan, feature: "customBranding" })) {
+    if (!hasFeature({ products, feature: "customBranding" })) {
       return { success: false, error: "planUpgradeRequired" };
     }
     updateData.cover_photo_url = parsed.data.cover_photo_url;
@@ -121,13 +121,13 @@ export async function updateEventPageContent(
     updateData.welcome_message = parsed.data.welcome_message;
   }
   if (parsed.data.schedule !== undefined) {
-    if (!hasFeature({ plan, feature: "schedule" })) {
+    if (!hasFeature({ products, feature: "schedule" })) {
       return { success: false, error: "planUpgradeRequired" };
     }
     updateData.schedule = (parsed.data.schedule as Json) ?? null;
   }
   if (parsed.data.menu !== undefined) {
-    if (!hasFeature({ plan, feature: "menu" })) {
+    if (!hasFeature({ products, feature: "menu" })) {
       return { success: false, error: "planUpgradeRequired" };
     }
     updateData.menu = (parsed.data.menu as Json) ?? null;
@@ -182,9 +182,9 @@ export async function getPresignedUrlForCoverPhoto(
   const planContext = await getEventPlanContext(eventId);
   if (
     !planContext ||
-    !hasFeature({ plan: planContext.plan_id, feature: "customBranding" })
+    !hasFeature({ products: planContext.products, feature: "customBranding" })
   ) {
-    throw new Error("Cover photos require a higher plan");
+    throw new Error("Cover photos require the guestbook app");
   }
 
   const uuid = crypto.randomUUID();
@@ -213,7 +213,7 @@ export async function getEventsForOwner(userId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("events")
-    .select("id, names, date, location, plan_id")
+    .select("id, names, date, location, products")
     .eq("owner_id", userId)
     .eq("is_active", true)
     .order("created_at", { ascending: false });

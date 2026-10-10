@@ -2,6 +2,7 @@
 
 import { SeatingBrowser } from "@/app/[locale]/e/[eventId]/tables/components/seating-browser";
 import { useDemoWorkspace } from "@/lib/demo/provider";
+import { hasApp } from "@/lib/permissions";
 
 export function DemoTablesPage() {
   const { event, seating } = useDemoWorkspace();
@@ -11,7 +12,9 @@ export function DemoTablesPage() {
       <SeatingBrowser
         eventNames={event.names}
         tables={
-          seating.is_published && seating.tables.length > 0
+          hasApp({ products: event.products, app: "seating" }) &&
+          seating.is_published &&
+          seating.tables.length > 0
             ? seating.tables
             : null
         }

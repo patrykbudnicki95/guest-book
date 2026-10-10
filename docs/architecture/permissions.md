@@ -1,59 +1,55 @@
-# Permissions & plans
+# Permissions & products
 
 ## Principles
 
-- Plan is on **`events.plan_id`**, not the profile. One user can own a Basic event and later a Gold one.
-- **`PLAN_ENTITLEMENTS`** (`lib/permissions/entitlements.ts`) is the single source of truth for features and limits.
-- **Prices** only in `lib/pricing.ts` (Basic / Silver / Gold, PLN).
-- Marketing numbers use ICU placeholders via `planCopyValues` / `planRangeValues` in `lib/plan-features.ts` so pricing copy cannot promise what the app rejects.
+- What an event may do comes from **`events.products`**, the list of products the couple bought for that event. Products are the apps (`guestbook`, `saveTheDate`, `seating`) and **`gold`**, which grants every app, including apps added later.
+- **`APP_ENTITLEMENTS`** (`lib/permissions/entitlements.ts`) is the single source of truth for each app's features and limits. Gold isn't listed there; `ownedApps(products)` in `lib/pricing.ts` expands it.
+- **Prices** live only in `lib/pricing.ts` (`PRODUCTS`, PLN). They are placeholders until the research in `docs/product/roadmap.md` is in.
+- Marketing numbers use ICU placeholders from `productCopyValues` (`lib/plan-features.ts`), so copy can't promise what the app rejects.
+- Owners **can't write `products`**: the `events` table has column-level INSERT/UPDATE grants that leave it out (migration `007_products.sql`). Only the service role changes it: the dev switcher today, the payment webhook later (`lib/supabase/admin.ts`).
 
 ## Current entitlements (summary)
 
-| | Basic | Silver | Gold |
-|--|-------|--------|------|
-| Storage | 100 GB | 400 GB | 800 GB |
-| Max file | 50 MB | 100 MB | 200 MB |
-| Guest upload window (days after wedding) | 3 | 5 | 14 |
-| Download window (days) | 14 | 30 | 90 |
-| QR table cards | 0 | 0 | 3 |
-| Seating plan tables | 0 | 0 | 100 |
-| Features | uploads, gallery, QR | + branding, schedule, menu | + video, QR cards, findYourTable, saveTheDate, weddingGames |
+| App | Features | Limits |
+|--|--|--|
+| `guestbook` | guest uploads, gallery, QR, custom branding, schedule, menu, video, QR table cards | 800 GB storage, 200 MB per file, guests upload 14 days after the wedding, 90 days to download, 3 QR table cards |
+| `saveTheDate` | save the date page | — |
+| `seating` | find your table | 100 tables |
+| `gold` | every app above | every limit above |
 
-`weddingGames` is declared with no consumer yet — intentional.
-
-## Add-ons
-
-One-off products bought on top of a plan live in **`events.addons`** (`text[]`). Prices are in `ADDONS` (`lib/pricing.ts`), and what each unlocks in `ADDON_FEATURES` (`lib/permissions/entitlements.ts`). Today there is one: `saveTheDate` (included in Gold, sold separately for Basic and Silver).
-
-Wherever an add-on can unlock a feature, pass the event's add-ons: `hasFeature({ plan, feature, addons })`. `getEventPlanContext` returns `addons`, so `requireOwnedEventFeature` / `checkOwnedEventFeature` already account for them. `PlanLock` shows the add-on price next to the minimum plan.
+Limits merge by taking the most generous value across owned apps. An event that owns nothing gets zero everywhere.
 
 ## How to check in code
 
 ```typescript
-import { hasFeature, getLimits, checkUploadAllowed } from "@/lib/permissions";
+import { hasApp, hasFeature, getLimits, checkUploadAllowed } from "@/lib/permissions";
 import { getEventPlanContext } from "@/lib/permissions/server";
 
-hasFeature({ plan, feature: "schedule" });
-getLimits(plan).storageBytes;
+hasFeature({ products: event.products, feature: "schedule" });
+hasApp({ products: event.products, app: "seating" });
+getLimits(event.products).storageBytes;
 
 const context = await getEventPlanContext(eventId);
-// { id, plan_id, addons, date, is_active, storage_used_bytes }
+// { id, products, date, is_active, storage_used_bytes }
 ```
 
 | Layer | API | Role |
 |-------|-----|------|
+| Dashboard navigation | `getOwnedApps` (layout) → `DashboardNav` | Shows only owned apps' tabs; the rest are in "Discover" on the overview |
 | UI | `hasFeature`, `PlanLock` | Hide/lock only — not security |
-| Guest upload | `checkUploadAllowed` | Presign + save must both call |
+| Guest upload | `checkUploadAllowed` | Presign + save must both call; an event without the guestbook is treated as inactive |
 | Owner mutations | `getEventPlanContext` / `requireOwnedEventFeature` | Re-check on server |
 
-## Adding a feature
+## Adding an app
 
-1. Add key to `PLAN_FEATURES` and to the right plans in `PLAN_ENTITLEMENTS`.
-2. Gate UI with `hasFeature` (+ `PlanLock` in dashboard).
-3. Gate the server action the same way.
+1. Add its id to `APP_IDS` and a price to `PRODUCTS` (`lib/pricing.ts`), and to the `events_products_check` constraint (migration).
+2. Add its features to `FEATURES` and an entry in `APP_ENTITLEMENTS`.
+3. Give its dashboard tabs `app: "<id>"` in `dashboard-nav.tsx`, gate the UI (`hasFeature` + `PlanLock`) and the server action.
+4. Add `products.<id>.{name,tagline}` and `landing.pricing.<id>` to both message files, plus an icon in `discover-apps.tsx`.
+5. Demo: it follows `event.products`, and `?apps=<id>` opens a demo of the app alone.
 
 ## Known gaps
 
 - **Download window**: gated in gallery UI only. Files use public R2 URLs until the bucket is private and downloads use signed GETs.
-- **Plan switcher**: `setEventPlan` and `setEventAddon` run only if `NEXT_PUBLIC_ENABLE_PLAN_SWITCHER=true` (server-checked). Dev escape hatch — off in production.
-- **Owners can write `plan_id` and `addons` directly**: the `events` UPDATE grant and policy cover every column, so an owner with the anon key could upgrade their own event. Must be closed (column-level grants or a trigger) before payments go live.
+- **No checkout yet**: products change only through the dev switcher (`setEventProducts`, runs only if `NEXT_PUBLIC_ENABLE_PLAN_SWITCHER=true`, server-checked, needs `SUPABASE_SERVICE_ROLE_KEY`) or by hand in Supabase.
+- **Upgrade credit** (single-app purchases counted toward Gold) is undecided; see the roadmap.

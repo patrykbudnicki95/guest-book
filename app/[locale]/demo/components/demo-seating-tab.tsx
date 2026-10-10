@@ -9,8 +9,8 @@ export function DemoSeatingTab() {
 
   // Stable reference: SeatingTab reloads its draft whenever the event changes.
   const events = useMemo(
-    () => [{ id: event.id, names: event.names, plan_id: event.plan_id, seating }],
-    [event.id, event.names, event.plan_id, seating],
+    () => [{ id: event.id, names: event.names, products: event.products, seating }],
+    [event.id, event.names, event.products, seating],
   );
 
   return (

@@ -34,10 +34,6 @@ export const pathnames = {
     pl: "/cennik",
     en: "/pricing",
   },
-  "/packages/[plan]": {
-    pl: "/pakiety/[plan]",
-    en: "/packages/[plan]",
-  },
   "/save-the-date": {
     pl: "/save-the-date-online",
     en: "/save-the-date",

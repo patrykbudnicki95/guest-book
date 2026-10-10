@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Camera, HardDrive, Calendar, Upload, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { PlanUsageCard } from "./plan-usage-card";
+import { DiscoverApps } from "./discover-apps";
+import type { AppId } from "@/lib/pricing";
 import type {
   DashboardStats,
   EventPlanSummary,
@@ -18,12 +20,15 @@ interface OverviewTabProps {
   stats: DashboardStats;
   events: UserEvent[];
   planSummaries: EventPlanSummary[];
+  /** Apps owned through any event; the rest are offered in "Discover". */
+  apps: AppId[];
 }
 
 export function OverviewTab({
   stats,
   events,
   planSummaries,
+  apps,
 }: OverviewTabProps) {
   const t = useTranslations("dashboard.overview");
   const tCommon = useTranslations("common");
@@ -107,6 +112,8 @@ export function OverviewTab({
       </div>
 
       <PlanUsageCard summaries={planSummaries} />
+
+      <DiscoverApps products={apps} />
 
       {events.length > 0 && (
         <Card className="rounded-xl border-0 shadow-sm">

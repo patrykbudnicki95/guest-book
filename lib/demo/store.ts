@@ -154,8 +154,9 @@ export async function loadDemoRecord(): Promise<{
   const entries = await kvGet<StoredEntryMeta[]>(ENTRIES_KEY);
 
   // No entries key means a fresh browser or a demo saved before entries
-  // existed; start over so stale per-upload blobs don't linger.
-  if (!event || event.id !== DEMO_EVENT_ID || !entries) {
+  // existed, and no products means one saved before apps replaced plans;
+  // start over so stale data doesn't linger.
+  if (!event || event.id !== DEMO_EVENT_ID || !entries || !Array.isArray(event.products)) {
     const seeded = await resetDemoRecord();
     return { ...seeded, saveTheDateFiles: {}, cover: null, files: {} };
   }

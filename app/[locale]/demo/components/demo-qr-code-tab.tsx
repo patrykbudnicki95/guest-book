@@ -14,7 +14,7 @@ export function DemoQrCodeTab() {
           names: event.names,
           date: event.date,
           location: event.location,
-          plan_id: event.plan_id,
+          products: event.products,
         },
       ]}
       guestHref="/demo"

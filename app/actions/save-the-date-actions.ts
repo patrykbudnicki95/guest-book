@@ -40,7 +40,7 @@ export async function getSaveTheDateList(
 
   const { data: eventsData, error: eventsError } = await supabase
     .from("events")
-    .select("id, names, date, location, plan_id, addons")
+    .select("id, names, date, location, products")
     .eq("owner_id", userId)
     .eq("is_active", true)
     .order("created_at", { ascending: false });
@@ -118,7 +118,7 @@ export async function getPublishedSaveTheDate(eventId: string): Promise<{
   const [eventResult, rowResult] = await Promise.all([
     supabase
       .from("events")
-      .select("id, names, date, location, plan_id, addons")
+      .select("id, names, date, location, products")
       .eq("id", eventId)
       .eq("is_active", true)
       .maybeSingle(),
@@ -172,15 +172,14 @@ export async function getPublishedSaveTheDate(eventId: string): Promise<{
   }
 
   const unlocked = hasFeature({
-    plan: event.data.plan_id,
+    products: event.data.products,
     feature: "saveTheDate",
-    addons: event.data.addons,
   });
 
   return { event: event.data, saveTheDate: unlocked ? row.data : null };
 }
 
-/** Ownership plus the Gold-or-add-on check every write needs. */
+/** Ownership plus the "owns the save the date app" check every write needs. */
 async function checkOwnedSaveTheDate(
   eventId: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
@@ -209,11 +208,7 @@ async function checkOwnedSaveTheDate(
   }
 
   if (
-    !hasFeature({
-      plan: context.plan_id,
-      feature: "saveTheDate",
-      addons: context.addons,
-    })
+    !hasFeature({ products: context.products, feature: "saveTheDate" })
   ) {
     return { ok: false, error: "planUpgradeRequired" };
   }

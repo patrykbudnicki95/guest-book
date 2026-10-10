@@ -32,7 +32,7 @@ export function createDemoSeed(): EventFull {
         items: [{ name: "Kaczka z burakami" }, { name: "Risotto z bazylią" }],
       },
     ],
-    plan_id: "gold",
+    products: ["gold"],
     storage_used_bytes: 0,
   };
 }
