@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { PLAN_LIST } from "@/lib/pricing";
 import { Heart } from "lucide-react";
 
 // Read once at module load rather than during render, so marketing pages can
@@ -9,7 +8,6 @@ const YEAR = new Date().getFullYear();
 
 export async function SiteFooter() {
   const t = await getTranslations("footer");
-  const tPricing = await getTranslations("landing.pricing");
 
   return (
     <footer className="border-t bg-white py-12">
@@ -57,19 +55,6 @@ export async function SiteFooter() {
                   {t("pricing")}
                 </Link>
               </li>
-              {PLAN_LIST.map((plan) => (
-                <li key={plan.id}>
-                  <Link
-                    href={{
-                      pathname: "/packages/[plan]",
-                      params: { plan: plan.id },
-                    }}
-                    className="transition-colors hover:text-foreground"
-                  >
-                    {tPricing(`${plan.id}.title`)}
-                  </Link>
-                </li>
-              ))}
             </ul>
           </div>
 

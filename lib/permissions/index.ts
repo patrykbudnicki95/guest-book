@@ -1,58 +1,52 @@
-import { ADDON_IDS, PLAN_IDS, type AddonId, type PlanId } from "@/lib/pricing";
+import { APP_IDS, ownedApps, type AppId, type ProductId } from "@/lib/pricing";
 import {
-  ADDON_FEATURES,
-  PLAN_ENTITLEMENTS,
-  type PlanFeature,
-  type PlanLimits,
+  APP_ENTITLEMENTS,
+  NO_LIMITS,
+  type Feature,
+  type Limits,
 } from "./entitlements";
 
 export {
-  ADDON_FEATURES,
-  DEFAULT_PLAN_ID,
-  PLAN_ENTITLEMENTS,
-  PLAN_FEATURES,
-  type PlanEntitlement,
-  type PlanFeature,
-  type PlanLimits,
+  APP_ENTITLEMENTS,
+  FEATURES,
+  NO_LIMITS,
+  type AppEntitlement,
+  type Feature,
+  type Limits,
 } from "./entitlements";
 
-export function getLimits(plan: PlanId): PlanLimits {
-  return PLAN_ENTITLEMENTS[plan].limits;
+/** `products` is always the event's `events.products`, Gold included. */
+type Owned = { products: readonly ProductId[] };
+
+export function hasApp({ products, app }: Owned & { app: AppId }): boolean {
+  return ownedApps(products).includes(app);
 }
 
-/** Pass the event's `addons` wherever an add-on can unlock the feature. */
-export function hasFeature({
-  plan,
-  feature,
-  addons = [],
-}: {
-  plan: PlanId;
-  feature: PlanFeature;
-  addons?: readonly AddonId[];
-}): boolean {
-  return (
-    (PLAN_ENTITLEMENTS[plan].features as readonly PlanFeature[]).includes(feature) ||
-    addons.some((addon) =>
-      (ADDON_FEATURES[addon] as readonly PlanFeature[]).includes(feature),
-    )
+export function hasFeature({ products, feature }: Owned & { feature: Feature }): boolean {
+  return ownedApps(products).some((app) =>
+    (APP_ENTITLEMENTS[app].features as readonly Feature[]).includes(feature),
   );
 }
 
-/** The add-on that sells the feature on its own, for "or buy it separately" copy. */
-export function getAddonFor(feature: PlanFeature): AddonId | null {
+/** The most generous value of each limit across the owned apps. */
+export function getLimits(products: readonly ProductId[]): Limits {
+  return ownedApps(products).reduce<Limits>((limits, app) => {
+    const appLimits: Partial<Limits> = APP_ENTITLEMENTS[app].limits;
+    const merged = { ...limits };
+    for (const key of Object.keys(appLimits) as (keyof Limits)[]) {
+      merged[key] = Math.max(merged[key], appLimits[key] ?? 0);
+    }
+    return merged;
+  }, NO_LIMITS);
+}
+
+/** The app that sells a feature, for "available in X" copy. */
+export function getAppFor(feature: Feature): AppId | null {
   return (
-    ADDON_IDS.find((addon) =>
-      (ADDON_FEATURES[addon] as readonly PlanFeature[]).includes(feature),
+    APP_IDS.find((app) =>
+      (APP_ENTITLEMENTS[app].features as readonly Feature[]).includes(feature),
     ) ?? null
   );
-}
-
-/**
- * The cheapest plan that includes the feature, for "available in Silver" copy.
- * Relies on PLAN_IDS being ordered from cheapest to most complete.
- */
-export function getMinimumPlanFor(feature: PlanFeature): PlanId | null {
-  return PLAN_IDS.find((plan) => hasFeature({ plan, feature })) ?? null;
 }
 
 /**
@@ -68,8 +62,8 @@ function endOfDayAfter(eventDate: string, days: number): Date {
   return end;
 }
 
-export function getUploadWindowEnd({ plan, eventDate }: { plan: PlanId; eventDate: string }): Date {
-  return endOfDayAfter(eventDate, getLimits(plan).guestAccessDays);
+export function getUploadWindowEnd({ products, eventDate }: { products: readonly ProductId[]; eventDate: string }): Date {
+  return endOfDayAfter(eventDate, getLimits(products).guestAccessDays);
 }
 
 /**
@@ -77,31 +71,31 @@ export function getUploadWindowEnd({ plan, eventDate }: { plan: PlanId; eventDat
  * bound, so couples can test the guestbook before the wedding.
  */
 export function isGuestUploadOpen({
-  plan,
+  products,
   eventDate,
   now = new Date(),
 }: {
-  plan: PlanId;
+  products: readonly ProductId[];
   eventDate: string;
   now?: Date;
 }): boolean {
-  return now <= getUploadWindowEnd({ plan, eventDate });
+  return now <= getUploadWindowEnd({ products, eventDate });
 }
 
-export function getDownloadWindowEnd({ plan, eventDate }: { plan: PlanId; eventDate: string }): Date {
-  return endOfDayAfter(eventDate, getLimits(plan).downloadDays);
+export function getDownloadWindowEnd({ products, eventDate }: { products: readonly ProductId[]; eventDate: string }): Date {
+  return endOfDayAfter(eventDate, getLimits(products).downloadDays);
 }
 
 export function isDownloadOpen({
-  plan,
+  products,
   eventDate,
   now = new Date(),
 }: {
-  plan: PlanId;
+  products: readonly ProductId[];
   eventDate: string;
   now?: Date;
 }): boolean {
-  return now <= getDownloadWindowEnd({ plan, eventDate });
+  return now <= getDownloadWindowEnd({ products, eventDate });
 }
 
 export type StorageState = {
@@ -111,22 +105,23 @@ export type StorageState = {
   percentUsed: number;
 };
 
-export function getStorageState({ plan, usedBytes }: { plan: PlanId; usedBytes: number }): StorageState {
-  const totalBytes = getLimits(plan).storageBytes;
+export function getStorageState({ products, usedBytes }: { products: readonly ProductId[]; usedBytes: number }): StorageState {
+  const totalBytes = getLimits(products).storageBytes;
   const safeUsed = Math.max(0, usedBytes);
 
   return {
     usedBytes: safeUsed,
     totalBytes,
     remainingBytes: Math.max(0, totalBytes - safeUsed),
-    percentUsed: Math.min(100, Math.round((safeUsed / totalBytes) * 100)),
+    percentUsed:
+      totalBytes > 0 ? Math.min(100, Math.round((safeUsed / totalBytes) * 100)) : 0,
   };
 }
 
-/** Files a guest can attach to one entry. The same on every plan. */
+/** Files a guest can attach to one entry. The same for every event. */
 export const MAX_FILES_PER_ENTRY = 10;
 
-/** Seats around one table in the seating plan. The same on every plan. */
+/** Seats around one table in the seating plan. The same for every event. */
 export const MAX_SEATS_PER_TABLE = 100;
 
 export type UploadRejectionReason =
@@ -144,7 +139,7 @@ export type UploadCheckResult = { allowed: true } | { allowed: false; reason: Up
  * for feedback.
  */
 export function checkUploadAllowed({
-  plan,
+  products,
   eventDate,
   isActive,
   usedBytes,
@@ -152,7 +147,7 @@ export function checkUploadAllowed({
   mediaType,
   now = new Date(),
 }: {
-  plan: PlanId;
+  products: readonly ProductId[];
   eventDate: string;
   isActive: boolean;
   usedBytes: number;
@@ -160,19 +155,20 @@ export function checkUploadAllowed({
   mediaType: "image" | "video";
   now?: Date;
 }): UploadCheckResult {
-  if (!isActive) {
+  // To a guest, an event without the guestbook app is simply not taking uploads.
+  if (!isActive || !hasFeature({ products, feature: "guestUploads" })) {
     return { allowed: false, reason: "eventInactive" };
   }
 
-  if (!isGuestUploadOpen({ plan, eventDate, now })) {
+  if (!isGuestUploadOpen({ products, eventDate, now })) {
     return { allowed: false, reason: "windowClosed" };
   }
 
-  if (mediaType === "video" && !hasFeature({ plan, feature: "videoUploads" })) {
+  if (mediaType === "video" && !hasFeature({ products, feature: "videoUploads" })) {
     return { allowed: false, reason: "mediaTypeNotAllowed" };
   }
 
-  const limits = getLimits(plan);
+  const limits = getLimits(products);
 
   if (fileBytes <= 0 || fileBytes > limits.maxFileBytes) {
     return { allowed: false, reason: "fileTooLarge" };

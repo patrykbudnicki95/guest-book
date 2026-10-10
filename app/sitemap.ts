@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { routing, type AppLocale } from "@/i18n/routing";
 import { localizedUrl, type SeoHref } from "@/lib/seo/metadata";
-import { PLAN_IDS } from "@/lib/pricing";
 import {
   GUIDE_ARTICLES,
   getGuideLocales,
@@ -65,15 +64,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.9,
     }),
-    ...PLAN_IDS.flatMap((plan) =>
-      localizedEntries(
-        sameHrefForAllLocales({
-          pathname: "/packages/[plan]",
-          params: { plan },
-        }),
-        { changeFrequency: "monthly", priority: 0.8 },
-      ),
-    ),
     ...localizedEntries(sameHrefForAllLocales("/about"), { priority: 0.4 }),
     ...localizedEntries(sameHrefForAllLocales("/contact"), { priority: 0.4 }),
   ];

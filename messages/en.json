@@ -20,22 +20,8 @@
       "description": "A virtual wedding guestbook. Guests add photos and wishes through a QR code, with no app to install. Download everything after the wedding."
     },
     "pricing": {
-      "title": "Pricing and packages",
-      "description": "Virtual guestbook packages from {price} PLN. Compare Basic, Silver and Gold and pick the one that fits your wedding."
-    },
-    "packages": {
-      "basic": {
-        "title": "Basic package",
-        "description": "Basic package for {price} PLN: a classic virtual guestbook, a live photo gallery during the wedding and {downloadDays} days to download everything."
-      },
-      "silver": {
-        "title": "Silver package",
-        "description": "Silver package for {price} PLN: custom styling, photo gallery plus wedding schedule and {downloadDays} days to download your photos."
-      },
-      "gold": {
-        "title": "Gold package",
-        "description": "Gold package for {price} PLN: photos and video, {downloadDays} days to download, {guestAccessDays} days of guest access and {qrTableCards} printed QR table cards."
-      }
+      "title": "Pricing",
+      "description": "Wedding apps from {price} PLN: guestbook, save the date and seating plan. Buy one, or all of them in the Gold package. One payment, no subscription."
     },
     "virtualGuestbook": {
       "title": "Virtual guestbook — how it works",
@@ -51,7 +37,7 @@
     },
     "contact": {
       "title": "Contact",
-      "description": "Questions about the virtual guestbook? Write to us and we will help you pick a package and set the app up."
+      "description": "Questions about our wedding apps? Write to us and we'll help you pick what you need and set it up."
     },
     "login": {
       "title": "Log in"
@@ -69,7 +55,7 @@
     },
     "saveTheDate": {
       "title": "Online save the date: an animated wedding announcement",
-      "description": "A digital save the date for phones: an opening animation, your photo and music, a countdown and add to calendar. Included in Gold or on its own for {price} PLN."
+      "description": "A digital save the date for phones: an opening animation, your photo and music, a countdown and add to calendar. On its own for {price} PLN or in the Gold package."
     }
   },
   "landing": {
@@ -129,44 +115,53 @@
       }
     },
     "pricing": {
-      "title": "Choose your plan",
-      "subtitle": "Select the package that fits your wedding",
-      "choosePlan": "Choose plan",
-      "seeDetails": "See package details",
-      "comparePlans": "Compare all packages in the pricing table",
-      "basic": {
-        "title": "Basic",
-        "description": "Classic wedding guestbook",
+      "title": "Pick what you need",
+      "subtitle": "Every app works on its own. All of them together come in the Gold package.",
+      "seeDetails": "See details",
+      "comparePlans": "See full pricing",
+      "choose": "Choose",
+      "guestbook": {
+        "title": "Guestbook",
+        "description": "Photos and wishes from guests",
         "features": {
-          "1": "Classic app look",
-          "2": "Photo gallery during the wedding",
-          "3": "{downloadDays} days to download your photos",
-          "4": "QR instruction within 48h of purchase",
-          "5": "{guestAccessDays}-day guest access (guests can add photos)"
+          "1": "Photos, videos and wishes from guests via QR code",
+          "2": "Live gallery during the wedding, private entries too",
+          "3": "A guest page with schedule and menu, in your colours",
+          "4": "Guests can add entries for {guestAccessDays} days after the wedding",
+          "5": "{downloadDays} days to download everything in one click",
+          "6": "{qrTableCards} printed QR table cards"
         }
       },
-      "silver": {
-        "title": "Silver",
-        "description": "Most popular",
+      "saveTheDate": {
+        "title": "Save the date",
+        "description": "Wedding announcement",
         "features": {
-          "1": "Custom colors, photo and font",
-          "2": "Photo gallery + wedding schedule",
-          "3": "{downloadDays} days to download your photos",
-          "4": "Personalized QR instruction within 48h",
-          "5": "{guestAccessDays}-day guest access"
+          "1": "4 templates with an opening animation",
+          "2": "Your photo and background music",
+          "3": "Your own colours and fonts",
+          "4": "Live countdown to the wedding",
+          "5": "Add to Google and Apple calendars"
+        }
+      },
+      "seating": {
+        "title": "Seating plan",
+        "description": "Find your table",
+        "features": {
+          "1": "Up to {seatingTables} tables, round or rectangular",
+          "2": "Guests search for their seat by name",
+          "3": "Table drawing with numbered seats",
+          "4": "Show the plan to guests when it's ready"
         }
       },
       "gold": {
         "title": "Gold",
-        "description": "Complete package",
+        "description": "Best value",
         "features": {
-          "1": "All Silver features",
-          "2": "Photo and video gallery",
-          "3": "{downloadDays} days to download",
-          "4": "{guestAccessDays}-day guest access",
-          "5": "{qrTableCards} QR table cards",
-          "6": "Find Your Table feature",
-          "7": "Animated save the date"
+          "1": "Guestbook",
+          "2": "Save the date",
+          "3": "Seating plan",
+          "4": "Every new app we add",
+          "5": "Less than the {appsTotalPrice} the apps cost separately"
         }
       }
     },
@@ -180,7 +175,7 @@
       "subtitle": "Four simple steps to your beautiful guestbook",
       "step1": {
         "title": "Create your guestbook",
-        "description": "Choose a plan and receive your personalized guestbook within minutes."
+        "description": "Pick an app or the Gold package and set everything up in minutes."
       },
       "step2": {
         "title": "Share the QR code",
@@ -214,12 +209,12 @@
     "faq": {
       "title": "Frequently asked questions",
       "1": {
-        "question": "Can I buy the guestbook in advance and keep the promotional price?",
-        "answer": "Yes! Once you purchase, your price is locked in. You can set up your guestbook whenever you're ready."
+        "question": "Can I buy in advance and keep today's price?",
+        "answer": "Yes. Once you buy, your price is locked in, and you can set everything up whenever you're ready."
       },
       "2": {
         "question": "Can I download photos and videos later?",
-        "answer": "Absolutely. Depending on your plan, you have {minDownloadDays}–{maxDownloadDays} days after the wedding to download all content."
+        "answer": "Absolutely. With the guestbook you have {downloadDays} days after the wedding to download all content."
       },
       "3": {
         "question": "Can guests see the gallery?",
@@ -227,11 +222,11 @@
       },
       "4": {
         "question": "Is there a limit on photos and videos guests can upload?",
-        "answer": "Each package has a storage pool — from {minStorage} to {maxStorage}, depending on the plan you pick."
+        "answer": "The guestbook has {storage} of storage for photos and videos, and a single file can be up to {maxFileSize}."
       },
       "5": {
         "question": "Can guests upload after the wedding?",
-        "answer": "Yes. Guests can add photos during the access period ({minGuestAccessDays}–{maxGuestAccessDays} days depending on plan) from the wedding date."
+        "answer": "Yes. Guests can keep adding photos for {guestAccessDays} days from the wedding date."
       }
     },
     "demo": {
@@ -255,7 +250,7 @@
   "contactPage": {
     "breadcrumb": "Contact",
     "heading": "Contact",
-    "lead": "Questions about the packages, the QR code or how the guestbook will work at your venue? Write to us — we usually reply within one business day.",
+    "lead": "Questions about our apps, the QR code or how the guestbook will work at your venue? Write to us; we usually reply within one working day.",
     "emailTitle": "Email",
     "emailPlaceholder": "The email address will be added here shortly.",
     "faqTitle": "The answer may already be in the FAQ",
@@ -273,7 +268,7 @@
     "how": {
       "1": {
         "title": "You create the guestbook",
-        "description": "Pick a package and set up a guestbook for your wedding."
+        "description": "You buy the guestbook (on its own or in the Gold package) and set it up for your wedding."
       },
       "2": {
         "title": "You get a QR code",
@@ -307,8 +302,8 @@
         "description": "Instead of a dozen chats and cloud links you get one gallery you download in a single go."
       }
     },
-    "planTitle": "Which package should you pick?",
-    "planBody": "The packages differ in how much you can customise, how long guests keep access and how much time you have to download. Basic is enough if you simply want to collect photos. Silver adds custom styling and the wedding schedule. Gold is the full set with video and printed QR table cards.",
+    "planTitle": "How much does the guestbook cost?",
+    "planBody": "The guestbook is one app at one price, with no tiers to compare: photos and videos, the gallery, the guest page and QR table cards. If you also want save the date or the seating plan, the Gold package costs less than buying them separately.",
     "planLink": "See the full pricing",
     "faqTitle": "Frequently asked questions",
     "faq": {
@@ -318,7 +313,7 @@
       },
       "2": {
         "question": "Can we download everything after the wedding?",
-        "answer": "Yes. Depending on the package you have between {minDownloadDays} and {maxDownloadDays} days after the wedding to download photos and videos."
+        "answer": "Yes. You have {downloadDays} days after the wedding to download the photos and videos."
       },
       "3": {
         "question": "Does it work on iPhone and Android?",
@@ -341,53 +336,24 @@
     "backToGuides": "All guides",
     "ctaTitle": "Collect guest photos in one place",
     "ctaSubtitle": "A QR code on the tables, a gallery with no app to install and everything ready to download after the wedding.",
-    "ctaButton": "See packages"
+    "ctaButton": "See pricing"
   },
   "pricingPage": {
     "breadcrumb": "Pricing",
-    "heading": "Virtual guestbook pricing",
-    "intro": "Three packages and a single payment per wedding — no subscription and no hidden photo limits. The packages differ in how much you can customise, how long guests keep access and how much time you have to download everything afterwards.",
-    "chooseTitle": "Which package should you pick?",
-    "chooseSubtitle": "A short cheat sheet if you would rather not compare every line.",
-    "choose": {
-      "basic": "Pick this if you mainly want to collect guest photos and keep them in one gallery. No extras, lowest price.",
-      "silver": "Everything in Basic, plus custom styling for the guestbook and a wedding schedule your guests can check on their phones.",
-      "gold": "For couples who want the full set: photos and video, the longest guest access, the most time to download and printed QR table cards."
-    },
-    "faqTitle": "Questions about the packages",
+    "heading": "Pricing",
+    "intro": "Buy only what you need: every app works on its own. If you want more than one, the Gold package for {goldPrice} gives you all of them. One payment per wedding, no subscription.",
+    "chooseTitle": "What should you pick?",
+    "chooseSubtitle": "A quick guide if you don't want to compare everything line by line.",
+    "faqTitle": "Pricing questions",
     "guideLink": "Not sure a virtual guestbook is right for you? See how it works",
     "ctaTitle": "Ready to collect the memories from your wedding?",
     "ctaSubtitle": "Setup takes a few minutes and your QR code is ready as soon as the guestbook is created.",
     "ctaButton": "Get started",
-    "addons": {
-      "title": "Add-ons",
-      "saveTheDate": {
-        "title": "Save the date",
-        "description": "An animated wedding announcement with your photo, music and a countdown. Included in Gold, and {price} for Basic and Silver.",
-        "link": "See save the date"
-      }
-    }
-  },
-  "packagePage": {
-    "breadcrumb": "Packages",
-    "includedTitle": "What this package includes",
-    "forWhomTitle": "Who it is for",
-    "otherTitle": "Other packages",
-    "productName": "Wirtualna Księga Gości — {name} package",
-    "priceNote": "Promotional price instead of {originalPrice} {currency}. One payment for one wedding.",
-    "cta": "Choose the {name} package",
-    "backToPricing": "Back to the full pricing table",
-    "basic": {
-      "intro": "The Basic package is the classic version of the virtual guestbook. Guests scan a QR code, add photos and wishes, and you get everything in a single gallery — with no app to install and no accounts to create.",
-      "forWhom": "A good fit if you simply want to collect guest photos and do not need custom styling or the wedding schedule inside the app."
-    },
-    "silver": {
-      "intro": "The Silver package is the most popular version. On top of the photo gallery you get custom styling — colour, photo and font — plus a wedding schedule your guests can check on their phones.",
-      "forWhom": "For couples who want the guestbook to match the rest of the wedding styling, and who want guests to know what happens when."
-    },
-    "gold": {
-      "intro": "The Gold package is the full set: a photo and video gallery, the longest guest access, {downloadDays} days to download everything and {qrTableCards} printed QR table cards. It also includes the Find Your Table feature.",
-      "forWhom": "For larger weddings and couples who want short videos as well as photos, without preparing print material themselves."
+    "choose": {
+      "guestbook": "If what matters most is photos and wishes from your guests, collected in one gallery.",
+      "saveTheDate": "If the wedding is months away and you want to announce the date beautifully before the invitations.",
+      "seating": "If you want guests to find their own table on their phones, without a queue at the board.",
+      "gold": "If you need two apps or more. For {goldPrice} you get all of them, instead of {appsTotalPrice} separately."
     }
   },
   "footer": {
@@ -475,14 +441,12 @@
     },
     "planLock": {
       "title": "This feature is locked",
-      "availableIn": "Available in the {plan} package",
-      "comingSoon": "Coming soon",
-      "cta": "See packages",
-      "orAddon": "or on its own as an add-on for {price}"
+      "availableIn": "Available in the {app} app ({price}) or the Gold package ({goldPrice}).",
+      "cta": "See pricing"
     },
     "plan": {
-      "title": "Your package",
-      "description": "Limits and deadlines for this wedding",
+      "title": "Your apps",
+      "description": "What each event has, with its limits and deadlines",
       "storage": "Storage used",
       "storageValue": "{used} of {total}",
       "maxFileSize": "Maximum file size",
@@ -490,7 +454,8 @@
       "downloadUntil": "Downloads available until",
       "closed": "Deadline passed",
       "qrTableCards": "Printed QR table cards",
-      "noEvents": "No active events."
+      "noEvents": "No active events.",
+      "noProducts": "No apps yet"
     },
     "gallery": {
       "title": "Gallery",
@@ -661,13 +626,9 @@
       "saveSuccess": "Settings saved successfully",
       "saveError": "Failed to save",
       "planSwitcher": {
-        "title": "Package (test mode)",
-        "description": "Visible in development only. Switches the event package without a payment.",
-        "label": "Active package",
-        "updated": "Package changed to {plan}",
-        "addons": {
-          "saveTheDate": "Add-on: save the date"
-        }
+        "title": "Apps (test mode)",
+        "description": "Visible in development only. Turns the event's apps on and off without payment.",
+        "updated": "Apps updated"
       },
       "privacy": {
         "title": "Privacy",
@@ -699,7 +660,7 @@
       "saveSuccess": "Save the date saved",
       "saveError": "Could not save",
       "errors": {
-        "planUpgradeRequired": "Save the date comes with Gold or as a separate add-on.",
+        "planUpgradeRequired": "Save the date is available as its own app or in the Gold package.",
         "invalidFileType": "This file type isn't supported.",
         "fileTooLarge": "The file is too large."
       },
@@ -771,6 +732,15 @@
         "title": "Preview",
         "replay": "Replay animation"
       }
+    },
+    "discover": {
+      "title": "Discover more apps",
+      "description": "Add only what you need. Every app works on its own and appears in the menu once you buy it.",
+      "buy": "Buy",
+      "tryDemo": "Try the demo",
+      "addInDemo": "Add in demo",
+      "goldTitle": "Everything in the Gold package",
+      "goldDescription": "Every app for {price} instead of {total}, including the ones we add later."
     }
   },
   "guestView": {
@@ -802,7 +772,7 @@
       "description": "Share photos, videos and your wishes",
       "photoOrVideo": "Photos or videos (optional)",
       "photoOnly": "Photos (optional)",
-      "imagesOnly": "This package only allows photo uploads (JPEG, PNG, WebP)",
+      "imagesOnly": "This guestbook accepts photos only (JPEG, PNG, WebP)",
       "quotaExceeded": "The storage for this wedding is full",
       "windowClosed": "The time for adding memories has passed",
       "eventInactive": "This event is not active",
@@ -833,7 +803,9 @@
     "memory": "Wedding memory",
     "privateBadge": "Private: visible only to you",
     "videoAlt": "Wedding video",
-    "filesCount": "{count, plural, one {# file} other {# files}}"
+    "filesCount": "{count, plural, one {# file} other {# files}}",
+    "guestbookUnavailable": "The guestbook isn't active",
+    "guestbookUnavailableDesc": "The couple hasn't turned on the guestbook for this event yet."
   },
   "demo": {
     "metaTitle": "Try the guestbook",
@@ -845,15 +817,17 @@
     "resetDone": "Demo reset to the sample wedding",
     "save": "Save to my event",
     "persistTitle": "Save this guestbook to a real event",
-    "persistBody": "After you buy a package, you will be able to copy this local guestbook onto your real wedding. Payments are not live yet — pick a package and create an account to get started.",
-    "persistPricing": "See packages",
+    "persistBody": "After you buy, you'll be able to copy this local version to a real event. Payments aren't live yet. Pick an app and create an account to get started.",
+    "persistPricing": "See pricing",
     "persistSignup": "Create an account",
     "persistClose": "Not now",
     "overviewTitle": "Sample wedding stored in this browser",
     "openGuest": "Open the guest guestbook",
     "photos": "Photos",
     "storage": "Storage used",
-    "capHint": "Up to {count} files, {size} each. Stored only on this device."
+    "capHint": "Up to {count} files, {size} each. Stored only on this device.",
+    "edition": "Demo version",
+    "editionCustom": "Custom set"
   },
   "qrPdf": {
     "instruction": "Scan the QR code below with your phone camera\nto open our guestbook.\nShare your wishes and photos with us!"
@@ -947,7 +921,7 @@
     "lead": "An animated wedding announcement for phones, with your photo, your music and a countdown to the big day. Send the link by text or Messenger, and guests add the date to their calendar in one tap.",
     "ctaPrimary": "Create your save the date",
     "ctaDemo": "Try the demo",
-    "priceNote": "Included in Gold or on its own for {addonPrice}. One payment, no subscription.",
+    "priceNote": "On its own for {addonPrice} or in the Gold package. One payment, no subscription.",
     "showcase": {
       "title": "See it live",
       "subtitle": "Pick a template and tap the preview. This is exactly what your guests will see.",
@@ -1001,12 +975,12 @@
       "title": "What it costs",
       "gold": {
         "title": "Included in Gold",
-        "description": "Save the date comes with the Gold package, together with the photo and video gallery, QR table cards and Find Your Table.",
-        "cta": "See the Gold package"
+        "description": "Gold is every app together: save the date, the guestbook with photos and video, and the seating plan.",
+        "cta": "See pricing"
       },
-      "addon": {
+      "single": {
         "title": "On its own",
-        "description": "Chose Basic or Silver? Add just the save the date. One payment.",
+        "description": "Only need the save the date? Buy just this app. One payment.",
         "cta": "See pricing"
       }
     },
@@ -1027,7 +1001,7 @@
       },
       "3": {
         "question": "How much does a save the date cost?",
-        "answer": "It's included in Gold. For Basic and Silver you can add it on its own for {addonPrice}. One payment, no subscription."
+        "answer": "You can buy save the date on its own for {addonPrice}, or together with the other apps in the Gold package. One payment, no subscription."
       },
       "4": {
         "question": "Can we add our own music?",
@@ -1041,5 +1015,23 @@
     "ctaTitle": "Tell your guests first",
     "ctaSubtitle": "Your save the date takes a few minutes, and you see the preview straight away.",
     "ctaButton": "Create your save the date"
+  },
+  "products": {
+    "guestbook": {
+      "name": "Guestbook",
+      "tagline": "Photos, videos and wishes from guests via QR code, with a gallery and downloads after the wedding."
+    },
+    "saveTheDate": {
+      "name": "Save the date",
+      "tagline": "An animated wedding announcement with your photo, music and a countdown."
+    },
+    "seating": {
+      "name": "Seating plan",
+      "tagline": "A seating plan where guests find their own seat."
+    },
+    "gold": {
+      "name": "Gold",
+      "tagline": "Every app together, including the ones we add later."
+    }
   }
 }

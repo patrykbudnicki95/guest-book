@@ -9,9 +9,11 @@ import {
 } from "@/lib/schemas/database";
 import {
   getUploadWindowEnd,
+  hasApp,
   hasFeature,
   isGuestUploadOpen,
 } from "@/lib/permissions";
+import { GuestbookUnavailable } from "./components/guestbook-unavailable";
 import { getPublishedSeating } from "@/app/actions/seating-actions";
 
 async function getEvent(eventId: string) {
@@ -19,7 +21,7 @@ async function getEvent(eventId: string) {
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, names, date, location, theme_color, cover_photo_url, welcome_message, schedule, menu, plan_id, storage_used_bytes",
+      "id, names, date, location, theme_color, cover_photo_url, welcome_message, schedule, menu, products, storage_used_bytes",
     )
     .eq("id", eventId)
     .eq("is_active", true)
@@ -98,12 +100,16 @@ export async function GuestViewContent({ eventId }: { eventId: string }) {
     );
   }
 
+  if (!hasApp({ products: event.products, app: "guestbook" })) {
+    return <GuestbookUnavailable />;
+  }
+
   // Computed on the server so a guest with a skewed clock cannot reopen the
   // window; the server actions enforce it again anyway.
   const uploadWindow = {
-    isOpen: isGuestUploadOpen({ plan: event.plan_id, eventDate: event.date }),
+    isOpen: isGuestUploadOpen({ products: event.products, eventDate: event.date }),
     closesAt: getUploadWindowEnd({
-      plan: event.plan_id,
+      products: event.products,
       eventDate: event.date,
     }).toISOString(),
   };
@@ -114,7 +120,7 @@ export async function GuestViewContent({ eventId }: { eventId: string }) {
       initialEntries={entries}
       uploadWindow={uploadWindow}
       seatingHref={
-        seating && hasFeature({ plan: event.plan_id, feature: "findYourTable" })
+        seating && hasFeature({ products: event.products, feature: "findYourTable" })
           ? { pathname: "/e/[eventId]/tables", params: { eventId } }
           : null
       }

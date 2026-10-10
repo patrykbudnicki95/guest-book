@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   getDashboardStats,
   getEventPlanSummaries,
+  getOwnedApps,
   getUserEvents,
 } from "@/app/actions/dashboard-actions";
 import { OverviewTab } from "./components/overview-tab";
@@ -34,14 +35,20 @@ async function OverviewContent() {
     return redirect({ href: "/login", locale: locale as "pl" | "en" });
   }
 
-  const [stats, events, planSummaries] = await Promise.all([
+  const [stats, events, planSummaries, apps] = await Promise.all([
     getDashboardStats(user.id),
     getUserEvents(user.id),
     getEventPlanSummaries(user.id),
+    getOwnedApps(user.id),
   ]);
 
   return (
-    <OverviewTab stats={stats} events={events} planSummaries={planSummaries} />
+    <OverviewTab
+      stats={stats}
+      events={events}
+      planSummaries={planSummaries}
+      apps={apps}
+    />
   );
 }
 

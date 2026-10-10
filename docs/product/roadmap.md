@@ -21,50 +21,50 @@ Principles that every new app must follow:
 
 A couple's year looks like this, and each step is a natural moment to sell the next app:
 
-| Months before the wedding | What the couple needs | App |
-|---|---|---|
-| 12–9 | Guest list, budget, checklist | Free planning tools (acquisition) |
-| 9–6 | Announce the date | **Save the date** (first paid touchpoint) |
-| 6–2 | Website, invitations, RSVP | **Wedding website + RSVP** |
-| 1–0 | Who sits where | **Find your table** |
-| Wedding day and after | Photos and wishes | **Guestbook + gallery** |
+| Months before the wedding | What the couple needs         | App                                       |
+| ------------------------- | ----------------------------- | ----------------------------------------- |
+| 12–9                      | Guest list, budget, checklist | Free planning tools (acquisition)         |
+| 9–6                       | Announce the date             | **Save the date** (first paid touchpoint) |
+| 6–2                       | Website, invitations, RSVP    | **Wedding website + RSVP**                |
+| 1–0                       | Who sits where                | **Find your table**                       |
+| Wedding day and after     | Photos and wishes             | **Guestbook + gallery**                   |
 
 The earlier we meet a couple, the more apps we can sell them. A guestbook-only business meets them a few weeks before the wedding, after competitors already have them.
 
 ## App catalogue
 
-| App | What it does | Status | Landing page |
-|---|---|---|---|
-| Guestbook + gallery | Guests upload photos, videos and wishes via QR; couple downloads everything | Live | `/wirtualna-ksiega-gosci` (exists) |
-| QR cards | Printable QR cards for tables (PDF), later printed and shipped | Live (PDF) | part of guestbook |
-| Save the date | Animated announcement page with photo, music, countdown and calendar | Live, no checkout yet | `/save-the-date-online` (exists) |
-| Find your table | Seating plan editor; guests search their table | Live (Gold only) | to do: `/plan-stolow` |
-| Wedding website | Schedule, map, FAQ, menu, story, gallery. Today's event page grows into it | Partly live (event page) | to do: `/strona-slubna` |
-| RSVP | Guests confirm attendance, diet, plus-ones, accommodation, custom questions | Planned | to do: `/rsvp-online` |
-| Guest list | Statuses, plus-ones, diets, accommodation, CSV/Excel export | Planned | to do: `/lista-gosci` |
-| Planner (checklist) | Tasks scheduled back from the wedding date | Planned (free) | to do |
-| Budget | Planned vs actual spend by category | Planned (free) | to do |
-| Gift list | Registry with "I'll buy this" reservations | Planned | to do |
-| Wedding games | QR field game with questions about the couple (`weddingGames` feature key exists) | Idea | to do |
+| App                 | What it does                                                                      | Status                   | Landing page                       |
+| ------------------- | --------------------------------------------------------------------------------- | ------------------------ | ---------------------------------- |
+| Guestbook + gallery | Guests upload photos, videos and wishes via QR; couple downloads everything       | Live                     | `/wirtualna-ksiega-gosci` (exists) |
+| QR cards            | Printable QR cards for tables (PDF), later printed and shipped                    | Live (PDF)               | part of guestbook                  |
+| Save the date       | Animated announcement page with photo, music, countdown and calendar              | Live, no checkout yet    | `/save-the-date-online` (exists)   |
+| Find your table     | Seating plan editor; guests search their table                                    | Live (Gold only)         | to do: `/plan-stolow`              |
+| Wedding website     | Schedule, map, FAQ, menu, story, gallery. Today's event page grows into it        | Partly live (event page) | to do: `/strona-slubna`            |
+| RSVP                | Guests confirm attendance, diet, plus-ones, accommodation, custom questions       | Planned                  | to do: `/rsvp-online`              |
+| Guest list          | Statuses, plus-ones, diets, accommodation, CSV/Excel export                       | Planned                  | to do: `/lista-gosci`              |
+| Planner (checklist) | Tasks scheduled back from the wedding date                                        | Planned (free)           | to do                              |
+| Budget              | Planned vs actual spend by category                                               | Planned (free)           | to do                              |
+| Gift list           | Registry with "I'll buy this" reservations                                        | Planned                  | to do                              |
+| Wedding games       | QR field game with questions about the couple (`weddingGames` feature key exists) | Idea                     | to do                              |
 
-## Pricing model (proposal)
+## Pricing model (decided 2026-10-09, prices still open, implemented with placeholder prices)
 
-Today plans are guestbook tiers (Basic / Silver / Gold differ in storage, days and features) plus one add-on. With several apps, three tiers of one app *and* per-app purchases *and* a bundle would confuse buyers. Proposal:
+Today plans are guestbook tiers (Basic / Silver / Gold differ in storage, days and features) plus one add-on. With several apps, three tiers of one app _and_ per-app purchases _and_ a bundle would confuse buyers, so Basic and Silver go away:
 
 - **Free:** account, guest list, planner and budget. These bring couples in 12 months early and make them stay.
 - **One price per paid app**, each with generous limits. Storage on R2 is cheap, so we stop selling gigabytes and sell outcomes.
 - **Gold = every paid app**, priced at roughly what two apps cost, so it's the obvious choice the moment a couple wants a second app.
-- **Upgrade credit:** whatever a couple already paid for single apps counts toward Gold. Nobody waits "in case they need more later" to buy their first app.
+- **Upgrade credit (proposal, undecided):** whatever a couple already paid for single apps counts toward Gold. Nobody waits "in case they need more later" to buy their first app.
 - **One-time payment per wedding**, no subscription (the market expects this).
 - Prices stay only in `lib/pricing.ts`. The numbers below are placeholders until [research](#research-needed) is back:
 
-| Product | Placeholder price |
-|---|---|
-| Guestbook + gallery | 199–249 zł |
-| Save the date | 100 zł (current add-on) |
-| Wedding website + RSVP | 149–199 zł |
-| Find your table | 79–99 zł |
-| **Gold (everything)** | 399–499 zł |
+| Product                | Placeholder price       |
+| ---------------------- | ----------------------- |
+| Guestbook + gallery    | 199–249 zł              |
+| Save the date          | 100 zł (current add-on) |
+| Wedding website + RSVP | 149–199 zł              |
+| Find your table        | 79–99 zł                |
+| **Gold (everything)**  | 399–499 zł              |
 
 Technically this replaces `events.plan_id` + `events.addons` with one list of owned products per event, with Gold as a bundle that grants all of them (see Phase 0).
 
@@ -80,7 +80,7 @@ The site isn't public yet (Basic Auth + noindex), so **we have no search ranking
 - **Navigation:** a "Funkcje" (apps) menu listing every app, plus Pricing, Guides, Demo.
 - **Brand:** "Wirtualna Księga Gości" describes one app. A platform needs a broader name and domain (see [Decisions needed](#decisions-needed)).
 
-## Demos (proposal)
+## Demos (proposal, partly built)
 
 - `/demo` becomes a picker: "try one app" or "try Gold".
 - `/demo/<app>` runs the real dashboard and guest pages with **only that app owned**, so it shows exactly what a single-app buyer gets.
@@ -92,13 +92,17 @@ The site isn't public yet (Basic Auth + noindex), so **we have no search ranking
 
 ### Phase 0 — Platform foundations (before adding apps)
 
-- [ ] Decide the [open questions](#decisions-needed): pricing model, brand, free tier
-- [ ] Products model: replace `plan_id` + `addons` with owned products per event; Gold grants all; limits per product (`lib/permissions`)
-- [ ] Lock entitlement columns so owners can't grant themselves products (today an owner can write `plan_id` / `addons` directly)
+- [ ] Decide upgrade credit (see [Decisions needed](#decisions-needed))
+- [ ] New brand name and domain; replace "Wirtualna Księga Gości" in the header, footer, `siteConfig`, metadata and messages
+- [x] Products model: `events.products` replaces `plan_id` + `addons`; Gold grants every app; limits per app (`lib/permissions`)
+- [x] Lock entitlement columns so owners can't grant themselves products (column-level grants; changes go through the service role)
+- [x] Placeholder prices per app + Gold in `lib/pricing.ts`; pricing page shows apps à la carte next to Gold
 - [ ] Payments (Stripe): checkout per app and for Gold, upgrade credit, invoices
-- [ ] Dashboard information architecture: app switcher, only owned apps in navigation, "Discover" section for the rest (the 7-tab nav won't scale)
+- [x] Dashboard: only owned apps in the navigation, "Discover" section on the overview for the rest
+- [ ] Dashboard navigation that scales past ~8 tabs (app switcher or sidebar) once Phase 2 apps arrive
 - [ ] Onboarding: at signup, ask what the couple needs ("just photos from guests" / "everything") and land them in the matching app
-- [ ] Demos per app + Gold demo
+- [x] Demos per app + Gold demo (`?apps=` on demo links, switcher in the demo banner, "Add in demo" in Discover)
+- [ ] `/demo` picker page ("try one app" / "try Gold") and demo links on every app landing page
 - [ ] Homepage hub + guestbook moves to its own landing page + "Funkcje" menu
 - [ ] Custom slugs, e.g. `ewa-i-patryk-2026` (every guest-facing app link gets nicer)
 
@@ -149,10 +153,13 @@ To be done by Patryk; results go into this file or `docs/product/`. Each item de
 
 ## Decisions needed
 
-1. **Pricing model**: keep Basic / Silver / Gold guestbook tiers, or move to one price per app + Gold bundle (proposal above)?
-2. **Free tier**: offer the guest list, planner and budget for free to bring couples in early?
-3. **Brand**: keep "Wirtualna Księga Gości" or rename for the platform?
-4. **Upgrade credit**: count single-app purchases toward Gold?
+1. **Upgrade credit**: count single-app purchases toward Gold?
+
+Decided on 2026-10-09:
+
+- **Pricing model**: one price per app + Gold bundle; the Basic / Silver guestbook tiers go away.
+- **Free tier**: guest list, planner and budget are free.
+- **Brand**: rename before launch (the current name describes one app).
 
 ## Done
 
@@ -176,3 +183,5 @@ To be done by Patryk; results go into this file or `docs/product/`. Each item de
 ## Notes for agents
 
 Do not treat this file as implementation spec. Prefer `docs/architecture/*` and `.claude/rules/` when coding. Items marked (proposal) are not decided; ask before building on them. Tick items and move them to Done when shipping.
+
+## google categories ? I heard something about that, verify later.

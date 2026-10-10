@@ -31,7 +31,7 @@ export function HeroSection() {
                 size="lg"
                 className="rounded-full px-8 text-base"
               >
-                <Link href="/demo">{t("hero.viewDemo")}</Link>
+                <Link href={{ pathname: "/demo", query: { apps: "gold" } }}>{t("hero.viewDemo")}</Link>
               </Button>
             </div>
           </div>

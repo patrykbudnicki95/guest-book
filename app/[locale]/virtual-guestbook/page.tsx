@@ -3,8 +3,8 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { buildMetadata, localizedUrl } from "@/lib/seo/metadata";
 import { breadcrumbListNode, faqPageNode } from "@/lib/seo/json-ld";
-import { CURRENCY_SYMBOL, PLANS } from "@/lib/pricing";
-import { planRangeValues } from "@/lib/plan-features";
+import { PRODUCTS, formatPrice } from "@/lib/pricing";
+import { productCopyValues } from "@/lib/plan-features";
 import { JsonLd } from "@/components/json-ld";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
@@ -45,7 +45,7 @@ export default async function VirtualGuestbookPage() {
     description: t(`why.${index}.description`),
   }));
 
-  const faqRange = planRangeValues();
+  const faqRange = productCopyValues();
   const faqItems = [1, 2, 3].map((index) => ({
     question: t(`faq.${index}.question`),
     answer: t(`faq.${index}.answer`, faqRange),
@@ -152,8 +152,7 @@ export default async function VirtualGuestbookPage() {
               href="/pricing"
               className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
             >
-              {t("planLink")} ({PLANS.basic.price}–{PLANS.gold.price}{" "}
-              {CURRENCY_SYMBOL})
+              {t("planLink")} ({formatPrice(PRODUCTS.guestbook.price)})
               <ArrowRight className="size-4" />
             </Link>
           </div>

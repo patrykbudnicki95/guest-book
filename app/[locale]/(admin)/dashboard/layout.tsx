@@ -4,6 +4,7 @@ import { redirect } from "@/i18n/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { noindexMetadata } from "@/lib/seo/metadata";
+import { getOwnedApps } from "@/app/actions/dashboard-actions";
 import { DashboardNav } from "./dashboard-nav";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -45,7 +46,10 @@ async function DashboardLayoutContent({ children }: { children: React.ReactNode 
     return redirect({ href: "/login", locale: locale as "pl" | "en" });
   }
 
-  const t = await getTranslations("dashboard");
+  const [t, apps] = await Promise.all([
+    getTranslations("dashboard"),
+    getOwnedApps(user.id),
+  ]);
 
   return (
     <div className="min-h-screen bg-muted/20">
@@ -68,7 +72,7 @@ async function DashboardLayoutContent({ children }: { children: React.ReactNode 
       </header>
 
       <div className="container mx-auto px-4 py-6">
-        <DashboardNav />
+        <DashboardNav apps={apps} />
         <div className="mt-6">{children}</div>
       </div>
     </div>

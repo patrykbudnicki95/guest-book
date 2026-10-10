@@ -23,8 +23,7 @@ Source of truth: `supabase/schema.sql` (includes migration-era columns). Apply i
 | `qr_code_url`, `theme_color` | |
 | `cover_photo_url`, `welcome_message` | Event page |
 | `schedule`, `menu` | JSONB |
-| `plan_id` | `basic` \| `silver` \| `gold` (default `basic`) |
-| `addons` | `text[]`, one-off products on top of the plan (today only `saveTheDate`); checked by a constraint |
+| `products` | `text[]`, what the couple bought: `guestbook`, `saveTheDate`, `seating` and/or `gold` (all apps); default `'{}'`. Owners can't write it (column-level grants); only the service role can |
 | `storage_used_bytes` | Denormalized; maintained by trigger on `uploads` |
 | `is_active` | |
 | `created_at`, `updated_at` | |
@@ -58,7 +57,7 @@ The files of an entry.
 
 ### `event_seating`
 
-The "find your table" plan (Gold). One row per event, created on the first save. Separate from `events` because everyone can read events, and a draft plan must stay hidden.
+The "find your table" plan (the `seating` app). One row per event, created on the first save. Separate from `events` because everyone can read events, and a draft plan must stay hidden.
 
 | Column | Notes |
 |--------|--------|
@@ -69,7 +68,7 @@ The "find your table" plan (Gold). One row per event, created on the first save.
 
 ### `event_save_the_date`
 
-The animated save the date page (Gold or the `saveTheDate` add-on). One row per event, created on the first save. Separate from `events` for the same reason as seating: a draft must stay hidden.
+The animated save the date page (the `saveTheDate` app). One row per event, created on the first save. Separate from `events` for the same reason as seating: a draft must stay hidden.
 
 | Column | Notes |
 |--------|--------|
@@ -84,7 +83,7 @@ The animated save the date page (Gold or the `saveTheDate` add-on). One row per 
 | Table | Read | Write |
 |-------|------|--------|
 | `profiles` | Own row | Own update |
-| `events` | Everyone | Owner insert/update/delete |
+| `events` | Everyone | Owner insert/update/delete, but INSERT/UPDATE only on the columns the dashboard edits (never `products`, `storage_used_bytes`) |
 | `entries` | Everyone for public rows; owner only for `is_private` rows | Anyone insert; owner delete (cascades to uploads) |
 | `uploads` | Same as their entry | Anyone insert; owner delete |
 | `event_seating` | Everyone when `is_published`; owner always | Owner insert/update/delete |

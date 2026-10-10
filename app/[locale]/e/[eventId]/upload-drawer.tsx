@@ -31,7 +31,7 @@ import {
   getLimits,
   hasFeature,
 } from "@/lib/permissions";
-import type { PlanId } from "@/lib/pricing";
+import type { ProductId } from "@/lib/pricing";
 import type { Entry } from "@/lib/schemas/database";
 import { toast } from "sonner";
 
@@ -51,7 +51,7 @@ export type LocalEntryResult = SaveEntryResult;
 
 interface UploadDrawerProps {
   eventId: string;
-  plan: PlanId;
+  products: ProductId[];
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onUploadSuccess: (entry: Entry) => void;
@@ -135,7 +135,7 @@ async function uploadFiles(
 
 export function UploadDrawer({
   eventId,
-  plan,
+  products,
   isOpen,
   onOpenChange,
   onUploadSuccess,
@@ -156,8 +156,8 @@ export function UploadDrawer({
 
   const files = selected.map((item) => item.file);
 
-  const limits = getLimits(plan);
-  const videoAllowed = hasFeature({ plan, feature: "videoUploads" });
+  const limits = getLimits(products);
+  const videoAllowed = hasFeature({ products, feature: "videoUploads" });
   const acceptedTypes = videoAllowed
     ? [...IMAGE_TYPES, ...VIDEO_TYPES]
     : IMAGE_TYPES;

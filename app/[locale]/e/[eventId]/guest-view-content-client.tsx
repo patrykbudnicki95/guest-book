@@ -100,12 +100,12 @@ export function GuestViewContentClient({
       <EventInfo welcomeMessage={event.welcome_message} />
 
       {/* Schedule */}
-      {hasFeature({ plan: event.plan_id, feature: "schedule" }) && (
+      {hasFeature({ products: event.products, feature: "schedule" }) && (
         <EventSchedule schedule={event.schedule} />
       )}
 
       {/* Menu */}
-      {hasFeature({ plan: event.plan_id, feature: "menu" }) && (
+      {hasFeature({ products: event.products, feature: "menu" }) && (
         <EventMenu menu={event.menu} />
       )}
 
@@ -149,7 +149,7 @@ export function GuestViewContentClient({
 
       <UploadDrawer
         eventId={event.id}
-        plan={event.plan_id}
+        products={event.products}
         isOpen={isDrawerOpen}
         onOpenChange={setIsDrawerOpen}
         onUploadSuccess={handleUploadSuccess}

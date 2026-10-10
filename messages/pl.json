@@ -20,22 +20,8 @@
       "description": "Wirtualna księga gości na wesele. Goście dodają zdjęcia i życzenia przez kod QR, bez pobierania aplikacji. Pobierz wszystkie materiały po weselu."
     },
     "pricing": {
-      "title": "Cennik i pakiety",
-      "description": "Pakiety wirtualnej księgi gości od {price} zł. Porównaj Basic, Silver i Gold i wybierz ten dopasowany do Waszego wesela."
-    },
-    "packages": {
-      "basic": {
-        "title": "Pakiet Basic",
-        "description": "Pakiet Basic za {price} zł: klasyczna wirtualna księga gości, galeria zdjęć w trakcie wesela i {downloadDays} dni na pobranie materiałów."
-      },
-      "silver": {
-        "title": "Pakiet Silver",
-        "description": "Pakiet Silver za {price} zł: personalizacja wyglądu, galeria zdjęć i harmonogram wesela, {downloadDays} dni na pobranie zdjęć."
-      },
-      "gold": {
-        "title": "Pakiet Gold",
-        "description": "Pakiet Gold za {price} zł: zdjęcia i wideo, {downloadDays} dni na pobranie, {guestAccessDays} dni dostępu dla gości i {qrTableCards} tabliczki z kodem QR na stół."
-      }
+      "title": "Cennik",
+      "description": "Aplikacje ślubne od {price} zł: księga gości, save the date i plan stołów. Kupcie jedną albo wszystkie w pakiecie Gold. Płacicie raz, bez abonamentu."
     },
     "virtualGuestbook": {
       "title": "Wirtualna księga gości — jak działa",
@@ -51,7 +37,7 @@
     },
     "contact": {
       "title": "Kontakt",
-      "description": "Masz pytanie o wirtualną księgę gości? Napisz do nas — pomożemy wybrać pakiet i skonfigurować aplikację."
+      "description": "Masz pytanie o nasze aplikacje ślubne? Napisz do nas, pomożemy wybrać to, czego potrzebujecie, i wszystko skonfigurować."
     },
     "login": {
       "title": "Logowanie"
@@ -69,7 +55,7 @@
     },
     "saveTheDate": {
       "title": "Save the date online: animowana zapowiedź ślubu",
-      "description": "Cyfrowe save the date na telefon: animacja otwarcia, Wasze zdjęcie i muzyka, odliczanie i dodawanie do kalendarza. W pakiecie Gold albo osobno za {price} zł."
+      "description": "Cyfrowe save the date na telefon: animacja otwarcia, Wasze zdjęcie i muzyka, odliczanie i dodawanie do kalendarza. Osobno za {price} zł albo w pakiecie Gold."
     }
   },
   "landing": {
@@ -129,44 +115,53 @@
       }
     },
     "pricing": {
-      "title": "Wybierz pakiet",
-      "subtitle": "Dopasuj ofertę do swojego wesela",
-      "choosePlan": "Wybierz pakiet",
-      "seeDetails": "Zobacz szczegóły pakietu",
-      "comparePlans": "Porównaj wszystkie pakiety w cenniku",
-      "basic": {
-        "title": "Basic",
-        "description": "Klasyczna księga gości",
+      "title": "Wybierzcie, czego potrzebujecie",
+      "subtitle": "Każda aplikacja działa osobno. Wszystkie razem są w pakiecie Gold.",
+      "seeDetails": "Zobacz szczegóły",
+      "comparePlans": "Zobacz pełny cennik",
+      "choose": "Wybieram",
+      "guestbook": {
+        "title": "Księga gości",
+        "description": "Zdjęcia i życzenia od gości",
         "features": {
-          "1": "Klasyczny wygląd aplikacji",
-          "2": "Galeria zdjęć w trakcie wesela",
-          "3": "{downloadDays} dni na pobranie zdjęć",
-          "4": "Instrukcja z kodem QR do 48h po zakupie",
-          "5": "Dostęp przez {guestAccessDays} dni (goście mogą dodawać zdjęcia)"
+          "1": "Zdjęcia, filmy i życzenia od gości przez kod QR",
+          "2": "Galeria na żywo w trakcie wesela, także wpisy prywatne",
+          "3": "Strona dla gości z harmonogramem i menu, w Waszych kolorach",
+          "4": "Goście dodają wpisy jeszcze {guestAccessDays} dni po weselu",
+          "5": "{downloadDays} dni na pobranie wszystkiego jednym kliknięciem",
+          "6": "{qrTableCards} tabliczki z kodem QR na stoły"
         }
       },
-      "silver": {
-        "title": "Silver",
-        "description": "Najczęściej wybierany",
+      "saveTheDate": {
+        "title": "Save the date",
+        "description": "Zapowiedź ślubu",
         "features": {
-          "1": "Zmiana koloru, zdjęcia i czcionki",
-          "2": "Galeria zdjęć + harmonogram wesela",
-          "3": "{downloadDays} dni na pobranie zdjęć",
-          "4": "Personalizowana instrukcja z kodem QR do 48h",
-          "5": "Dostęp przez {guestAccessDays} dni"
+          "1": "4 szablony z animacją otwarcia",
+          "2": "Wasze zdjęcie i muzyka w tle",
+          "3": "Własne kolory i czcionki",
+          "4": "Odliczanie do ślubu na żywo",
+          "5": "Dodawanie do kalendarza Google i Apple"
+        }
+      },
+      "seating": {
+        "title": "Plan stołów",
+        "description": "Znajdź swój stół",
+        "features": {
+          "1": "Do {seatingTables} stołów: okrągłe i prostokątne",
+          "2": "Goście szukają swojego miejsca po imieniu",
+          "3": "Rysunek stołu z numerami miejsc",
+          "4": "Pokazujecie plan gościom, gdy jest gotowy"
         }
       },
       "gold": {
         "title": "Gold",
-        "description": "Pełny pakiet",
+        "description": "Najlepsza wartość",
         "features": {
-          "1": "Wszystko z Silver",
-          "2": "Galeria zdjęć i wideo",
-          "3": "{downloadDays} dni na pobranie",
-          "4": "Dostęp przez {guestAccessDays} dni",
-          "5": "{qrTableCards} tabliczki z kodem QR na stół",
-          "6": "Funkcja Znajdź Swój Stół",
-          "7": "Animowane save the date"
+          "1": "Księga gości",
+          "2": "Save the date",
+          "3": "Plan stołów",
+          "4": "Każda nowa aplikacja, którą dodamy",
+          "5": "Taniej niż {appsTotalPrice} za aplikacje kupowane osobno"
         }
       }
     },
@@ -180,7 +175,7 @@
       "subtitle": "Cztery proste kroki dzielą Cię od pięknej księgi gości",
       "step1": {
         "title": "Stwórz księgę gości",
-        "description": "Wybierz pakiet i otrzymaj spersonalizowaną księgę w kilka minut."
+        "description": "Wybierzcie aplikację albo pakiet Gold i przygotujcie wszystko w kilka minut."
       },
       "step2": {
         "title": "Udostępnij kod QR",
@@ -214,12 +209,12 @@
     "faq": {
       "title": "Często pytacie",
       "1": {
-        "question": "Czy można wykupić księgę wcześniej i zachować cenę promocyjną?",
-        "answer": "Tak! Po zakupie cena jest zablokowana. Możesz skonfigurować księgę, gdy będziesz gotowy."
+        "question": "Czy można kupić wcześniej i zachować obecną cenę?",
+        "answer": "Tak. Po zakupie cena jest zablokowana, a wszystko skonfigurujecie wtedy, kiedy będziecie gotowi."
       },
       "2": {
         "question": "Czy zdjęcia i filmy można później pobrać?",
-        "answer": "Oczywiście. W zależności od pakietu masz {minDownloadDays}–{maxDownloadDays} dni po weselu na pobranie wszystkich materiałów."
+        "answer": "Oczywiście. Z księgą gości macie {downloadDays} dni po weselu na pobranie wszystkich materiałów."
       },
       "3": {
         "question": "Czy galeria jest widoczna dla gości?",
@@ -227,11 +222,11 @@
       },
       "4": {
         "question": "Jaki jest limit filmów i zdjęć?",
-        "answer": "Każdy pakiet ma pulę miejsca na pliki — od {minStorage} do {maxStorage}, w zależności od wybranego pakietu."
+        "answer": "Księga gości ma {storage} miejsca na zdjęcia i filmy, a pojedynczy plik może mieć do {maxFileSize}."
       },
       "5": {
         "question": "Czy goście mogą przesyłać zdjęcia po weselu?",
-        "answer": "Tak. Goście mogą dodawać zdjęcia w okresie dostępu ({minGuestAccessDays}–{maxGuestAccessDays} dni w zależności od pakietu) od dnia wesela."
+        "answer": "Tak. Goście mogą dodawać zdjęcia jeszcze przez {guestAccessDays} dni od dnia wesela."
       }
     },
     "demo": {
@@ -255,7 +250,7 @@
   "contactPage": {
     "breadcrumb": "Kontakt",
     "heading": "Kontakt",
-    "lead": "Macie pytanie o pakiety, kod QR albo o to, jak księga zadziała na Waszej sali? Piszcie — odpowiadamy zwykle w ciągu jednego dnia roboczego.",
+    "lead": "Macie pytanie o nasze aplikacje, kod QR albo o to, jak księga zadziała na Waszej sali? Piszcie, odpowiadamy zwykle w ciągu jednego dnia roboczego.",
     "emailTitle": "E-mail",
     "emailPlaceholder": "Adres e-mail uzupełnimy tutaj wkrótce.",
     "faqTitle": "Może odpowiedź jest już w FAQ",
@@ -273,7 +268,7 @@
     "how": {
       "1": {
         "title": "Tworzycie księgę",
-        "description": "Wybieracie pakiet i zakładacie księgę gości dla swojego wesela."
+        "description": "Kupujecie księgę gości (osobno albo w pakiecie Gold) i zakładacie ją dla swojego wesela."
       },
       "2": {
         "title": "Dostajecie kod QR",
@@ -307,8 +302,8 @@
         "description": "Zamiast kilkunastu czatów i linków do dysków macie jedną galerię, z której pobieracie wszystko naraz."
       }
     },
-    "planTitle": "Jak wybrać pakiet?",
-    "planBody": "Pakiety różnią się zakresem personalizacji, długością dostępu dla gości i czasem na pobranie materiałów. Basic wystarczy, jeśli chcecie po prostu zebrać zdjęcia. Silver dodaje personalizację wyglądu i harmonogram wesela. Gold to komplet ze wideo i tabliczkami z kodem QR na stoły.",
+    "planTitle": "Ile kosztuje księga gości?",
+    "planBody": "Księga gości to jedna aplikacja w jednej cenie, bez wybierania wariantów: zdjęcia i filmy, galeria, strona dla gości i tabliczki z kodem QR. Jeśli chcecie też save the date albo plan stołów, pakiet Gold wyjdzie taniej niż kupowanie ich osobno.",
     "planLink": "Zobacz pełny cennik",
     "faqTitle": "Najczęstsze pytania",
     "faq": {
@@ -318,7 +313,7 @@
       },
       "2": {
         "question": "Czy da się pobrać wszystko po weselu?",
-        "answer": "Tak. W zależności od pakietu macie od {minDownloadDays} do {maxDownloadDays} dni po weselu na pobranie zdjęć i filmów."
+        "answer": "Tak. Macie {downloadDays} dni po weselu na pobranie zdjęć i filmów."
       },
       "3": {
         "question": "Czy to działa na iPhonie i Androidzie?",
@@ -341,53 +336,24 @@
     "backToGuides": "Wszystkie poradniki",
     "ctaTitle": "Zbierzcie zdjęcia od gości w jednym miejscu",
     "ctaSubtitle": "Kod QR na stołach, galeria bez instalowania aplikacji i wszystkie materiały do pobrania po weselu.",
-    "ctaButton": "Zobacz pakiety"
+    "ctaButton": "Zobacz cennik"
   },
   "pricingPage": {
     "breadcrumb": "Cennik",
-    "heading": "Cennik wirtualnej księgi gości",
-    "intro": "Trzy pakiety i jedna opłata za wesele — bez abonamentu i bez ukrytych limitów zdjęć. Pakiety różnią się zakresem personalizacji, długością dostępu dla gości i czasem, jaki macie na pobranie materiałów po weselu.",
-    "chooseTitle": "Który pakiet wybrać?",
+    "heading": "Cennik",
+    "intro": "Kupujecie tylko to, czego potrzebujecie: każda aplikacja działa osobno. Jeśli chcecie więcej niż jedną, pakiet Gold za {goldPrice} daje wszystkie. Płacicie raz za wesele, bez abonamentu.",
+    "chooseTitle": "Co wybrać?",
     "chooseSubtitle": "Krótka ściąga, jeśli nie chcecie porównywać wszystkiego punkt po punkcie.",
-    "choose": {
-      "basic": "Wybierzcie, jeśli zależy Wam głównie na tym, żeby zebrać zdjęcia od gości i mieć je w jednej galerii. Bez dodatków, w najniższej cenie.",
-      "silver": "Ma wszystko to, co Basic, ale dochodzi personalizacja wyglądu księgi i harmonogram wesela, który goście widzą w telefonie.",
-      "gold": "Dla par, które chcą komplet: zdjęcia i wideo, najdłuższy dostęp dla gości, najwięcej czasu na pobranie materiałów i gotowe tabliczki z kodem QR na stoły."
-    },
-    "faqTitle": "Pytania o pakiety",
+    "faqTitle": "Pytania o cennik",
     "guideLink": "Nie wiecie jeszcze, czy wirtualna księga gości jest dla Was? Zobacz, jak działa",
     "ctaTitle": "Gotowi zebrać wspomnienia z Waszego wesela?",
     "ctaSubtitle": "Konfiguracja zajmuje kilka minut, a kod QR dostajecie zaraz po utworzeniu księgi.",
     "ctaButton": "Rozpocznij",
-    "addons": {
-      "title": "Dodatki",
-      "saveTheDate": {
-        "title": "Save the date",
-        "description": "Animowana zapowiedź ślubu z Waszym zdjęciem, muzyką i odliczaniem. W pakiecie Gold, a do Basic i Silver za {price}.",
-        "link": "Zobaczcie save the date"
-      }
-    }
-  },
-  "packagePage": {
-    "breadcrumb": "Pakiety",
-    "includedTitle": "Co zawiera ten pakiet",
-    "forWhomTitle": "Dla kogo jest ten pakiet",
-    "otherTitle": "Pozostałe pakiety",
-    "productName": "Wirtualna Księga Gości — pakiet {name}",
-    "priceNote": "Cena promocyjna zamiast {originalPrice} {currency}. Jednorazowa opłata za jedno wesele.",
-    "cta": "Wybieram pakiet {name}",
-    "backToPricing": "Wróć do pełnego cennika",
-    "basic": {
-      "intro": "Pakiet Basic to wirtualna księga gości w klasycznej odsłonie. Goście skanują kod QR, dodają zdjęcia i życzenia, a Wy macie wszystko w jednej galerii — bez instalowania aplikacji i bez zakładania kont.",
-      "forWhom": "Dobry wybór, jeśli chcecie po prostu zebrać zdjęcia od gości i nie potrzebujecie personalizacji wyglądu ani harmonogramu wesela w aplikacji."
-    },
-    "silver": {
-      "intro": "Pakiet Silver to najczęściej wybierana wersja księgi. Poza galerią zdjęć dostajecie personalizację wyglądu — kolor, zdjęcie i czcionkę — oraz harmonogram wesela, który goście mają pod ręką w telefonie.",
-      "forWhom": "Dla par, które chcą, żeby księga wyglądała spójnie z resztą oprawy wesela, i którym zależy, żeby goście wiedzieli, co i o której się dzieje."
-    },
-    "gold": {
-      "intro": "Pakiet Gold to pełny zestaw: galeria zdjęć i wideo, najdłuższy dostęp dla gości, {downloadDays} dni na pobranie materiałów oraz {qrTableCards} gotowe tabliczki z kodem QR na stoły. Dochodzi też funkcja Znajdź Swój Stół.",
-      "forWhom": "Dla większych wesel i par, które chcą zebrać nie tylko zdjęcia, ale i krótkie filmiki, i nie chcą się martwić o przygotowanie materiałów do druku."
+    "choose": {
+      "guestbook": "Jeśli zależy Wam przede wszystkim na zdjęciach i życzeniach od gości, zebranych w jednej galerii.",
+      "saveTheDate": "Jeśli ślub jest za kilka miesięcy i chcecie pięknie ogłosić datę, zanim wyślecie zaproszenia.",
+      "seating": "Jeśli chcecie, żeby goście sami znaleźli swój stół w telefonie, bez kolejki przy tablicy.",
+      "gold": "Jeśli potrzebujecie dwóch aplikacji albo więcej. Za {goldPrice} macie wszystkie, zamiast {appsTotalPrice} osobno."
     }
   },
   "footer": {
@@ -475,14 +441,12 @@
     },
     "planLock": {
       "title": "Ta funkcja jest zablokowana",
-      "availableIn": "Dostępna w pakiecie {plan}",
-      "comingSoon": "Wkrótce dostępna",
-      "cta": "Zobacz pakiety",
-      "orAddon": "albo osobno jako dodatek za {price}"
+      "availableIn": "Dostępna w aplikacji {app} ({price}) albo w pakiecie Gold ({goldPrice}).",
+      "cta": "Zobacz cennik"
     },
     "plan": {
-      "title": "Twój pakiet",
-      "description": "Limity i terminy dla tego wesela",
+      "title": "Wasze aplikacje",
+      "description": "Co macie w każdym wydarzeniu, z limitami i terminami",
       "storage": "Wykorzystane miejsce",
       "storageValue": "{used} z {total}",
       "maxFileSize": "Maksymalny rozmiar pliku",
@@ -490,7 +454,8 @@
       "downloadUntil": "Materiały do pobrania do",
       "closed": "Termin minął",
       "qrTableCards": "Tabliczki QR na stół",
-      "noEvents": "Brak aktywnych wydarzeń."
+      "noEvents": "Brak aktywnych wydarzeń.",
+      "noProducts": "Brak aplikacji"
     },
     "gallery": {
       "title": "Galeria",
@@ -661,13 +626,9 @@
       "saveSuccess": "Ustawienia zostały zapisane",
       "saveError": "Nie udało się zapisać",
       "planSwitcher": {
-        "title": "Pakiet (tryb testowy)",
-        "description": "Widoczne tylko w środowisku deweloperskim. Zmienia pakiet wydarzenia bez płatności.",
-        "label": "Aktywny pakiet",
-        "updated": "Pakiet zmieniony na {plan}",
-        "addons": {
-          "saveTheDate": "Dodatek: save the date"
-        }
+        "title": "Aplikacje (tryb testowy)",
+        "description": "Widoczne tylko w środowisku deweloperskim. Włącza i wyłącza aplikacje wydarzenia bez płatności.",
+        "updated": "Aplikacje zaktualizowane"
       },
       "privacy": {
         "title": "Prywatność",
@@ -699,7 +660,7 @@
       "saveSuccess": "Save the date zapisane",
       "saveError": "Nie udało się zapisać",
       "errors": {
-        "planUpgradeRequired": "Save the date jest w pakiecie Gold albo jako osobny dodatek.",
+        "planUpgradeRequired": "Save the date jest dostępne jako osobna aplikacja albo w pakiecie Gold.",
         "invalidFileType": "Ten typ pliku nie jest obsługiwany.",
         "fileTooLarge": "Plik jest za duży."
       },
@@ -771,6 +732,15 @@
         "title": "Podgląd",
         "replay": "Odtwórz animację"
       }
+    },
+    "discover": {
+      "title": "Odkryjcie więcej aplikacji",
+      "description": "Dokupcie tylko to, czego potrzebujecie. Każda aplikacja działa osobno, a po zakupie pojawi się w menu.",
+      "buy": "Kup",
+      "tryDemo": "Zobacz w demo",
+      "addInDemo": "Dodaj w demo",
+      "goldTitle": "Wszystko w pakiecie Gold",
+      "goldDescription": "Wszystkie aplikacje za {price} zamiast {total}, także te, które dodamy później."
     }
   },
   "guestView": {
@@ -802,7 +772,7 @@
       "description": "Podziel się zdjęciami, filmami i życzeniami",
       "photoOrVideo": "Zdjęcia lub filmy (opcjonalnie)",
       "photoOnly": "Zdjęcia (opcjonalnie)",
-      "imagesOnly": "Ten pakiet pozwala przesyłać tylko zdjęcia (JPEG, PNG, WebP)",
+      "imagesOnly": "Ta księga przyjmuje tylko zdjęcia (JPEG, PNG, WebP)",
       "quotaExceeded": "Miejsce na pliki dla tego wesela zostało wykorzystane",
       "windowClosed": "Czas na dodawanie wspomnień już minął",
       "eventInactive": "To wydarzenie jest nieaktywne",
@@ -833,7 +803,9 @@
     "memory": "Wspomnienie z wesela",
     "privateBadge": "Prywatne: widoczne tylko dla Was",
     "videoAlt": "Film z wesela",
-    "filesCount": "{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}"
+    "filesCount": "{count, plural, one {# plik} few {# pliki} many {# plików} other {# pliku}}",
+    "guestbookUnavailable": "Księga gości jest nieaktywna",
+    "guestbookUnavailableDesc": "Para Młoda nie włączyła jeszcze księgi gości dla tego wydarzenia."
   },
   "demo": {
     "metaTitle": "Wypróbuj księgę gości",
@@ -845,15 +817,17 @@
     "resetDone": "Demo wróciło do przykładowego wesela",
     "save": "Zapisz na moje wesele",
     "persistTitle": "Zapisz tę księgę na prawdziwe wesele",
-    "persistBody": "Po zakupie pakietu będzie można skopiować tę lokalną księgę na prawdziwe wydarzenie. Płatności jeszcze nie działają — wybierz pakiet i załóż konto, żeby zacząć.",
-    "persistPricing": "Zobacz pakiety",
+    "persistBody": "Po zakupie będzie można skopiować tę lokalną wersję na prawdziwe wydarzenie. Płatności jeszcze nie działają. Wybierzcie aplikację i załóżcie konto, żeby zacząć.",
+    "persistPricing": "Zobacz cennik",
     "persistSignup": "Załóż konto",
     "persistClose": "Nie teraz",
     "overviewTitle": "Przykładowe wesele zapisane w tej przeglądarce",
     "openGuest": "Otwórz księgę gości",
     "photos": "Zdjęcia",
     "storage": "Wykorzystane miejsce",
-    "capHint": "Do {count} plików, po {size} każdy. Tylko na tym urządzeniu."
+    "capHint": "Do {count} plików, po {size} każdy. Tylko na tym urządzeniu.",
+    "edition": "Wersja demo",
+    "editionCustom": "Własny zestaw"
   },
   "qrPdf": {
     "instruction": "Zeskanuj poniższy kod QR aparatem telefonu,\naby otworzyć naszą księgę gości.\nPodziel się z nami swoimi życzeniami i zdjęciami!"
@@ -947,7 +921,7 @@
     "lead": "Animowana zapowiedź ślubu na telefon, z Waszym zdjęciem, muzyką i odliczaniem do wielkiego dnia. Wyślijcie link SMS-em albo na Messengerze, a goście jednym kliknięciem dodadzą datę do kalendarza.",
     "ctaPrimary": "Stwórzcie save the date",
     "ctaDemo": "Wypróbujcie w demo",
-    "priceNote": "W pakiecie Gold albo osobno za {addonPrice}. Płacicie raz, bez abonamentu.",
+    "priceNote": "Osobno za {addonPrice} albo w pakiecie Gold. Płacicie raz, bez abonamentu.",
     "showcase": {
       "title": "Zobaczcie na żywo",
       "subtitle": "Wybierzcie szablon i dotknijcie podglądu. Tak samo zobaczą to Wasi goście.",
@@ -1001,12 +975,12 @@
       "title": "Ile to kosztuje",
       "gold": {
         "title": "W pakiecie Gold",
-        "description": "Save the date jest częścią pakietu Gold, razem z galerią zdjęć i wideo, tabliczkami z kodem QR i funkcją Znajdź Swój Stół.",
-        "cta": "Zobaczcie pakiet Gold"
+        "description": "Gold to wszystkie aplikacje razem: save the date, księga gości ze zdjęciami i wideo oraz plan stołów.",
+        "cta": "Zobaczcie cennik"
       },
-      "addon": {
+      "single": {
         "title": "Osobno",
-        "description": "Wybraliście Basic albo Silver? Dokupcie samo save the date. Płacicie raz.",
+        "description": "Potrzebujecie tylko save the date? Kupcie samą tę aplikację. Płacicie raz.",
         "cta": "Zobaczcie cennik"
       }
     },
@@ -1027,7 +1001,7 @@
       },
       "3": {
         "question": "Ile kosztuje save the date?",
-        "answer": "Jest w pakiecie Gold. Do pakietów Basic i Silver możecie dokupić je osobno za {addonPrice}. Płacicie raz, bez abonamentu."
+        "answer": "Save the date kupicie osobno za {addonPrice} albo razem z pozostałymi aplikacjami w pakiecie Gold. Płacicie raz, bez abonamentu."
       },
       "4": {
         "question": "Czy możemy dodać własną muzykę?",
@@ -1041,5 +1015,23 @@
     "ctaTitle": "Dajcie gościom znać jako pierwsi",
     "ctaSubtitle": "Save the date przygotujecie w kilka minut, a podgląd widzicie od razu.",
     "ctaButton": "Stwórzcie save the date"
+  },
+  "products": {
+    "guestbook": {
+      "name": "Księga gości",
+      "tagline": "Zdjęcia, filmy i życzenia od gości przez kod QR, z galerią i pobieraniem po weselu."
+    },
+    "saveTheDate": {
+      "name": "Save the date",
+      "tagline": "Animowana zapowiedź ślubu z Waszym zdjęciem, muzyką i odliczaniem."
+    },
+    "seating": {
+      "name": "Plan stołów",
+      "tagline": "Plan stołów, w którym goście sami znajdą swoje miejsce."
+    },
+    "gold": {
+      "name": "Gold",
+      "tagline": "Wszystkie aplikacje razem, także te, które dodamy później."
+    }
   }
 }

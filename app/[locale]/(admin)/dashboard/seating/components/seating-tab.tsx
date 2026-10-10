@@ -107,9 +107,9 @@ export function SeatingTab({ events, onSave }: SeatingTabProps) {
     setIsPublished(selectedEvent?.seating.is_published ?? false);
   }
 
-  const plan = selectedEvent?.plan_id ?? "basic";
-  const canEdit = hasFeature({ plan, feature: "findYourTable" });
-  const maxTables = getLimits(plan).seatingTables;
+  const products = selectedEvent?.products ?? [];
+  const canEdit = hasFeature({ products, feature: "findYourTable" });
+  const maxTables = getLimits(products).seatingTables;
   const guestCount = tables.reduce(
     (sum, table) =>
       sum +

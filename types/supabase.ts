@@ -45,8 +45,7 @@ export interface Database {
           welcome_message: string | null;
           schedule: Json | null;
           menu: Json | null;
-          plan_id: string;
-          addons: string[];
+          products: string[];
           storage_used_bytes: number;
           is_active: boolean;
           created_at: string;
@@ -64,8 +63,7 @@ export interface Database {
           welcome_message?: string | null;
           schedule?: Json | null;
           menu?: Json | null;
-          plan_id?: string;
-          addons?: string[];
+          products?: string[];
           storage_used_bytes?: number;
           is_active?: boolean;
           created_at?: string;
@@ -83,8 +81,7 @@ export interface Database {
           welcome_message?: string | null;
           schedule?: Json | null;
           menu?: Json | null;
-          plan_id?: string;
-          addons?: string[];
+          products?: string[];
           storage_used_bytes?: number;
           is_active?: boolean;
           created_at?: string;

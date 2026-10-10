@@ -1,5 +1,5 @@
 import type { AppLocale } from "@/i18n/routing";
-import { CURRENCY, type Plan } from "@/lib/pricing";
+import { CURRENCY, type Product } from "@/lib/pricing";
 import { absoluteUrl, siteConfig } from "./config";
 
 export type JsonLdNode = Record<string, unknown>;
@@ -33,7 +33,7 @@ type SoftwareApplicationOptions = {
   description: string;
   url: string;
   locale: AppLocale;
-  offers: { plan: Plan; name: string; url: string }[];
+  offers: { product: Product; name: string; url: string }[];
 };
 
 export function softwareApplicationNode({
@@ -51,11 +51,11 @@ export function softwareApplicationNode({
     operatingSystem: "Web browser",
     inLanguage: locale,
     publisher: { "@id": ORGANIZATION_ID },
-    offers: offers.map(({ plan, name, url: offerUrl }) => ({
+    offers: offers.map(({ product, name, url: offerUrl }) => ({
       "@type": "Offer",
       name,
       url: offerUrl,
-      price: String(plan.price),
+      price: String(product.price),
       priceCurrency: CURRENCY,
       availability: "https://schema.org/InStock",
     })),
@@ -63,7 +63,7 @@ export function softwareApplicationNode({
 }
 
 type ProductOptions = {
-  plan: Plan;
+  product: Product;
   name: string;
   description: string;
   url: string;
@@ -71,7 +71,7 @@ type ProductOptions = {
 };
 
 export function productNode({
-  plan,
+  product,
   name,
   description,
   url,
@@ -83,11 +83,11 @@ export function productNode({
     description,
     url,
     brand: { "@type": "Brand", name: siteConfig.name },
-    category: "Wedding guestbook software",
+    category: "Wedding planning software",
     offers: {
       "@type": "Offer",
       url: offerUrl,
-      price: String(plan.price),
+      price: String(product.price),
       priceCurrency: CURRENCY,
       availability: "https://schema.org/InStock",
       seller: { "@id": ORGANIZATION_ID },

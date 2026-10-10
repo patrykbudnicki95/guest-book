@@ -23,9 +23,11 @@ CREATE TABLE IF NOT EXISTS events (
   welcome_message TEXT,
   schedule JSONB,
   menu JSONB,
-  plan_id TEXT NOT NULL DEFAULT 'basic' CHECK (plan_id IN ('basic', 'silver', 'gold')),
-  -- One-off products bought on top of the plan
-  addons TEXT[] NOT NULL DEFAULT '{}' CONSTRAINT events_addons_check CHECK (addons <@ ARRAY['saveTheDate']::TEXT[]),
+  -- What the couple bought: single apps and/or 'gold', which grants every app.
+  -- Owners can't write it (see the column GRANTs at the end).
+  products TEXT[] NOT NULL DEFAULT '{}'
+    CONSTRAINT events_products_check
+    CHECK (products <@ ARRAY['guestbook', 'saveTheDate', 'seating', 'gold']::TEXT[]),
   storage_used_bytes BIGINT NOT NULL DEFAULT 0,
   is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -56,7 +58,7 @@ CREATE TABLE IF NOT EXISTS uploads (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Create event_seating table: the "find your table" plan (Gold). Kept apart
+-- Create event_seating table: the "find your table" plan (the seating app). Kept apart
 -- from events, which everyone can read, so a draft plan stays hidden by RLS.
 CREATE TABLE IF NOT EXISTS event_seating (
   event_id UUID PRIMARY KEY REFERENCES events(id) ON DELETE CASCADE,
@@ -67,8 +69,8 @@ CREATE TABLE IF NOT EXISTS event_seating (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Create event_save_the_date table: the animated save the date page (Gold or
--- add-on). Kept apart from events so a draft stays hidden by RLS.
+-- Create event_save_the_date table: the animated save the date page (the
+-- saveTheDate app). Kept apart from events so a draft stays hidden by RLS.
 CREATE TABLE IF NOT EXISTS event_save_the_date (
   event_id UUID PRIMARY KEY REFERENCES events(id) ON DELETE CASCADE,
   template TEXT NOT NULL DEFAULT 'envelope'
@@ -375,7 +377,17 @@ $$;
 -- Table privileges. RLS decides which rows a role sees; these GRANTs decide
 -- whether the role may touch the table at all, and both are required.
 GRANT SELECT ON public.events TO anon, authenticated;
-GRANT INSERT, UPDATE, DELETE ON public.events TO authenticated;
+GRANT DELETE ON public.events TO authenticated;
+-- Owners may write only the columns they edit in the dashboard: never
+-- `products` (what they paid for) or `storage_used_bytes` (kept by a trigger).
+GRANT INSERT (
+  owner_id, names, date, location, qr_code_url, theme_color,
+  cover_photo_url, welcome_message, schedule, menu, is_active
+) ON public.events TO authenticated;
+GRANT UPDATE (
+  names, date, location, qr_code_url, theme_color,
+  cover_photo_url, welcome_message, schedule, menu, is_active, updated_at
+) ON public.events TO authenticated;
 GRANT SELECT, INSERT ON public.entries TO anon, authenticated;
 GRANT DELETE ON public.entries TO authenticated;
 GRANT SELECT, INSERT ON public.uploads TO anon, authenticated;

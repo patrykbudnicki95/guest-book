@@ -16,6 +16,7 @@ import type {
   SeatingUpdate,
 } from "@/lib/schemas/database";
 import type { SaveTheDateAssetKind } from "@/lib/save-the-date";
+import { isProductId, type ProductId } from "@/lib/pricing";
 import type {
   DashboardEntry,
   EventExportResult,
@@ -59,6 +60,16 @@ type Hydrated = {
 };
 
 const DemoContext = createContext<DemoWorkspace | null>(null);
+
+/**
+ * `?apps=saveTheDate` (or `gold`, or a comma list) on any demo link picks what
+ * the demo event owns, so each app's landing page can open its own demo.
+ */
+function requestedProducts(): ProductId[] | null {
+  const raw = new URLSearchParams(window.location.search).get("apps");
+  const products = raw?.split(",").filter(isProductId) ?? [];
+  return products.length > 0 ? [...new Set(products)] : null;
+}
 
 function mediaTypeFor(fileType: string): "image" | "video" {
   return IMAGE_TYPES.includes(fileType) ? "image" : "video";
@@ -178,7 +189,13 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
 
     void loadDemoRecord()
-      .then((record) => {
+      .then(async (record) => {
+        const requested = requestedProducts();
+        if (requested) {
+          record = { ...record, event: { ...record.event, products: requested } };
+          await saveDemoEvent(record.event);
+        }
+
         if (cancelled) {
           return;
         }
@@ -194,6 +211,19 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
       revokeAll();
     };
   }, [applyRecord, revokeAll]);
+
+  const setProducts = useCallback(
+    async (products: ProductId[]) => {
+      if (!event) {
+        return;
+      }
+
+      const next: EventFull = { ...event, products: [...new Set(products)] };
+      await saveDemoEvent(next);
+      setEvent(next);
+    },
+    [event],
+  );
 
   const updateSettings = useCallback(
     async (data: EventSettingsUpdate) => {
@@ -251,18 +281,18 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     [event, rememberUrl],
   );
 
-  /** Same checks as `updateSeating`, minus auth: the demo runs as Gold. */
+  /** Same checks as `updateSeating`, minus auth. */
   const updateSeating = useCallback(
     async (data: SeatingUpdate) => {
       if (!event) {
         return { success: false, error: "Demo not ready" };
       }
 
-      if (!hasFeature({ plan: event.plan_id, feature: "findYourTable" })) {
+      if (!hasFeature({ products: event.products, feature: "findYourTable" })) {
         return { success: false, error: "planUpgradeRequired" };
       }
 
-      if (data.tables.length > getLimits(event.plan_id).seatingTables) {
+      if (data.tables.length > getLimits(event.products).seatingTables) {
         return { success: false, error: "tooManyTables" };
       }
 
@@ -281,14 +311,14 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     [event],
   );
 
-  /** Same checks as `updateSaveTheDate`, minus auth: the demo runs as Gold. */
+  /** Same checks as `updateSaveTheDate`, minus auth. */
   const updateSaveTheDate = useCallback(
     async (data: SaveTheDateUpdate) => {
       if (!event) {
         return { success: false, error: "Demo not ready" };
       }
 
-      if (!hasFeature({ plan: event.plan_id, feature: "saveTheDate" })) {
+      if (!hasFeature({ products: event.products, feature: "saveTheDate" })) {
         return { success: false, error: "planUpgradeRequired" };
       }
 
@@ -338,7 +368,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
 
         if (
           VIDEO_TYPES.includes(file.type) &&
-          !hasFeature({ plan: event.plan_id, feature: "videoUploads" })
+          !hasFeature({ products: event.products, feature: "videoUploads" })
         ) {
           return { ok: false, reason: "mediaTypeNotAllowed" };
         }
@@ -458,6 +488,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         seating,
         saveTheDate,
         isReady: true,
+        setProducts,
         updateSettings,
         updatePageContent,
         uploadCover,

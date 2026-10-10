@@ -61,7 +61,7 @@ async function deleteObjects(fileKeys: string[]) {
 }
 
 /**
- * Signs direct-to-R2 uploads for one entry only if the event's plan allows the
+ * Signs direct-to-R2 uploads for one entry only if the event's guestbook allows the
  * whole batch. `ContentLength` is part of each signature so R2 rejects a payload
  * of a different size than the one we approved.
  */
@@ -91,7 +91,7 @@ export async function getPresignedUrls(input: {
 
   for (const file of files) {
     const check = checkUploadAllowed({
-      plan: context.plan_id,
+      products: context.products,
       eventDate: context.date,
       isActive: context.is_active,
       usedBytes,
@@ -131,7 +131,7 @@ export async function getPresignedUrls(input: {
 }
 
 /**
- * Re-checks one uploaded object against the plan. The size and media type are
+ * Re-checks one uploaded object against the guestbook limits. The size and media type are
  * read back from R2 rather than taken from the request.
  */
 function checkStoredObject(
@@ -153,7 +153,7 @@ function checkStoredObject(
 
   const mediaType = mediaTypeFor(contentType);
   const check = checkUploadAllowed({
-    plan: context.plan_id,
+    products: context.products,
     eventDate: context.date,
     isActive: context.is_active,
     usedBytes,
@@ -211,7 +211,7 @@ export async function saveEntry(input: {
     return { ok: false, reason: "eventInactive" };
   }
 
-  if (!isGuestUploadOpen({ plan: context.plan_id, eventDate: context.date })) {
+  if (!isGuestUploadOpen({ products: context.products, eventDate: context.date })) {
     await deleteObjects(fileKeys);
     return { ok: false, reason: "windowClosed" };
   }

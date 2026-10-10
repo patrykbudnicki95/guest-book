@@ -4,7 +4,7 @@ import {
   EventPlanContextSchema,
   type EventPlanContext,
 } from "@/lib/schemas/database";
-import { hasFeature, type PlanFeature } from "./index";
+import { hasFeature, type Feature } from "./index";
 
 /**
  * Reads everything the permission layer needs about an event in one query.
@@ -17,7 +17,7 @@ export async function getEventPlanContext(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("events")
-    .select("id, plan_id, addons, date, is_active, storage_used_bytes")
+    .select("id, products, date, is_active, storage_used_bytes")
     .eq("id", eventId)
     .single();
 
@@ -43,7 +43,7 @@ export async function getEventPlanContext(
 }
 
 /**
- * Verifies the caller owns the event and that the event's plan includes the
+ * Verifies the caller owns the event and that one of its apps includes the
  * feature. Throws so server actions can guard in a single line.
  */
 export async function requireOwnedEventFeature({
@@ -51,7 +51,7 @@ export async function requireOwnedEventFeature({
   feature,
 }: {
   eventId: string;
-  feature: PlanFeature;
+  feature: Feature;
 }): Promise<EventPlanContext> {
   const supabase = await createClient();
   const {
@@ -79,8 +79,8 @@ export async function requireOwnedEventFeature({
     throw new Error("Event not found");
   }
 
-  if (!hasFeature({ plan: context.plan_id, feature, addons: context.addons })) {
-    throw new Error(`Plan ${context.plan_id} does not include ${feature}`);
+  if (!hasFeature({ products: context.products, feature })) {
+    throw new Error(`Event ${eventId} does not own ${feature}`);
   }
 
   return context;
@@ -95,7 +95,7 @@ export async function checkOwnedEventFeature({
   feature,
 }: {
   eventId: string;
-  feature: PlanFeature;
+  feature: Feature;
 }): Promise<{ allowed: boolean; context: EventPlanContext | null }> {
   const context = await getEventPlanContext(eventId);
 
@@ -104,11 +104,7 @@ export async function checkOwnedEventFeature({
   }
 
   return {
-    allowed: hasFeature({
-      plan: context.plan_id,
-      feature,
-      addons: context.addons,
-    }),
+    allowed: hasFeature({ products: context.products, feature }),
     context,
   };
 }

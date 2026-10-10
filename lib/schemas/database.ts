@@ -1,13 +1,18 @@
 import { z } from "zod";
-import { ADDON_IDS, PLAN_IDS } from "@/lib/pricing";
+import { PRODUCT_IDS } from "@/lib/pricing";
 import { MAX_SEATS_PER_TABLE } from "@/lib/permissions";
 
-export const PlanIdSchema = z.enum(PLAN_IDS);
-export const AddonIdsSchema = z.array(z.enum(ADDON_IDS));
+/** `events.products`: what the couple bought for this event. */
+export const ProductIdsSchema = z.array(z.enum(PRODUCT_IDS));
 
 // Event schemas
 export const EventIdSchema = z.object({
   id: z.string().uuid(),
+});
+
+/** `events.select("products")`: what each event owns, for the dashboard navigation. */
+export const EventProductsSchema = z.object({
+  products: ProductIdsSchema,
 });
 
 /** Plan + usage for the dashboard plan card. */
@@ -15,15 +20,14 @@ export const EventPlanSummarySchema = z.object({
   id: z.string().uuid(),
   names: z.string(),
   date: z.string(),
-  plan_id: PlanIdSchema,
+  products: ProductIdsSchema,
   storage_used_bytes: z.coerce.number().int().nonnegative(),
 });
 
 /** Everything the permission layer needs to decide what an event may do. */
 export const EventPlanContextSchema = z.object({
   id: z.string().uuid(),
-  plan_id: PlanIdSchema,
-  addons: AddonIdsSchema,
+  products: ProductIdsSchema,
   date: z.string(),
   is_active: z.boolean(),
   storage_used_bytes: z.coerce.number().int().nonnegative(),
@@ -39,7 +43,7 @@ export const EventForPdfSchema = z.object({
   names: z.string(),
   date: z.string(),
   location: z.string().nullable(),
-  plan_id: PlanIdSchema,
+  products: ProductIdsSchema,
 });
 
 export const EventOwnerSchema = z.object({
@@ -58,8 +62,7 @@ export const EventSettingsSchema = z.object({
   date: z.string(),
   location: z.string().nullable(),
   theme_color: z.string().nullable(),
-  plan_id: PlanIdSchema,
-  addons: AddonIdsSchema,
+  products: ProductIdsSchema,
 });
 
 export const EventSettingsUpdateSchema = z.object({
@@ -97,7 +100,7 @@ export const EventFullSchema = z.object({
   welcome_message: z.string().nullable(),
   schedule: z.array(ScheduleItemSchema).nullable(),
   menu: z.array(MenuSectionSchema).nullable(),
-  plan_id: PlanIdSchema,
+  products: ProductIdsSchema,
   storage_used_bytes: z.coerce.number().int().nonnegative(),
 });
 
@@ -132,11 +135,11 @@ export const EventSeatingSchema = z.object({
   is_published: z.boolean(),
 });
 
-/** `events.select("id, names, plan_id")` for the seating editor */
+/** `events.select("id, names, products")` for the seating editor */
 export const EventForSeatingSchema = z.object({
   id: z.string().uuid(),
   names: z.string(),
-  plan_id: PlanIdSchema,
+  products: ProductIdsSchema,
 });
 
 /** The table count limit depends on the plan, so the action checks it. */
@@ -194,14 +197,13 @@ export const SaveTheDateUpdateSchema = EventSaveTheDateSchema.omit({
   event_id: true,
 });
 
-/** `events.select("id, names, date, location, plan_id, addons")` */
+/** `events.select("id, names, date, location, products")` */
 export const EventForSaveTheDateSchema = z.object({
   id: z.string().uuid(),
   names: z.string(),
   date: z.string(),
   location: z.string().nullable(),
-  plan_id: PlanIdSchema,
-  addons: AddonIdsSchema,
+  products: ProductIdsSchema,
 });
 
 // Upload schemas

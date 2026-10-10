@@ -2,13 +2,12 @@
 
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
-  AddonIdsSchema,
   EventSettingsSchema,
   EventSettingsUpdateSchema,
-  PlanIdSchema,
+  ProductIdsSchema,
 } from "@/lib/schemas/database";
-import { ADDON_IDS } from "@/lib/pricing";
 import { hasFeature } from "@/lib/permissions";
 import { getEventPlanContext } from "@/lib/permissions/server";
 import type { Database } from "@/types/supabase";
@@ -20,7 +19,7 @@ export async function getEventSettingsList(userId: string): Promise<EventSetting
 
   const { data, error } = await supabase
     .from("events")
-    .select("id, names, date, location, theme_color, plan_id, addons")
+    .select("id, names, date, location, theme_color, products")
     .eq("owner_id", userId)
     .eq("is_active", true)
     .order("created_at", { ascending: false });
@@ -48,7 +47,7 @@ export async function getEventSettings(
 
   const { data, error } = await supabase
     .from("events")
-    .select("id, names, date, location, theme_color, plan_id, addons")
+    .select("id, names, date, location, theme_color, products")
     .eq("id", eventId)
     .eq("owner_id", userId)
     .eq("is_active", true)
@@ -102,9 +101,9 @@ export async function updateEventSettings(
     updated_at: new Date().toISOString(),
   };
 
-  // The colour picker is part of custom branding, so lower plans keep whatever
-  // colour they already have rather than silently having it cleared.
-  if (hasFeature({ plan: planContext.plan_id, feature: "customBranding" })) {
+  // The colour picker is part of custom branding (the guestbook app), so other
+  // events keep whatever colour they have rather than having it cleared.
+  if (hasFeature({ products: planContext.products, feature: "customBranding" })) {
     updateData.theme_color = parsed.data.theme_color ?? null;
   }
 
@@ -124,62 +123,22 @@ export async function updateEventSettings(
 }
 
 /**
- * Development-only escape hatch for exercising all three tiers without a
- * checkout flow. The flag is re-read from the server environment so flipping the
- * client bundle is not enough to call this.
+ * Development-only stand-in for checkout: sets what the event owns, so the
+ * dashboard can be tried as Gold or as any single app. Owners can't write
+ * `products` themselves, hence the service-role client. The flag is re-read on
+ * the server, so flipping it in the client bundle is not enough.
  */
-export async function setEventPlan(
+export async function setEventProducts(
   eventId: string,
-  planId: string,
+  products: string[],
 ): Promise<{ success: boolean; error?: string }> {
   if (process.env.NEXT_PUBLIC_ENABLE_PLAN_SWITCHER !== "true") {
-    return { success: false, error: "Plan switching is disabled" };
+    return { success: false, error: "Product switching is disabled" };
   }
 
-  const parsedPlan = PlanIdSchema.safeParse(planId);
-  if (!parsedPlan.success) {
-    return { success: false, error: "Nieznany pakiet" };
-  }
-
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return { success: false, error: "Nie jesteś zalogowany" };
-  }
-
-  const { error } = await supabase
-    .from("events")
-    // @ts-expect-error Supabase update() infers 'never' - types/supabase.ts events.Update is correct
-    .update({ plan_id: parsedPlan.data, updated_at: new Date().toISOString() })
-    .eq("id", eventId)
-    .eq("owner_id", user.id);
-
-  if (error) {
-    console.error("[setEventPlan] Error updating plan:", error);
-    return { success: false, error: error.message };
-  }
-
-  return { success: true };
-}
-
-/**
- * Development-only companion to `setEventPlan` for add-ons, until checkout
- * exists. Same server-side flag check.
- */
-export async function setEventAddon(
-  eventId: string,
-  addonId: string,
-  enabled: boolean,
-): Promise<{ success: boolean; error?: string }> {
-  if (process.env.NEXT_PUBLIC_ENABLE_PLAN_SWITCHER !== "true") {
-    return { success: false, error: "Plan switching is disabled" };
-  }
-
-  if (!(ADDON_IDS as readonly string[]).includes(addonId)) {
-    return { success: false, error: "Unknown add-on" };
+  const parsed = ProductIdsSchema.safeParse([...new Set(products)]);
+  if (!parsed.success) {
+    return { success: false, error: "Unknown product" };
   }
 
   const supabase = await createClient();
@@ -191,38 +150,24 @@ export async function setEventAddon(
     return { success: false, error: "Unauthorized" };
   }
 
-  const { data, error: readError } = await supabase
+  const { data: owned } = await supabase
     .from("events")
-    .select("addons")
+    .select("id")
     .eq("id", eventId)
     .eq("owner_id", user.id)
-    .single();
-
-  if (readError || !data) {
-    console.error("[setEventAddon] Error fetching event:", readError);
+    .maybeSingle();
+  if (!owned) {
     return { success: false, error: "Event not found" };
   }
 
-  const current = AddonIdsSchema.safeParse((data as { addons: unknown }).addons);
-  if (!current.success) {
-    console.error("[setEventAddon] Zod validation failed:", z.prettifyError(current.error));
-    console.error("[setEventAddon] Raw data:", JSON.stringify(data, null, 2));
-    return { success: false, error: "Invalid add-on data" };
-  }
-
-  const addons = enabled
-    ? [...new Set([...current.data, addonId])]
-    : current.data.filter((id) => id !== addonId);
-
-  const { error } = await supabase
+  const { error } = await createAdminClient()
     .from("events")
     // @ts-expect-error Supabase update() infers 'never' - types/supabase.ts events.Update is correct
-    .update({ addons, updated_at: new Date().toISOString() })
-    .eq("id", eventId)
-    .eq("owner_id", user.id);
+    .update({ products: parsed.data, updated_at: new Date().toISOString() })
+    .eq("id", eventId);
 
   if (error) {
-    console.error("[setEventAddon] Error updating add-ons:", error);
+    console.error("[setEventProducts] Error updating products:", error);
     return { success: false, error: error.message };
   }
 

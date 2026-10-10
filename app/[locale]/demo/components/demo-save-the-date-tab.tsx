@@ -16,12 +16,11 @@ export function DemoSaveTheDateTab() {
         names: event.names,
         date: event.date,
         location: event.location,
-        plan_id: event.plan_id,
-        addons: [],
+        products: event.products,
         saveTheDate,
       },
     ],
-    [event.id, event.names, event.date, event.location, event.plan_id, saveTheDate],
+    [event.id, event.names, event.date, event.location, event.products, saveTheDate],
   );
 
   return (

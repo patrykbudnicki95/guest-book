@@ -19,7 +19,7 @@ async function getEvent(eventId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("events")
-    .select("id, names, plan_id")
+    .select("id, names, products")
     .eq("id", eventId)
     .eq("is_active", true)
     .single();
@@ -92,7 +92,7 @@ async function TablesContent({ params }: TablesPageProps) {
     <SeatingBrowser
       eventNames={event.names}
       tables={
-        hasFeature({ plan: event.plan_id, feature: "findYourTable" })
+        hasFeature({ products: event.products, feature: "findYourTable" })
           ? seating
           : null
       }

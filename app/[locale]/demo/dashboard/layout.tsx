@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Heart } from "lucide-react";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { DashboardNav } from "@/app/[locale]/(admin)/dashboard/dashboard-nav";
+import { DemoDashboardNav } from "../components/demo-dashboard-nav";
 
 // The demo reads its state from IndexedDB, so DemoProvider renders a skeleton
 // instead of this segment on the server and Next can't validate it.
@@ -27,7 +27,7 @@ export default function DemoDashboardLayout({
       </header>
 
       <div className="container mx-auto px-4 py-6">
-        <DashboardNav basePath="/demo/dashboard" />
+        <DemoDashboardNav />
         <div className="mt-6">{children}</div>
       </div>
     </div>

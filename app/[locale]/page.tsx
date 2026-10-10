@@ -8,8 +8,8 @@ import {
   softwareApplicationNode,
   webSiteNode,
 } from "@/lib/seo/json-ld";
-import { PLAN_LIST } from "@/lib/pricing";
-import { planFeatures, planRangeValues } from "@/lib/plan-features";
+import { APPS_TOTAL_PRICE, PRODUCT_LIST, PRODUCT_PAGES } from "@/lib/pricing";
+import { productCopyValues, productFeatures } from "@/lib/plan-features";
 import { JsonLd } from "@/components/json-ld";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
 import { PricingCard } from "@/components/marketing/pricing-card";
@@ -46,10 +46,10 @@ export default async function LandingPage() {
 
   const t = await getTranslations("landing");
 
-  const faqRange = planRangeValues();
+  const values = productCopyValues();
   const faqItems = [1, 2, 3, 4, 5].map((index) => ({
     question: t(`faq.${index}.question`),
-    answer: t(`faq.${index}.answer`, faqRange),
+    answer: t(`faq.${index}.answer`, values),
   }));
 
   const problems = [
@@ -77,13 +77,10 @@ export default async function LandingPage() {
       description: t("definition.body"),
       url: localizedUrl("/", locale),
       locale,
-      offers: PLAN_LIST.map((plan) => ({
-        plan,
-        name: t(`pricing.${plan.id}.title`),
-        url: localizedUrl(
-          { pathname: "/packages/[plan]", params: { plan: plan.id } },
-          locale,
-        ),
+      offers: PRODUCT_LIST.map((product) => ({
+        product,
+        name: t(`pricing.${product.id}.title`),
+        url: localizedUrl(PRODUCT_PAGES[product.id] ?? "/pricing", locale),
       })),
     }),
     faqPageNode(faqItems),
@@ -207,18 +204,22 @@ export default async function LandingPage() {
             </h2>
             <p className="text-muted-foreground">{t("pricing.subtitle")}</p>
           </div>
-          <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-3">
-            {PLAN_LIST.map((plan) => (
-              <PricingCard
-                key={plan.id}
-                plan={plan}
-                title={t(`pricing.${plan.id}.title`)}
-                description={t(`pricing.${plan.id}.description`)}
-                features={planFeatures(t, plan.id)}
-                cta={t("pricing.choosePlan")}
-                detailsLabel={t("pricing.seeDetails")}
-              />
-            ))}
+          <div className="mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {PRODUCT_LIST.map((product) => {
+              const page = PRODUCT_PAGES[product.id];
+              return (
+                <PricingCard
+                  key={product.id}
+                  product={product}
+                  title={t(`pricing.${product.id}.title`)}
+                  description={t(`pricing.${product.id}.description`)}
+                  features={productFeatures(t, product.id)}
+                  cta={t("pricing.choose")}
+                  compareAtPrice={product.id === "gold" ? APPS_TOTAL_PRICE : undefined}
+                  details={page ? { href: page, label: t("pricing.seeDetails") } : undefined}
+                />
+              );
+            })}
           </div>
           <div className="mt-10 text-center">
             <Link
